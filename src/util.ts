@@ -38,3 +38,9 @@ export const coords = {
         return Volatile.point(coord.x - rect.left, coord.y - rect.top);
     },
 }
+
+/** A mutable counterpart to ArrayLike. */
+export interface Arrayish<T> {
+    readonly length: number;
+    [n: number]: T;
+}

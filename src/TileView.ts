@@ -1,6 +1,6 @@
 import { $, $$ } from './dollar';
 import { Volatile, coords } from './util';
-import { Site } from './site';
+import { Site, SiteChild } from './site';
 import { Palette, RGBA } from './gfx/palette';
 import { TileData } from './gfx/TileData';
 import { demoNesTile, tileCodecs, TileCodec } from './gfx/tileCodec';
@@ -43,7 +43,7 @@ export class TileView {
     }
 
     site(owner: Site) {
-        owner.site.appendChild(this.element);
+        SiteChild(this.element, owner);
         this.owner = owner;
 
         this.element.addEventListener('mousemove', e => this.onMouseMove(e));
@@ -79,13 +79,13 @@ export class TileView {
         
             this.pixels.setPixel(px, py, this.selectedColor);
         } else if (e.button === 2) {
-            var nesTile = demoNesTile;
-            var codec = tileCodecs.nesCodec;
+            // var nesTile = demoNesTile;
+            // var codec = tileCodecs.nesCodec;
 
-            codec.decode(
-                { data: nesTile, offset: 0 },
-                { data: this.pixels, offset: 0 }
-            );
+            // codec.decode(
+            //     { data: nesTile, offset: 0 },
+            //     { data: this.pixels, offset: 0 }
+            // );
 
             this.redraw();
         }    

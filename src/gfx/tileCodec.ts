@@ -1,10 +1,7 @@
 import { StylePalette } from "./palette";
 import { TileData } from "./TileData";
+import { Arrayish } from '../util';
 
-interface Arrayish<T> {
-    readonly length: number;
-    [n: number]: T;
-}
 
 export interface BufferPointer {
     data: ArrayLike<number>;
@@ -56,7 +53,9 @@ const nesCodec = {
         }
     },
     encode: function encode(source: TilePointer, dest: BufferPointer) {
-
+        throw Error('not implementing this until I can test it');
+        // cause I know that I'll write a broken implementation, and when it 
+        // doesn't work down the road I'll spend hours trying to debug it
     },
 } as TileCodec;
 
