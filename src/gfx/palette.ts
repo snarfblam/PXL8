@@ -59,3 +59,4 @@ function byteToHex(val: number) {
     return result;
 }
 export type Palette = RGBA[];
+export type StylePalette = string[];

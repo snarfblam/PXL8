@@ -2,6 +2,8 @@ import { $, $$ } from './dollar';
 import { Volatile, coords } from './util';
 import { Site } from './site';
 import { Palette, RGBA } from './gfx/palette';
+import { TileData } from './gfx/TileData';
+import { demoNesTile, tileCodecs, TileCodec } from './gfx/tileCodec';
 
 /** 
  * Tile editing interface component.
@@ -77,6 +79,14 @@ export class TileView {
         
             this.pixels.setPixel(px, py, this.selectedColor);
         } else if (e.button === 2) {
+            var nesTile = demoNesTile;
+            var codec = tileCodecs.nesCodec;
+
+            codec.decode(
+                { data: nesTile, offset: 0 },
+                { data: this.pixels, offset: 0 }
+            );
+
             this.redraw();
         }    
     }
@@ -119,23 +129,6 @@ export class TileView {
     }
 }
 
-/** Represents indexed image data as an array of pixel values. */
-export class TileData {
-    data: Uint8Array;
-    constructor(public readonly width: number, public readonly height: number) {
-        this.data = new Uint8Array(width * height);
-    }
-
-    getPixel(x: number, y: number) {
-        return this.data[x + y * this.width];
-    }
-
-    setPixel(x: number, y: number, value: number) {
-        this.data[x + y * this.width] = value;
-    }
-
-    
-}
 
 export interface TileViewMetrics {
     width: number;
@@ -156,4 +149,5 @@ const defaultPalette = [
     { r: 0x00, g: 0x00, b: 0x00, a: 0xFF }, // black
     { r: 0xFF, g: 0xFF, b: 0xFF, a: 0xFF }, // white
     { r: 0x00, g: 0x00, b: 0xFF, a: 0xFF }, // blue
+    { r: 0x00, g: 0xFF, b: 0x00, a: 0xFF }, // green
 ];
