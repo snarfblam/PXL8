@@ -16,18 +16,26 @@
  *      http://localhost:8000/
  */
 
-//@ts-check
 "use strict";
 
-/** Creates an object that can produce metadata for a ROM file
- *  @param {File} romFile File to process. A blob can be processed provided 
- *                that it has a name property containing a string
- */
+import { TileView } from './TileView';
+
 class Pxl8 {
     constructor() {
-    }
+        var editor = new TileView();
+        editor.initialize(320, 240, { width: 20, height: 15, pixelWidth: 16, pixelHeight: 16 });
+        editor.site({ site: document.body });
+        var pixels = editor.pixels.data;
+        for (var i = 0; i < pixels.length; i++){
+            var val = Math.floor(Math.random() * 2);
+            pixels[i] = val;
+        }
 
+        editor.redraw();
+    }
 }
+
+
 
 
 
@@ -80,4 +88,4 @@ var isIE = !!detectIE(); // true if it's IE
 window.poopMode = isIE;
 
 // 'export default Hasher' produces an object {_deafult: Hasher}... not what we want
-module.exports = Pxl8;
+export default Pxl8;

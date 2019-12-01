@@ -34,7 +34,8 @@ var regNameLookup = {
     rom: "ROM",
 };
 
-
+// @ts-ignore
+var app = new pxl8.default();
 ///////////////////// Helper Functions ///////////////////////////////////////
 
 /** Performs a jQuery call, but writes an error to the console if the selector
@@ -67,53 +68,31 @@ function setClass(obj, state, className) {
 /** Page initialization */
 $(document).ready(function () {
     ui = {
-        btnRom: $$('#btn-rom'),
-        btnHeader: $$('#btn-header'),
-        btnHashes: $$('#btn-hashes'),
-        detailRom: $$('#detail-rom'),
-        detailHeader: $$('#detail-header'),
-        detailHashes: $$('#detail-hashes'),
-        btnCopy: $$('#btn-copy'),
-        fileInput: $$('#file-input'),
-        fileInputBox: $$('#file-input-box'),
-        abortHash: $$('#abort-hash'),
-        chkSha1: $$('#chk-sha1'),
-        file: {
-            input: $$('#file-input'),
-            inputBox: $$('#file-input-box'),
-            inputBoxOuter: $$('#file-input-outer'),
-            platformIcon: $$('#platform-icon'),
-            gameName: $$('#game-name'),
-        },
-        progressBar: $$('#hash-progress'),
-        progressBarMarker: $$('#hash-progress-marker'),
-        outputSummary: $$('#result-box-content'),
-        body: $$(document.body),
-        output: document.getElementById('hasher-output'),
+        // btnRom: $$('#btn-rom'),
+        // btnHeader: $$('#btn-header'),
+        // btnHashes: $$('#btn-hashes'),
+        // detailRom: $$('#detail-rom'),
+        // detailHeader: $$('#detail-header'),
+        // detailHashes: $$('#detail-hashes'),
+        // btnCopy: $$('#btn-copy'),
+        // fileInput: $$('#file-input'),
+        // fileInputBox: $$('#file-input-box'),
+        // abortHash: $$('#abort-hash'),
+        // chkSha1: $$('#chk-sha1'),
+        // file: {
+        //     input: $$('#file-input'),
+        //     inputBox: $$('#file-input-box'),
+        //     inputBoxOuter: $$('#file-input-outer'),
+        //     platformIcon: $$('#platform-icon'),
+        //     gameName: $$('#game-name'),
+        // },
+        // progressBar: $$('#hash-progress'),
+        // progressBarMarker: $$('#hash-progress-marker'),
+        // outputSummary: $$('#result-box-content'),
+        // body: $$(document.body),
+        // output: document.getElementById('hasher-output'),
     };
 
-    // tab selection
-    ui.btnRom.on('click', function () { selectDetailTab(ui.btnRom, ui.detailRom); });
-    ui.btnHashes.on('click', function () { selectDetailTab(ui.btnHashes, ui.detailHashes); });
-    ui.btnHeader.on('click', function () { selectDetailTab(ui.btnHeader, ui.detailHeader); });
-    ui.btnCopy.on('click', function () {
-        copyText(ui.outputSummary.text());
-        ui.btnCopy.blur();
-    });
-
-    // File drag and drop
-    ui.fileInputBox.on('drop', onFileDrop);
-    ui.fileInputBox.on('dragdrop', onFileDrop);
-    ui.fileInputBox.on('dragover', onDragOver);
-    ui.fileInputBox.on('dragenter', onDragOver);
-    ui.fileInputBox.on('dragend', onDragEnd);
-    ui.fileInputBox.on('dragleave', onDragEnd);
-
-    // File dialog
-    ui.fileInput.on('change', onFileSelected);
-
-    // 'Cancel' button
-    ui.abortHash.on('click', function (ev) { hasher.cancel(); });
 });
 
 /** Handles the selection of a file via the file dialog */
