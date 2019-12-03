@@ -39,6 +39,13 @@ export const coords = {
     },
 }
 
+export function eventToClientCoords(elem: HTMLElement, e: MouseEvent) {
+    var box = elem.getBoundingClientRect();
+    var x = e.clientX - box.left;
+    var y = e.clientY - box.top;
+    return Volatile.point(x, y);
+}
+
 /** A mutable counterpart to ArrayLike. */
 export interface Arrayish<T> {
     readonly length: number;

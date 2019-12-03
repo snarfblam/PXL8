@@ -23,22 +23,30 @@ import { GfxView } from './gfxView';
 import { $, $$ } from './dollar';
 import { tileCodecs } from './gfx/tileCodec';
 import { debugPalette } from './gfx/palette';
+import { RomView } from './romView';
+import { ROM } from './rom';
 
 class Pxl8 {
     constructor() {
-        var editor = new TileView();
-        editor.initialize(128, 128, { width: 8, height: 8, pixelWidth: 16, pixelHeight: 16 });
-        editor.site({ site: document.body });
-        editor.palette = debugPalette;
-        editor.element.style.margin = '2px';
-        var pixels = editor.pixels.data;
-        for (var i = 0; i < pixels.length; i++){
-            var val = Math.floor(Math.random() * 2);
-            pixels[i] = val;
-        }
 
-        editor.redraw();
-        (window as any).tileEditor = editor;
+        var romView = new RomView();
+        romView.site({site: document.body});
+        (window as any).romView = romView;
+
+        // var editor = new TileView();
+        // editor.initialize({ tileWidth: 8, tileHeight: 8, pixelWidth: 16, pixelHeight: 16 });
+        // editor.site({ site: document.body });
+        // console.log('sited');
+        // editor.palette = debugPalette;
+        // editor.element.style.margin = '2px';
+        // var pixels = editor.pixels.data;
+        // for (var i = 0; i < pixels.length; i++){
+        //     var val = Math.floor(Math.random() * 2);
+        //     pixels[i] = val;
+        // }
+
+        // editor.redraw();
+        // (window as any).tileEditor = editor;
 
         var fileInput = $.create('input') as HTMLInputElement;
         fileInput.type = 'file';
@@ -46,44 +54,55 @@ class Pxl8 {
 
         fileInput.onchange = e => {
             var file = fileInput.files![0];  
-            var reader = new FileReader();
-            reader.onload = e => onFileLoaded(reader.result as ArrayBuffer);
-            reader.readAsArrayBuffer(file);
+            onRomLoaded(file);
+            
+            // var reader = new FileReader();
+            // reader.onload = e => {
+            //     onFileLoaded(reader.result as ArrayBuffer);
+            // }
+            // reader.readAsArrayBuffer(file);
         };
     }
 }
 
-function onFileLoaded(contents: ArrayBuffer) {
-    var editor = ((window as any).tileEditor as TileView);
-    
-    var buffy = new Uint8Array(contents);
-    var view = new GfxView();
-    view.initialize();
-    view.codec = tileCodecs.nesCodec;
-    view.palette = debugPalette;
-    view.gfxData = buffy;
-    view.site({
-        site: document.body,
-        placeElement: e => {
-            document.body.insertBefore(e, editor.element);
-        }   
-    });
-    view.displayOffset(0x40010);
-
-    view.element.onmousedown = function (e) {
-        var b = view.element.getBoundingClientRect();
-        var x = (e.clientX - b.left) / view.metrics.pixelWidth;
-        var y = (e.clientY - b.top) / view.metrics.pixelHeight;
-        var tileX = Math.floor(x / view.metrics.tileWidth);
-        var tileY = Math.floor(y / view.metrics.tileHeight);
-        var tileIndex = tileY * view.metrics.gridWidth + tileX;
-        var offset = tileIndex * view.codec!.bytesPerTile + 0x40010;
-
-        var pixelData = editor.pixels;
-        view.codec!.decode({ data: buffy, offset }, { data: pixelData, offset: 0 });
-        editor.redraw();
-    };
+function onRomLoaded(file: File) {
+    var romView = ((window as any).romView as RomView);
+    romView.loadRom(new ROM(file), tileCodecs.nesCodec);
+    romView.setViewOffset(0x40010);
 }
+
+// function onFileLoaded(contents: ArrayBuffer) {
+
+//     // var editor = ((window as any).tileEditor as TileView);
+    
+//     // var buffy = new Uint8Array(contents);
+//     // var view = new GfxView();
+//     // view.initialize();
+//     // view.codec = tileCodecs.nesCodec;
+//     // view.palette = debugPalette;
+//     // view.gfxData = buffy;
+//     // view.site({
+//     //     site: document.body,
+//     //     placeElement: e => {
+//     //         document.body.insertBefore(e, editor.element);
+//     //     }   
+//     // });
+//     // view.displayOffset(0x40010);
+
+//     // view.element.onmousedown = function (e) {
+//     //     var b = view.element.getBoundingClientRect();
+//     //     var x = (e.clientX - b.left) / view.metrics.pixelWidth;
+//     //     var y = (e.clientY - b.top) / view.metrics.pixelHeight;
+//     //     var tileX = Math.floor(x / view.metrics.tileWidth);
+//     //     var tileY = Math.floor(y / view.metrics.tileHeight);
+//     //     var tileIndex = tileY * view.metrics.gridWidth + tileX;
+//     //     var offset = tileIndex * view.codec!.bytesPerTile + 0x40010;
+
+//     //     var pixelData = editor.pixels;
+//     //     view.codec!.decode({ data: buffy, offset }, { data: pixelData, offset: 0 });
+//     //     editor.redraw();
+//     // };
+// }
 
 
 

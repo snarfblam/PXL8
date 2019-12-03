@@ -29,9 +29,9 @@ export class TileView {
     }
 
     /** Initializes this element for use. Can be called multiple times if the object is re-used. */
-    initialize(width: number, height: number, metrics: TileViewMetrics) {
-        // this.element.setAttribute('width', width.toString());
-        // this.element.setAttribute('height', height.toString());
+    initialize(metrics: TileViewMetrics) {
+        var width = metrics.tileWidth * metrics.pixelWidth;
+        var height = metrics.tileHeight * metrics.pixelHeight;
         this.element.width = width;
         this.element.height = height;
         this.element.style.background = 'white';
@@ -39,7 +39,7 @@ export class TileView {
 
 
         this.metrics = { ...metrics };
-        this.pixels = new TileData(this.metrics.width, this.metrics.height);
+        this.pixels = new TileData(this.metrics.tileWidth, this.metrics.tileHeight);
     }
 
     site(owner: Site) {
@@ -98,13 +98,13 @@ export class TileView {
 
     /** Rerenders the tile image based on this object's pixel data. Call when pixel data or palette changes. */
     redraw() {
-        var { width, height, pixelWidth: pw, pixelHeight: ph } = this.metrics;
+        var { tileWidth, tileHeight, pixelWidth: pw, pixelHeight: ph } = this.metrics;
         var iPxl = 0;
         var data = this.pixels.data;
         var pal = this.palette;
 
-        for (var y = 0; y < height; y++){
-            for (var x = 0; x < width; x++) {
+        for (var y = 0; y < tileHeight; y++){
+            for (var x = 0; x < tileWidth; x++) {
                 var iColor = data[iPxl];
                 if (iColor >= pal.length) iColor = pal.length - 1;
                 var color = this.palette[iColor];
@@ -131,16 +131,16 @@ export class TileView {
 
 
 export interface TileViewMetrics {
-    width: number;
-    height: number;
+    tileWidth: number;
+    tileHeight: number;
     pixelWidth: number;
     pixelHeight: number;
 }
 
 
-const defaultMetrics = {
-    width: 16,
-    height: 16,
+const defaultMetrics:TileViewMetrics = {
+    tileWidth: 16,
+    tileHeight: 16,
     pixelWidth: 1,
     pixelHeight: 1,
 }

@@ -2,5 +2,6 @@
     "search.exclude": {
         "**/node_modules": false,
         "**/bower_components": true
-    }
+    },
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }
