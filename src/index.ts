@@ -25,6 +25,7 @@ import { tileCodecs } from './gfx/tileCodec';
 import { debugPalette } from './gfx/palette';
 import { RomView } from './romView';
 import { ROM } from './rom';
+import { PaletteView } from './paletteView';
 
 class Pxl8 {
     constructor() {
@@ -33,6 +34,9 @@ class Pxl8 {
         romView.site({site: document.body});
         (window as any).romView = romView;
 
+        var pal = new PaletteView();
+        pal.site({ site: document.body });
+        pal.events.subscribe({ paletteModified: () => console.log('event!') });
         // var editor = new TileView();
         // editor.initialize({ tileWidth: 8, tileHeight: 8, pixelWidth: 16, pixelHeight: 16 });
         // editor.site({ site: document.body });

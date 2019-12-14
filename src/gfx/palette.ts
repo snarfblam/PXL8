@@ -28,9 +28,9 @@ export const RGBA = {
     /** Converts a 32-bit integer with ARGB ordering (#AARRGGBB) to an RGBA object. */
     fromNumARGB(value: number) {
         return {
-            b: value & 0xFF,
-            g: (value & 0xFF00) >>> 8,
             r: (value & 0xFF0000) >>> 16,
+            g: (value & 0xFF00) >>> 8,
+            b: value & 0xFF,
             a: (value & FF000000) >>> 24, 
         };
     },
@@ -44,11 +44,23 @@ export const RGBA = {
             value = RGBA.fromNumARGB(value);
         }
         
-        return "#" +
-            byteToHex(value.r) +
-            byteToHex(value.g) +
-            byteToHex(value.b) +
-            byteToHex(value.a);
+        // return "#" +
+        //     byteToHex(value.r) +
+        //     byteToHex(value.g) +
+        //     byteToHex(value.b) +
+        //     byteToHex(value.a);
+        if (value.a === 255) {
+            return "rgb(" +
+                (255 &value.r).toString() + ", " +
+                (255 &value.g).toString() + ", " +
+                (255 &value.b).toString() + ")";
+        } else {
+            return "rgba(" + 
+                (255 &value.r).toString() + ", " + 
+                (255 &value.g).toString() + ", " + 
+                (255 &value.b).toString() + ", " + 
+                (value.a / 255).toFixed(4) + ")";
+        }
         
     },
 };
@@ -73,3 +85,82 @@ export const debugPalette = [
     { r: 0xFF, g: 0xDD, b: 0xBB, a: 0xFF }, // skin
     { r: 0x00, g: 0x00, b: 0x00, a: 0xFF }, // black
 ];
+
+const undefinedColor = { r: 0, g: 0, b: 0, a: 0 };
+export class ManagedPalette {
+    data = [] as RGBA[];
+    styles = [] as (string | null)[];
+
+    constructor(size?: number);
+    constructor(data: RGBA[]);
+    constructor(arg: number | RGBA[] | undefined) {
+        var size = 0;
+        if (typeof arg === 'number') {
+            size = arg;
+        } else if (arg) {
+            size = arg.length;
+        }
+
+        for (var i = 0; i < size; i++) {
+            this.data.push({ r: 0, g: 0, b: 0, a: 255 });
+            this.styles.push(null);
+        }
+        if (arg instanceof Array) {
+            for (var i = 0; i < size; i++) {
+                this.setColor(i, arg[i]);
+            }            
+        }
+    }
+
+    getColor(index: number, output?: RGBA) {
+        var result = (this.data[index] || undefinedColor) as Readonly<RGBA>;
+        if (output) {
+            output.r = result.r;
+            output.g = result.g;
+            output.b = result.b;
+            output.a = result.a;
+            result = output;
+        }
+        return result;
+    }
+
+    setColor(index: number, value: RGBA) {
+        var color = (this.data[index] || undefinedColor);
+        color.r = value.r & 255;
+        color.g = value.g & 255;
+        color.b = value.b & 255;
+        color.a = value.a & 255;
+        if (0 <= index && index < this.styles.length) {
+            this.styles[index] = null;
+        }
+    }
+
+    getStyle(index: number) {
+        var style = this.styles[index];
+        if (style) {
+            return style;
+        } else {
+            var color = (this.data[index] || undefinedColor);
+            if (color.a === 255) {
+                style = "rgb(" +
+                    color.r.toString() + ", " +
+                    color.g.toString() + ", " +
+                    color.b.toString() + ")";
+            } else {
+                style ="rgba(" + 
+                    color.r.toString() + ", " + 
+                    color.g.toString() + ", " + 
+                    color.b.toString() + ", " + 
+                    (color.a / 255).toFixed(4) + ")";
+            }
+
+            if (0 <= index && index < this.styles.length) {
+                this.styles[index] = style;
+            }
+    
+            return style; 
+        }
+    }
+
+    getLength() { return this.data.length; }
+}
