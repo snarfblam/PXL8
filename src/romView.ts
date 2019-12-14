@@ -6,6 +6,7 @@ import { TileCodec } from "./gfx/tileCodec";
 import { Palette, debugPalette } from "./gfx/palette";
 import { Arrayish } from "./util";
 import { SiteChild, Site } from "./site";
+import { EventManager, EventSubscription } from './eventManager';
 
 const tileViewZoom = 8;
 const gfxViewZoom = 2;
@@ -24,30 +25,36 @@ export class RomView {
     private romBuffer: Uint8Array;
     private viewableByteCount = 0;
 
-    private listeners: RomViewEvents[] = [];
+    // private listeners: RomViewEvents[] = [];
+    private readonly eventMgr: EventManager<RomViewEvents>;
+    public readonly events: EventSubscription<RomViewEvents>;
     
     constructor() {
         this.gfxView = new GfxView();
         this.tileView = new TileView();
         this.romBuffer = new Uint8Array(1);
         this.element = $.create('div');
+
+        this.eventMgr = new EventManager<RomViewEvents>();
+        this.events = this.eventMgr.subscriber;
     }   
 
-    addListener(listener: RomViewEvents) {
-        this.listeners.push(listener);
-    }
+    // addListener(listener: RomViewEvents) {
+    //     this.listeners.push(listener);
+    // }
 
-    removeListener(listener: RomViewEvents) {
-        var index = this.listeners.indexOf(listener);
-        if (index >= 0) this.listeners = this.listeners.splice(index, 1);
-    }
+    // removeListener(listener: RomViewEvents) {
+    //     var index = this.listeners.indexOf(listener);
+    //     if (index >= 0) this.listeners = this.listeners.splice(index, 1);
+    // }
 
-    private raise<T extends keyof RomViewEvents>(eventName: T, args: RomViewEvents[T]) {
-        this.listeners.forEach(l => {
-            var handler = l[eventName];
-            if (handler) handler(args);
-        });
-    }
+    // private raise<T extends keyof RomViewEvents>(eventName: T, args: EventArg<T>) {
+    //     this.listeners.forEach(l => {
+    //         var handler = l[eventName];
+    //         if (handler) handler(args as any as never);
+    //     });
+
+    // }
 
     site(site: Site) {
         var thisSite = { site: this.element };
@@ -117,8 +124,10 @@ export class RomView {
 }
 
 export interface RomViewEvents {
-    tilePicked?: (arg: { relativeIndex: number, offset: number }) =>void;
-    dogs?: (arg: number) => void;
+    tilePicked?: (arg: { relativeIndex: number, offset: number }) => void;
+    test?: (arg: number) => void;
+    tesy?: (arg: string) => void;
 }
+// type EventHandler<T extends keyof RomViewEvents> = NonNullable<RomViewEvents[T]>
+// type EventArg<T extends keyof RomViewEvents> = Parameters<EventHandler<T>>[0];
 
-type RomViewEventName = keyof RomViewEvents;

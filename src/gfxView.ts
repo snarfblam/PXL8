@@ -101,19 +101,9 @@ export class GfxView {
 
     onMouseMove(e: MouseEvent) {
         var { x, y } = eventToClientCoords(this.element, e);
-        //     // view.element.onmousedown = function (e) {
-//     //     var b = view.element.getBoundingClientRect();
-//     //     var x = (e.clientX - b.left) / view.metrics.pixelWidth;
-//     //     var y = (e.clientY - b.top) / view.metrics.pixelHeight;
         var tileX = Math.floor(x / this.metrics.tileWidth);
         var tileY = Math.floor(y / this.metrics.tileHeight);
         var tileIndex = tileY * this.metrics.gridWidth + tileX;
-//     //     var offset = tileIndex * view.codec!.bytesPerTile + 0x40010;
-
-//     //     var pixelData = editor.pixels;
-//     //     view.codec!.decode({ data: buffy, offset }, { data: pixelData, offset: 0 });
-//     //     editor.redraw();
-//     // };
     }
     onMouseDown(e: MouseEvent) {
         e.preventDefault();
