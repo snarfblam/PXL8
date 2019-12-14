@@ -42,11 +42,10 @@ export interface PaletteViewEvents {
 }
 
 export class PaletteView {
-    paletteCount = 4;
-    rgbDetents = 8;
-    palette = new ManagedPalette(defaultPalette);
-    primarySelection = 0;
-    secondarySelection = 1;
+    private rgbDetents = 8;
+    private palette = new ManagedPalette(defaultPalette);
+    private primarySelection = 0;
+    private secondarySelection = 1;
     
     private eventManager = new EventManager<PaletteViewEvents>();
     public events = this.eventManager.subscriber;
@@ -91,6 +90,21 @@ export class PaletteView {
 
     site(site: Site) {
         SiteChild(this.ui.element, site);
+    }
+
+    setPalette(palette: RGBA[]) {
+        this.palette.resize(palette.length);
+        for (var i = 0; i < palette.length; i++){
+            this.palette.setColor(i, palette[i]);
+        }
+
+        this.updateSwatchGrid();
+        this.updatePrimarySwatch();
+        this.updateSecondarySwatch();
+    }
+
+    getPalette() {
+        return this.palette.cloneColors();
     }
 
     updatePrimarySwatch() {
@@ -138,10 +152,17 @@ export class PaletteView {
 
         this.palette.setColor(palIndex, newColor);
         this.updatePaletteColors();
+        this.eventManager.raise('paletteModified', undefined);
     }
 
     private createComponents() {
+        this.ui.element.style.position = 'relative';
         this.siteStaticChildren(this.ui);
+        this.updateSwatchGrid();
+    }
+
+    /** Creates or removes palette swatch according to this object's palette and rgbDetent values.*/
+    private updateSwatchGrid() {
         this.createPaletteElements();
         this.createRgbElements();
     }

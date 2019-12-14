@@ -4,7 +4,11 @@ import { Site, SiteChild } from './site';
 import { Palette, RGBA } from './gfx/palette';
 import { TileData } from './gfx/TileData';
 import { demoNesTile, tileCodecs, TileCodec } from './gfx/tileCodec';
+import { EventManager } from './eventManager';
 
+export interface TileViewEvents {
+    commitChanges: () => void;
+}
 /** 
  * Tile editing interface component.
  *
@@ -23,6 +27,9 @@ export class TileView {
     pixels: TileData = defaultTileData;
     palette: Palette = defaultPalette;
     selectedColor = 2; // todo: default to 0
+    
+    private eventManager = new EventManager<TileViewEvents>();
+    public events = this.eventManager.subscriber; 
 
     constructor() {
         this.element = $.create('canvas') as HTMLCanvasElement;

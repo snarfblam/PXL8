@@ -86,6 +86,7 @@ export const debugPalette = [
     { r: 0x00, g: 0x00, b: 0x00, a: 0xFF }, // black
 ];
 
+function newRGBA() { return { r: 0, g: 0, b: 0, a: 255 } as RGBA };
 const undefinedColor = { r: 0, g: 0, b: 0, a: 0 };
 export class ManagedPalette {
     data = [] as RGBA[];
@@ -102,7 +103,7 @@ export class ManagedPalette {
         }
 
         for (var i = 0; i < size; i++) {
-            this.data.push({ r: 0, g: 0, b: 0, a: 255 });
+            this.data.push(newRGBA());
             this.styles.push(null);
         }
         if (arg instanceof Array) {
@@ -110,6 +111,28 @@ export class ManagedPalette {
                 this.setColor(i, arg[i]);
             }            
         }
+    }
+
+    resize(count: number) {
+        while (this.data.length > count) {
+            this.data.pop();
+            this.styles.pop();
+        }
+
+        while (this.data.length < count) {
+            this.data.push(newRGBA());
+            this.styles.push(null);
+        }
+    }
+
+    cloneColors() {
+        var result = [] as RGBA[];
+        for (var i = 0; i < this.data.length; i++){
+            var { r, g, b, a } = this.data[i];
+            result.push({ r, g, b, a });
+        }
+
+        return result;
     }
 
     getColor(index: number, output?: RGBA) {

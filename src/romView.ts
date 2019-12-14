@@ -7,6 +7,7 @@ import { Palette, debugPalette } from "./gfx/palette";
 import { Arrayish } from "./util";
 import { SiteChild, Site } from "./site";
 import { EventManager, EventSubscription } from './eventManager';
+import { PaletteView } from "./paletteView";
 
 const tileViewZoom = 8;
 const gfxViewZoom = 2;
@@ -15,6 +16,7 @@ const gfxViewZoom = 2;
 export class RomView {
     gfxView: GfxView;
     tileView: TileView;
+    palView: PaletteView;
     element: HTMLElement;
 
     private rom: ROM | null = null;
@@ -32,11 +34,19 @@ export class RomView {
     constructor() {
         this.gfxView = new GfxView();
         this.tileView = new TileView();
+        this.palView = new PaletteView();
         this.romBuffer = new Uint8Array(1);
         this.element = $.create('div');
 
         this.eventMgr = new EventManager<RomViewEvents>();
         this.events = this.eventMgr.subscriber;
+
+        this.palView.events.subscribe({
+            paletteModified: () => {
+                this.gfxView.palette = this.palView.getPalette();
+                this.gfxView.displayOffset(0);
+            },
+        });
     }   
 
     // addListener(listener: RomViewEvents) {
@@ -60,6 +70,7 @@ export class RomView {
         var thisSite = { site: this.element };
         this.gfxView.site(thisSite);
         this.tileView.site(thisSite);
+        this.palView.site(thisSite);
         SiteChild(this.element, site);
     }
 
@@ -82,6 +93,8 @@ export class RomView {
             gridWidth: 16,
             gridHeight: 16,
         });
+
+        this.palView.setPalette(debugPalette);
 
         this.viewableByteCount = this.gfxView.metrics.gridWidth * this.gfxView.metrics.gridHeight * this.codec.bytesPerTile;
         this.romBuffer = new Uint8Array(this.viewableByteCount);
