@@ -6,7 +6,11 @@ import { GfxBuffer, GfxBufferMetrics } from './gfx/gfxBuffer';
 import { TileCodec } from './gfx/tileCodec';
 import { Palette } from './gfx/palette';
 import { TileData } from './gfx/TileData';
+import { EventManager } from './eventManager';
 
+export interface GfxViewEvents {
+    tilePicked?: (index: number) => void;
+}
 export class GfxView {
     element: HTMLCanvasElement;
     context: CanvasRenderingContext2D | null = null;
@@ -16,6 +20,8 @@ export class GfxView {
     codec: TileCodec | null = null;
     buffer: GfxBuffer | null = null;
     palette: Palette | null = null;
+    private eventManager = new EventManager<GfxViewEvents>();
+    public events = this.eventManager.subscriber;
 
     constructor() {
         this.element = $.create('canvas') as HTMLCanvasElement;
@@ -81,6 +87,42 @@ export class GfxView {
         }
     }
 
+    refreshTile(offset: number, index: number) {
+        var { codec, gfxData, buffer, context, palette, metrics } = this;
+
+        if (codec == null || gfxData == null || buffer == null || context == null || palette == null) {
+            throw Error("GfxView object not initialized or required property not set (codec, gfxData, palette).");
+        }
+        
+        buffer.palette = palette;
+        buffer.codec = codec;
+
+        var tileOffset = offset + index * codec.bytesPerTile;
+        var offsetAfter = tileOffset + codec.bytesPerTile;
+        var enoughData = index >= 0 && offsetAfter <= gfxData.length;
+
+        if (enoughData) {
+            var src = { data: gfxData, offset: tileOffset };
+            buffer.loadTile(src, 0, 0);
+
+            // Tile index
+            var tileX = index % this.metrics.gridWidth;
+            var tileY = Math.floor(index / this.metrics.gridWidth);
+            // View coords
+            var outX = tileX * metrics.tileWidth * metrics.pixelWidth;
+            var outY = tileY * metrics.tileHeight * metrics.pixelHeight;
+            var outWidth = metrics.tileWidth * metrics.pixelWidth;
+            var outHeight = metrics.tileHeight * metrics.pixelHeight;
+            console.log({ index, src, tileX, tileY, outX, outY, outWidth, outHeight });
+            context.drawImage(buffer.canvas,
+                // src
+                0, 0, this.metrics.tileWidth, this.metrics.tileHeight,
+                // dest
+                outX, outY, outWidth, outHeight
+            );
+        }
+    }
+
 
     site(owner: Site) {
         SiteChild(this.element, owner);
@@ -109,7 +151,10 @@ export class GfxView {
         e.preventDefault();
 
         var { x, y } = eventToClientCoords(this.element, e);
-
+        var tileX = Math.floor(x / (this.metrics.tileWidth * this.metrics.pixelWidth));
+        var tileY = Math.floor(y / (this.metrics.tileHeight * this.metrics.pixelHeight));
+        var tileIndex = tileX + tileY * this.metrics.gridWidth;
+        this.eventManager.raise("tilePicked", tileIndex);
     }
  
     onMouseUp(e: MouseEvent) {

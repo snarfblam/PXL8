@@ -7,7 +7,7 @@ import { demoNesTile, tileCodecs, TileCodec } from './gfx/tileCodec';
 import { EventManager } from './eventManager';
 
 export interface TileViewEvents {
-    commitChanges: () => void;
+    commitChanges?: () => void;
 }
 /** 
  * Tile editing interface component.
@@ -27,6 +27,8 @@ export class TileView {
     pixels: TileData = defaultTileData;
     palette: Palette = defaultPalette;
     selectedColor = 2; // todo: default to 0
+    private cachedColor: number | null = 0;
+    private cachedColorStyle: string = 'black';
     
     private eventManager = new EventManager<TileViewEvents>();
     public events = this.eventManager.subscriber; 
@@ -81,10 +83,12 @@ export class TileView {
             var left = px * this.metrics.pixelHeight;
             var iColor = this.selectedColor;
             if (iColor >= this.palette.length) iColor = this.palette.length - 1;
-            this.context!.fillStyle = 'red'; // RGBA.toStyle(this.palette[iColor]);
+            this.context!.fillStyle = this.getCachedColor(this.selectedColor);
             this.context!.fillRect(left, top, this.metrics.pixelWidth, this.metrics.pixelHeight);
         
             this.pixels.setPixel(px, py, this.selectedColor);
+            console.log(this.selectedColor);
+            this.eventManager.raise("commitChanges", undefined);
         } else if (e.button === 2) {
             // var nesTile = demoNesTile;
             // var codec = tileCodecs.nesCodec;
@@ -103,12 +107,22 @@ export class TileView {
         var { x, y } = coords.absToElement(Volatile.point(e.clientX, e.clientY), this.element);
     }
 
+    private getCachedColor(color: number) {
+        if (this.cachedColor !== color) {
+            this.cachedColor = color;
+            this.cachedColorStyle = RGBA.toStyle(this.palette[color]);
+        }
+
+        return this.cachedColorStyle;
+    }
+
     /** Rerenders the tile image based on this object's pixel data. Call when pixel data or palette changes. */
     redraw() {
         var { tileWidth, tileHeight, pixelWidth: pw, pixelHeight: ph } = this.metrics;
         var iPxl = 0;
         var data = this.pixels.data;
         var pal = this.palette;
+        console.log(this.palette);
 
         for (var y = 0; y < tileHeight; y++){
             for (var x = 0; x < tileWidth; x++) {

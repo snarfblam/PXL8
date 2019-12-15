@@ -21,11 +21,13 @@ export class RomView {
 
     private rom: ROM | null = null;
     private codec: TileCodec | null = null;
-    private palette: Palette = debugPalette;
+    // private palette: Palette = debugPalette;
     private viewOffset = 0;
+    private tileViewOffset = 0;
     private renderReady = false;
     private romBuffer: Uint8Array;
     private viewableByteCount = 0;
+    private romLoaded = false;
 
     // private listeners: RomViewEvents[] = [];
     private readonly eventMgr: EventManager<RomViewEvents>;
@@ -43,9 +45,23 @@ export class RomView {
 
         this.palView.events.subscribe({
             paletteModified: () => {
-                this.gfxView.palette = this.palView.getPalette();
-                this.gfxView.displayOffset(0);
+                var newPal = this.palView.getPalette();
+                this.gfxView.palette = newPal; 
+                this.gfxView.displayOffset(this.viewOffset);
+                this.tileView.palette = newPal;
+                this.tileView.redraw();
             },
+            colorSelected: () => {
+                this.tileView.selectedColor = this.palView.getPrimarySelection();
+            }
+        });
+        this.tileView.events.subscribe({
+            commitChanges: () => {
+                this.commitTileEdit();
+            },
+        });
+        this.gfxView.events.subscribe({
+            tilePicked: index => this.openTileForEdit(index)
         });
     }   
 
@@ -75,6 +91,7 @@ export class RomView {
     }
 
     loadRom(rom: ROM, codec: TileCodec) {
+        this.romLoaded = false;
         this.rom = rom;
         this.codec = codec;
 
@@ -98,24 +115,47 @@ export class RomView {
 
         this.viewableByteCount = this.gfxView.metrics.gridWidth * this.gfxView.metrics.gridHeight * this.codec.bytesPerTile;
         this.romBuffer = new Uint8Array(this.viewableByteCount);
+
+        this.rom.rawDataPromise.then(() => this.romLoaded = true);
+    }
+
+    private openTileForEdit(tileIndex: number) {
+        if (!this.rom) return;
+
+        if (!this.romLoaded) {
+            this.rom.rawDataPromise.then(() => this.openTileForEdit(tileIndex));
+        } else {
+            if (this.isRenderReady()) {
+                this.tileViewOffset = this.viewOffset + tileIndex * this.codec!.bytesPerTile;
+                this.codec!.decode(
+                    { data: this.rom.rawData!, offset: this.tileViewOffset }, // src
+                    { data: this.tileView.pixels, offset: 0 }); // dest
+                this.tileView.redraw();
+            } else {
+                console.warn('Not ready for render in openTileForEdit');
+            }    
+        }
     }
 
     setViewOffset(offset: number) {
-        this.viewOffset = offset;
-        if (this.isRenderReady()) { 
-            var doFetch = this.fetchRomData(offset);
-            doFetch.then((data) => {
-                var dataBytes = new Uint8Array(data);
-                console.log('fatched');
+        if (!this.rom) return;
+
+        if (!this.romLoaded) {
+            this.rom.rawDataPromise.then(() => this.setViewOffset(offset));
+        } else {
+            this.viewOffset = offset;
+            this.tileViewOffset = this.viewOffset + 0x10;
+            if (this.isRenderReady()) {
+                var dataBytes = this.rom.rawData!; // this.romLoaded indicates raw data was loaded
                 this.gfxView.gfxData = dataBytes;
-                this.gfxView.displayOffset(0);
+                this.gfxView.displayOffset(this.viewOffset);
                 
                 var pixelData = this.tileView.pixels;
-                this.codec!.decode({ data: dataBytes, offset: 0x10 }, { data: pixelData, offset: 0 });
+                this.codec!.decode({ data: dataBytes, offset: this.tileViewOffset }, { data: pixelData, offset: 0 });
                 this.tileView.redraw();
-            });
-        } else {
-            console.warn('RomView not ready to render.');
+            } else {
+                console.warn('RomView not ready to render.');
+            }
         }
     }
 
@@ -126,13 +166,24 @@ export class RomView {
     private isRenderReady() {
         if (this.renderReady) return true;
 
-        var { codec, palette, rom } = this;
-        if (codec == null || palette == null || rom == null) return false;
+        var { codec, rom } = this;
+        if (codec == null || rom == null) return false;
 
+        var palette = this.palView.getPalette();
         this.tileView.palette = palette;
         this.gfxView.palette = palette;
         this.gfxView.codec = codec;
         return true;
+    }
+
+    private commitTileEdit() {
+        if (!this.codec) return;
+        var offset = this.tileViewOffset - this.viewOffset;
+        var tileData = this.tileView.pixels;
+
+        this.codec.encode({ data: tileData, offset: 0 }, { data: this.rom!.rawData!, offset: this.tileViewOffset });
+        var index = Math.floor(offset / this.codec.bytesPerTile);
+        this.gfxView.refreshTile(this.viewOffset, index);
     }
 }
 

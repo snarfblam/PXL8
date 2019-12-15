@@ -205,6 +205,9 @@ export class PaletteView {
         }
     }
 
+    getPrimarySelection() { return this.primarySelection;}
+    getSecondarySlection() { return this.secondarySelection;}
+
     private updatePaletteColors() {
         var count = this.ui.palettePanes.children.length;
         for (var i = 0; i < count; i++){
