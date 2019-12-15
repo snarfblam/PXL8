@@ -23,15 +23,19 @@ import { GfxView } from './gfxView';
 import { $, $$ } from './dollar';
 import { tileCodecs } from './gfx/tileCodec';
 import { debugPalette } from './gfx/palette';
-import { RomView } from './romView';
+import { RomView, ViewUnit } from './romView';
 import { ROM } from './rom';
 import { PaletteView } from './paletteView';
+import { Direction, Orientation } from './util';
+import { Scrollbar } from './scrollbar';
 
 class Pxl8 {
     constructor() {
-
         var romView = new RomView();
-        romView.site({site: document.body});
+        var appcontainer = document.querySelector('.app-container')as HTMLElement;
+        romView.site({ site: appcontainer });
+        romView.element.style.display = 'inline-block';
+        console.log(appcontainer);
         (window as any).romView = romView;
 
         // var pal = new PaletteView();
@@ -69,10 +73,21 @@ class Pxl8 {
     }
 }
 
+function $_(selector: string) { return $(selector) as HTMLElement };
+
 function onRomLoaded(file: File) {
     var romView = ((window as any).romView as RomView);
     romView.loadRom(new ROM(file), tileCodecs.nesCodec);
-    romView.setViewOffset(0x40010);
+    romView.setViewOffset(0);
+
+    $_('.offset-page-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.page);
+    $_('.offset-row-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.row);
+    $_('.offset-tile-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.tile);
+    $_('.offset-byte-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.byte);
+    $_('.offset-byte-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.byte);
+    $_('.offset-tile-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.tile);
+    $_('.offset-row-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.row);
+    $_('.offset-page-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.page);
 }
 
 // function onFileLoaded(contents: ArrayBuffer) {

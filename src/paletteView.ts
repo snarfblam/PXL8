@@ -77,6 +77,7 @@ export class PaletteView {
             },
         },
     };
+    readonly element = this.ui.element;
 
     constructor() {
         this.createComponents();  

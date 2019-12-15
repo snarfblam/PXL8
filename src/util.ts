@@ -51,3 +51,15 @@ export interface Arrayish<T> {
     readonly length: number;
     [n: number]: T;
 }
+
+export enum Direction {
+    "up" = "up",
+    "down" = "down",
+    "left" = "left",
+    "right" = "right",
+}
+
+export enum Orientation {
+    "horizontal" = "horizontal",
+    "vertical" = "vertical",
+}

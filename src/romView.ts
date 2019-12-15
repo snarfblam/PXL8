@@ -4,13 +4,21 @@ import { TileView, TileViewMetrics } from './TileView';
 import { $ } from "./dollar";
 import { TileCodec } from "./gfx/tileCodec";
 import { Palette, debugPalette } from "./gfx/palette";
-import { Arrayish } from "./util";
+import { Arrayish, Direction } from "./util";
 import { SiteChild, Site } from "./site";
 import { EventManager, EventSubscription } from './eventManager';
 import { PaletteView } from "./paletteView";
+import { Scrollbar } from "./scrollbar";
 
-const tileViewZoom = 8;
+const tileViewZoom = 32;
 const gfxViewZoom = 2;
+
+export enum ViewUnit {
+    "byte" = "byte",
+    "tile" = "tile",
+    "row" = "row",
+    "page" = "page",
+}
 
 /** Provides an interface composed of a GfxView, a TileView, and a PalettView. */
 export class RomView {
@@ -18,6 +26,7 @@ export class RomView {
     tileView: TileView;
     palView: PaletteView;
     element: HTMLElement;
+    scroll: Scrollbar;
 
     private rom: ROM | null = null;
     private codec: TileCodec | null = null;
@@ -37,6 +46,7 @@ export class RomView {
         this.gfxView = new GfxView();
         this.tileView = new TileView();
         this.palView = new PaletteView();
+        this.scroll = new Scrollbar();
         this.romBuffer = new Uint8Array(1);
         this.element = $.create('div');
 
@@ -63,27 +73,19 @@ export class RomView {
         this.gfxView.events.subscribe({
             tilePicked: index => this.openTileForEdit(index)
         });
+        this.scroll.events.subscribe({
+            pageUp: () => this.scrollView(Direction.up, ViewUnit.page),
+            pageDown: () => this.scrollView(Direction.down, ViewUnit.page),
+            tickUp: () => this.scrollView(Direction.up, ViewUnit.row),
+            tickDown: () => this.scrollView(Direction.down, ViewUnit.row),
+        });
+
+        this.tileView.element.style.marginLeft = '8px';
     }   
-
-    // addListener(listener: RomViewEvents) {
-    //     this.listeners.push(listener);
-    // }
-
-    // removeListener(listener: RomViewEvents) {
-    //     var index = this.listeners.indexOf(listener);
-    //     if (index >= 0) this.listeners = this.listeners.splice(index, 1);
-    // }
-
-    // private raise<T extends keyof RomViewEvents>(eventName: T, args: EventArg<T>) {
-    //     this.listeners.forEach(l => {
-    //         var handler = l[eventName];
-    //         if (handler) handler(args as any as never);
-    //     });
-
-    // }
 
     site(site: Site) {
         var thisSite = { site: this.element };
+        this.scroll.site(thisSite);
         this.gfxView.site(thisSite);
         this.tileView.site(thisSite);
         this.palView.site(thisSite);
@@ -91,9 +93,13 @@ export class RomView {
     }
 
     loadRom(rom: ROM, codec: TileCodec) {
+        const gridHeight = 16;
+
         this.romLoaded = false;
         this.rom = rom;
         this.codec = codec;
+
+        this.scroll.setSize(gfxViewZoom * codec.tileHeight * gridHeight);
 
         this.tileView.initialize({
             pixelWidth: tileViewZoom,
@@ -108,7 +114,7 @@ export class RomView {
             tileWidth: codec.tileWidth,
             tileHeight: codec.tileHeight,
             gridWidth: 16,
-            gridHeight: 16,
+            gridHeight: gridHeight,
         });
 
         this.palView.setPalette(debugPalette);
@@ -137,6 +143,35 @@ export class RomView {
         }
     }
 
+    scrollView(dir: Direction, unit: ViewUnit) {
+        var amt = 1;
+
+        if (dir === Direction.up) {
+            amt = -1;    
+        } else if (dir !== Direction.down) {
+            console.error(Error('Invalid direction specified'));
+        }
+
+        const bytesPerRow = this.codec!.bytesPerTile * this.gfxView.metrics.gridWidth;
+        if (unit === ViewUnit.tile) {
+            amt *= this.codec!.bytesPerTile;
+        } else if (unit === ViewUnit.row) {
+            amt *= bytesPerRow;
+        } else if (unit === ViewUnit.page) {
+            amt *= bytesPerRow * this.gfxView.metrics.gridHeight;
+        } else if (unit !== ViewUnit.byte) {
+            console.error(Error('Unsupported unit specified'));
+        }
+       
+        var newOffset = this.viewOffset + amt;
+        if (newOffset >= this.rom!.rawData!.length - bytesPerRow){
+            newOffset = this.rom!.rawData!.length - bytesPerRow;
+        }
+        if (newOffset < 0) newOffset = 0;
+        console.log('Scrolling to: $' + newOffset.toString(16).toUpperCase());
+        this.setViewOffset(newOffset);
+    }
+
     setViewOffset(offset: number) {
         if (!this.rom) return;
 
@@ -153,6 +188,8 @@ export class RomView {
                 var pixelData = this.tileView.pixels;
                 this.codec!.decode({ data: dataBytes, offset: this.tileViewOffset }, { data: pixelData, offset: 0 });
                 this.tileView.redraw();
+
+                this.scroll.setValue(offset / dataBytes.length);
             } else {
                 console.warn('RomView not ready to render.');
             }

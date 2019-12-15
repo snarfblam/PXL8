@@ -146,149 +146,46 @@
         color: #BB0000;
         margin: .5em 1.5em;
     }
-/*** App Container *********************************************/
 
-    .app-container {
-        max-width: 800px;
-        margin: 1em auto;
-        overflow: hidden;
+/*** General ***************************************************/
+.offset-pane {
+    display: inline-block;
+    width: 64px;
+}
+.offset-picker {
+    display: block;
+    width: 64px;
+    height: 32px;
+    border: 1px solid #444444;
+    background: white;
+    color: #444444;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0px 1px white, inset 0 0 0px 3px #888888;
+}
 
-        background: #eee;
-        border: 1px solid #666;
-        border-radius: 3px;
-        box-shadow: 3px 4px 18px #00000085;
-    }
+.scroller {
+    background: white;
+    border-radius: 0px;
+    border: none;
+}
 
-    .app-container-content {
-        padding: 1em;
-    }
+div.scroller {
+    outline: 1px solid #888;
+    display:inline-block;
+}
 
-    .app-spacer {
-        height: 64px;
-    }
-
-     /* Goes after a .app-container */
-    .footnote {
-        color: black;
-        max-width: 800px;
-        margin: -.8em auto 1em auto;
-    }
-    .footnote::before {
-        content: "\2001";
-    }
-
-
-/*** File Drop *************************************************/
-
-    #file-input-outer {
-        display: inline-block;    
-        width: 202px;
-        height: 202px;
-        vertical-align: top;
-
-        text-align: center;
-
-        border: 1px #666 dashed;
-        outline: 3px rgba(255, 255, 255, 0.35) solid;
-        outline-offset:  -3px;
-        background: #b1c2d8;
-        background: -moz-linear-gradient(-45deg, #b1c2d8 0%, #a1b0c4 13%, #c9d5e5 39%, #dce1e8 49%, #eaf0ff 64%, #d0d8e2 75%, #a6c0e3 88%, #d2dfed 99%);
-        background: -webkit-linear-gradient(-45deg, #b1c2d8 0%,#a1b0c4 13%,#c9d5e5 39%,#dce1e8 49%,#eaf0ff 64%,#d0d8e2 75%,#a6c0e3 88%,#d2dfed 99%);
-        background: linear-gradient(135deg, #b1c2d8 0%,#a1b0c4 13%,#c9d5e5 39%,#dce1e8 49%,#eaf0ff 64%,#d0d8e2 75%,#a6c0e3 88%,#d2dfed 99%);
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b1c2d8', endColorstr='#d2dfed',GradientType=1 );
-    }
-
-    #file-input-box {
-        display: inline-block;
-        position: relative;
-        width: 184px;
-        height: 184px;
-        margin: 8px;
-
-        background: rgba(255, 255, 255, 0.5);
-        box-shadow: 0px 0px 3px white;
-    }
-
-    #file-input-box.file-input-filedrag {
-        background: white;
-        outline: 2px dashed #888;
-    }
-
-    #file-input {
-        width: 0.1px;
-        height: 0.1px;
-
-        opacity: 0;
-        overflow: hidden;
-        position: absolute;
-        z-index: -1;   
-    }
-
-    #file-input-text {
-        /* margin-top: 3.5em; */
-    }
-
-    .fake-link {
-        color: #0000CC;
-        text-decoration: underline;
-        cursor: pointer;
-    }
-
-    .fake-link-3 {
-        display: inline-block;
-        margin-bottom: 1em;
-        padding: .5em 1.5em;
-
-        cursor: pointer;
-        color: white;
-        background: rgba(29, 42, 70, 0.445);
-        border: 1px solid  rgb(100, 112, 136);
-        box-shadow: 3px 3px 6px rgba(0, 0, 0, .25);
-    }
-
-    .fake-link-3:focus,
-    input:focus+* .fake-link-3 { /* include fake link inside label associated with input */
-        outline: 1px dashed #555;
-        outline-offset: -4px;
-    }
-
-    #file-input-label>span {
-        margin-top: 3em;
-    }
-
-    #platform-icon {
-        display: none;
-    }
-
-    #game-name {
-        display: none;
-        margin-top: 0;
-        overflow: hidden;
-        max-height: 75px;
-    }
-
-    .file-loaded #platform-icon {
-        display: inline-block;
-    }
-
-    .file-loaded #game-name {
-        display: block;
-    }
-
-    .file-loaded #lbl-dragndrop {
-        display: none;
-    }
-
-    #file-input-outer.file-loaded {
-        border-style: solid;
-    }
-
-    .file-loaded #file-input-label>span {
-        position: absolute;
-        bottom: 0;
-        width: 80%;
-        left: 10%;
-    }
+.scroller-up {
+    border: 1px solid #666;
+    background: url('scroll-up.png');
+}
+.scroller-down {
+    border: 1px solid #666;
+    background: url('scroll-down.png');
+}
+.scroller-scroll {
+    border: 1px solid #666;
+    background: url('scroll-scroll.png');
+}
 
 
 /*** Modals ****************************************************/
