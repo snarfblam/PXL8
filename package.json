@@ -4,8 +4,8 @@
   "description": "Browser-based CHR editor",
   "main": "src/index.js",
   "scripts": {
-    "build": "npx webpack --config webpack.prod.js && cpx \"src/db/*.*\" \"dist/db\" && cpx \"frontend/*.*\" \"dist\" && cpx \"frontend/res/*.*\" \"dist/res\"",
-    "build-dev": "npx webpack --config webpack.dev.js && cpx \"src/db/*.*\" \"dist/db\" && cpx \"frontend/*.*\" \"dist\" && cpx \"frontend/res/*.*\" \"dist/res\"",
+    "build": "npx webpack --config webpack.prod.js && cpx \"src/db/*.*\" \"dist/db\" && cpx \"frontend/**/*\" \"dist\" && cpx \"frontend/res/*.*\" \"dist/res\"",
+    "build-dev": "npx webpack --config webpack.dev.js && cpx \"src/db/*.*\" \"dist/db\" && cpx \"frontend/**/*\" \"dist\" && cpx \"frontend/res/*.*\" \"dist/res\"",
     "build-test": "npx webpack --config webpack.test.js",
     "start": "node testServer.js"
   },
