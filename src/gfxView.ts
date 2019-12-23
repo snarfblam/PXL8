@@ -1,6 +1,6 @@
 
 import { $, $$ } from './dollar';
-import { Site, SiteChild } from './site';
+import { Site, siteChild } from './site';
 import { coords, Volatile, Arrayish, eventToClientCoords } from './util';
 import { GfxBuffer, GfxBufferMetrics } from './gfx/gfxBuffer';
 import { TileCodec } from './gfx/tileCodec';
@@ -125,7 +125,7 @@ export class GfxView {
 
 
     site(owner: Site) {
-        SiteChild(this.element, owner);
+        siteChild(this.element, owner);
         this.owner = owner;
 
         this.element.addEventListener('mousemove', e => this.onMouseMove(e));

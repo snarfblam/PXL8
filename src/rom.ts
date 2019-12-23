@@ -34,7 +34,7 @@ export const maxRomSize = 0x200000;
 
 export class ROM {
     /** Contains the ROM as a raw byte array if it is able to be loaded. Otherwise, null. */
-    public rawData: ArrayLike<number> | null = null;
+    public rawData: Uint8Array | null = null;
     public rawDataPromise: Promise<Uint8Array>;
     private reader = new FileReader();
     private isReading = false;
@@ -43,11 +43,14 @@ export class ROM {
         reject:null as DataPromiseReject | null,
     };
     private readQueue: ReadQueueItem[] = [];
+    filename = 'rom';
 
     public constructor(public readonly data: File | Blob) {
         this.reader.onload = e => this.onDataLoaded();
         this.reader.onerror = e => this.onDataError();
 
+        if ((data as File).name) this.filename = (data as File).name;
+            
         this.rawDataPromise = this.getData(0, data.size)
             .then(data => new Uint8Array(data));
         

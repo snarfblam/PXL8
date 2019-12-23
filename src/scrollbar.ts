@@ -1,6 +1,6 @@
 import { Orientation, eventToClientCoords } from './util';
 import { $, $$ } from './dollar';
-import { Site, SiteChild } from './site';
+import { Site, siteChild } from './site';
 import { EventManager } from './eventManager';
 
 export interface ScrollbarMetrics {
@@ -54,7 +54,7 @@ export class Scrollbar{
     }
 
     site(site: Site) {
-        SiteChild(this.element, site);
+        siteChild(this.element, site);
     }
 
     setMetrics(metrics: ScrollbarMetrics) {

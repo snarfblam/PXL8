@@ -32,6 +32,20 @@ export const Volatile = {
     },
 }
 
+export function saveBlob(blob: Blob, filename: string) {
+    if (window.navigator.msSaveOrOpenBlob as any) {
+        window.navigator.msSaveBlob(blob, filename);
+    }
+    else {
+        var elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+    }
+}
+
 export const coords = {
     absToElement: function absToElement(coord: Point, elem: HTMLElement) {
         var rect = elem.getBoundingClientRect();
@@ -44,6 +58,13 @@ export function eventToClientCoords(elem: HTMLElement, e: MouseEvent) {
     var x = e.clientX - box.left;
     var y = e.clientY - box.top;
     return Volatile.point(x, y);
+}
+
+export function removeFrom<T>(array: T[], item: T) {
+    var index = array.indexOf(item);
+    if (index < 0) return false;
+    array.splice(index, 1);
+    return true;
 }
 
 /** A mutable counterpart to ArrayLike. */

@@ -149,8 +149,10 @@
 
 /*** General ***************************************************/
 .offset-pane {
-    display: inline-block;
+    /* display: inline-block; */
     width: 64px;
+    float: left;
+    margin-right: 4px;
 }
 .offset-picker {
     display: block;
@@ -187,6 +189,48 @@ div.scroller {
     background: url('scroll-scroll.png');
 }
 
+
+/*** Toolbar ***************************************************/
+
+div.toolbar {
+    background: white;
+    box-shadow: inset 0 -2px 3px #0000001a;
+    /* text-align: center; */
+    padding-top: 4px;
+}
+
+.toolbar-button {
+    display: inline-block;
+    /* height: calc(32px + 2em); */
+    margin-bottom: 4px;
+    text-align: center;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    position: relative;
+    top: 0px;
+    min-width: 64px;
+}
+.toolbar-button:hover {
+    background: #DDD;
+    border-radius: 4px;
+}
+.toolbar-button:active {
+    top:1px;
+}
+img.toolbar-icon {
+    height: 32px;
+    width: 32px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.toolbar-caption {
+    /* display: block; */
+    /* margin-top: .2em; */
+    cursor: default;
+}
 
 /*** Modals ****************************************************/
 

@@ -4,11 +4,12 @@ import { TileView, TileViewMetrics } from './TileView';
 import { $ } from "./dollar";
 import { TileCodec } from "./gfx/tileCodec";
 import { Palette, debugPalette } from "./gfx/palette";
-import { Arrayish, Direction } from "./util";
-import { SiteChild, Site } from "./site";
+import { Arrayish, Direction, saveBlob } from "./util";
+import { siteChild, Site } from "./site";
 import { EventManager, EventSubscription } from './eventManager';
 import { PaletteView } from "./paletteView";
 import { Scrollbar } from "./scrollbar";
+import { Pxl8Toolbar } from "./pxl8Toolbar";
 
 const tileViewZoom = 32;
 const gfxViewZoom = 2;
@@ -22,11 +23,14 @@ export enum ViewUnit {
 
 /** Provides an interface composed of a GfxView, a TileView, and a PalettView. */
 export class RomView {
-    gfxView: GfxView;
-    tileView: TileView;
-    palView: PaletteView;
-    element: HTMLElement;
-    scroll: Scrollbar;
+    gfxView = new GfxView();
+    tileView = new TileView();
+    palView = new PaletteView();
+    element = $.create('div');
+    scroll = new Scrollbar();
+    private offsetDisplay = $.create('p');
+    private saveLink = $.create('a') as HTMLAnchorElement;
+    private statusPane = $.create('div');
 
     private rom: ROM | null = null;
     private codec: TileCodec | null = null;
@@ -43,15 +47,23 @@ export class RomView {
     public readonly events: EventSubscription<RomViewEvents>;
     
     constructor() {
-        this.gfxView = new GfxView();
-        this.tileView = new TileView();
-        this.palView = new PaletteView();
-        this.scroll = new Scrollbar();
+        // this.gfxView = new GfxView();
+        // this.tileView = new TileView();
+        // this.palView = new PaletteView();
+        // this.scroll = new Scrollbar();
+        // this.element = $.create('div');
         this.romBuffer = new Uint8Array(1);
-        this.element = $.create('div');
+
+        this.statusPane.style.display = 'inline-block';
+        this.offsetDisplay.textContent = "No ROM loaded";
+        this.saveLink.textContent = "Click to save";
+        this.saveLink.href = '#';
+        this.saveLink.onclick = e => this.onSave(e);
 
         this.eventMgr = new EventManager<RomViewEvents>();
         this.events = this.eventMgr.subscriber;
+
+        this.palView.element.style.display = 'inline-block';
 
         this.palView.events.subscribe({
             paletteModified: () => {
@@ -84,12 +96,17 @@ export class RomView {
     }   
 
     site(site: Site) {
+        this.statusPane.appendChild(this.offsetDisplay);
+        this.statusPane.appendChild(this.saveLink);
+
         var thisSite = { site: this.element };
         this.scroll.site(thisSite);
         this.gfxView.site(thisSite);
         this.tileView.site(thisSite);
+        this.element.appendChild($.create('br'));
         this.palView.site(thisSite);
-        SiteChild(this.element, site);
+        this.element.appendChild(this.statusPane);
+        siteChild(this.element, site);
     }
 
     loadRom(rom: ROM, codec: TileCodec) {
@@ -190,6 +207,7 @@ export class RomView {
                 this.tileView.redraw();
 
                 this.scroll.setValue(offset / dataBytes.length);
+                this.offsetDisplay.textContent = "Offset: $" + offset.toString(16).toUpperCase();
             } else {
                 console.warn('RomView not ready to render.');
             }
@@ -221,6 +239,13 @@ export class RomView {
         this.codec.encode({ data: tileData, offset: 0 }, { data: this.rom!.rawData!, offset: this.tileViewOffset });
         var index = Math.floor(offset / this.codec.bytesPerTile);
         this.gfxView.refreshTile(this.viewOffset, index);
+    }
+
+    private onSave(e: Event) {
+        e.preventDefault();
+        var blob = new Blob([this.rom!.rawData!]);
+        var filename = this.rom!.filename;
+        saveBlob(blob, filename);
     }
 }
 

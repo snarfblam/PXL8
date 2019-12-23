@@ -1,6 +1,6 @@
 import { $, $$ } from './dollar';
 import { Palette, ManagedPalette, RGBA } from './gfx/palette';
-import { Site, SiteChild, Siteable } from './site';
+import { Site, siteChild, Siteable } from './site';
 import { EventManager } from './eventManager';
 
 function createElem(tag: string, x: number, y: number, w: number, h: number, color?: string) {
@@ -51,7 +51,7 @@ export class PaletteView {
     public events = this.eventManager.subscriber;
 
     private ui = {
-        element: createElem('div', 0, 0, 320, 120),
+        element: createElem('div', 0, 0, 360, 120),
         selectionBox: {
             element: createElem('div', 0, 0, 120, 120, '#777'),
             secondary: { element: createElem('div', 40, 40, 80, 80, '#444') },
@@ -90,7 +90,7 @@ export class PaletteView {
     }
 
     site(site: Site) {
-        SiteChild(this.ui.element, site);
+        siteChild(this.ui.element, site);
     }
 
     setPalette(palette: RGBA[]) {

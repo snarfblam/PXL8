@@ -11,7 +11,7 @@ export interface Site {
     placeElement?: (child: HTMLElement) => void;
 }
 
-export function SiteChild(child: HTMLElement, site: Site) {
+export function siteChild(child: HTMLElement, site: Site): HTMLElement {
     var target = site.site;
     if (site.placeElement) {
         site.placeElement(child);
@@ -20,6 +20,8 @@ export function SiteChild(child: HTMLElement, site: Site) {
     } else {
         target.appendChild(child);
     }
+
+    return target;
 }
 
 export class SiteElement implements Site {

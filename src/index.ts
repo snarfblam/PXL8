@@ -28,15 +28,38 @@ import { ROM } from './rom';
 import { PaletteView } from './paletteView';
 import { Direction, Orientation } from './util';
 import { Scrollbar } from './scrollbar';
+import { Toolbar, ToolbarButton } from './toolbar';
+import { Pxl8Toolbar } from './pxl8Toolbar';
+import { Site } from './site';
 
 class Pxl8 {
     constructor() {
+        var appcontainer = { site: document.querySelector('.app-container') as HTMLElement };
+        var appcontainerPrepend: Site = { site: appcontainer.site, prepend: true };
+
+        var t = new Pxl8Toolbar();
+        t.setIconPath('res/icons');
+        t.site(appcontainerPrepend);
+
         var romView = new RomView();
-        var appcontainer = document.querySelector('.app-container')as HTMLElement;
-        romView.site({ site: appcontainer });
+        romView.site(appcontainer);
         romView.element.style.display = 'inline-block';
         console.log(appcontainer);
         (window as any).romView = romView;
+
+        // var t = new Toolbar();
+        // t.setIconPath('res/icons');
+        // t.site(document.body);
+        // console.log('WOULD YOU KINDLY');
+        // var b1 = new ToolbarButton();
+        // b1.setText('Import');
+        // b1.setIcon('import.png');
+        // b1.site(t);
+        // var b2 = new ToolbarButton();
+        // b2.setText('Export');
+        // b2.setIcon('export.png');
+        // b2.site(t);
+
 
         // var pal = new PaletteView();
         // pal.site({ site: document.body });

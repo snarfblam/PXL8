@@ -1,6 +1,6 @@
 import { $, $$ } from './dollar';
 import { Volatile, coords } from './util';
-import { Site, SiteChild } from './site';
+import { Site, siteChild } from './site';
 import { Palette, RGBA } from './gfx/palette';
 import { TileData } from './gfx/TileData';
 import { demoNesTile, tileCodecs, TileCodec } from './gfx/tileCodec';
@@ -52,7 +52,7 @@ export class TileView {
     }
 
     site(owner: Site) {
-        SiteChild(this.element, owner);
+        siteChild(this.element, owner);
         this.owner = owner;
 
         this.element.addEventListener('mousemove', e => this.onMouseMove(e));
