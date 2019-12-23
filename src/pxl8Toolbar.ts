@@ -1,6 +1,7 @@
 import { Toolbar, ToolbarButton } from "./toolbar";
 import { $ } from "./dollar";
 import { Widget } from "./widget";
+import { EventManager } from "./eventManager";
 
 function newButton(text: string, icon: string) {
     var btn = new ToolbarButton();
@@ -34,6 +35,12 @@ function newPxl8Logo() {
     return logo;
 }
 
+export type Pxl8ToolbarButton = 'import' | 'export' | 'copy' | 'paste' | 'zoomin' | 'zoomout';
+
+export interface Pxl8ToolbarEvents {
+    buttonClick?: (name: Pxl8ToolbarButton) => void;
+}
+
 export class Pxl8Toolbar extends Toolbar {
     private items = {
         import: newButton("Import", "import.png"),
@@ -43,10 +50,17 @@ export class Pxl8Toolbar extends Toolbar {
         zoomIn: newButton("Zoom In", "zoomin.png"),
         zoomOut: newButton("Zoom Out", "zoomout.png"),
     };
+    private eventManager = new EventManager<Pxl8ToolbarEvents>();
+    public events = this.eventManager.subscriber;
+
     constructor() {
         super();
 
         this.initWidget();
+
+        this.items.import.element.onclick = e => {
+            this.eventManager.raise('buttonClick', 'import');
+        };
     }
 
     private initWidget() {

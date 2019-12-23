@@ -31,15 +31,30 @@ import { Scrollbar } from './scrollbar';
 import { Toolbar, ToolbarButton } from './toolbar';
 import { Pxl8Toolbar } from './pxl8Toolbar';
 import { Site } from './site';
+import { showFileDialog } from './fileDialog';
 
 class Pxl8 {
     constructor() {
         var appcontainer = { site: document.querySelector('.app-container') as HTMLElement };
         var appcontainerPrepend: Site = { site: appcontainer.site, prepend: true };
 
-        var t = new Pxl8Toolbar();
-        t.setIconPath('res/icons');
-        t.site(appcontainerPrepend);
+        var toolbar = new Pxl8Toolbar();
+        toolbar.setIconPath('res/icons');
+        toolbar.site(appcontainerPrepend);
+
+        toolbar.events.subscribe({
+            buttonClick: buttonName => {
+                if (buttonName === 'import') {
+                    showFileDialog()
+                        .then(file => {
+                            if (file) {
+                                onRomLoaded(file);
+                            }
+                        })
+                        .catch(console.error);
+                }
+            }
+        });
 
         var romView = new RomView();
         romView.site(appcontainer);
