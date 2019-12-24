@@ -9,7 +9,7 @@ import { siteChild, Site } from "./site";
 import { EventManager, EventSubscription } from './eventManager';
 import { PaletteView } from "./paletteView";
 import { Scrollbar } from "./scrollbar";
-import { Pxl8Toolbar } from "./pxl8Toolbar";
+import { Pxl8Toolbar } from "./pxl8Toolbars";
 
 const tileViewZoom = 32;
 const gfxViewZoom = 2;
@@ -100,8 +100,8 @@ export class RomView {
         this.statusPane.appendChild(this.saveLink);
 
         var thisSite = { site: this.element };
-        this.scroll.site(thisSite);
         this.gfxView.site(thisSite);
+        this.scroll.site(thisSite);
         this.tileView.site(thisSite);
         this.element.appendChild($.create('br'));
         this.palView.site(thisSite);
@@ -243,6 +243,10 @@ export class RomView {
 
     private onSave(e: Event) {
         e.preventDefault();
+        this.saveRomAsDownload();
+    }
+
+    public saveRomAsDownload() {
         var blob = new Blob([this.rom!.rawData!]);
         var filename = this.rom!.filename;
         saveBlob(blob, filename);

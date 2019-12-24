@@ -4,11 +4,12 @@ import { removeFrom } from './util';
 
 
 
-
+export enum ToolbarSize { small, large }
 
 export class Toolbar extends Widget {
     private iconPath = '';
     private buttons = [] as ToolbarButton[];
+    private toolbarSize = ToolbarSize.small;
 
     constructor() {
         super();
@@ -26,6 +27,23 @@ export class Toolbar extends Widget {
     }
 
     getIconPath() { return this.iconPath; }
+
+    getSize() { return this.toolbarSize; }
+    setSize(size: ToolbarSize) {
+        if (this.toolbarSize === ToolbarSize.small) {
+            this.element.classList.remove('toolbar-small');
+        } else {
+            this.element.classList.remove('toolbar-large');
+        }
+     
+        this.toolbarSize = size;
+     
+        if (this.toolbarSize === ToolbarSize.small) {
+            this.element.classList.add('toolbar-small');
+        } else {
+            this.element.classList.add('toolbar-large');
+        }
+    }
     
     private registerButton(b: ToolbarButton) { this.buttons.push(b); }
     private unregisterButton(b: ToolbarButton) { removeFrom(this.buttons, b); }

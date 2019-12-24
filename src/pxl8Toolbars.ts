@@ -58,9 +58,16 @@ export class Pxl8Toolbar extends Toolbar {
 
         this.initWidget();
 
-        this.items.import.element.onclick = e => {
-            this.eventManager.raise('buttonClick', 'import');
-        };
+        this.addClickHandler(this.items.import, 'import');
+        this.addClickHandler(this.items.export, 'export');
+        this.addClickHandler(this.items.copy, 'copy');
+        this.addClickHandler(this.items.paste, 'paste');
+        this.addClickHandler(this.items.zoomIn, 'zoomin');
+        this.addClickHandler(this.items.zoomOut, 'zoomout');
+    }
+
+    private addClickHandler(btn: ToolbarButton, name: Pxl8ToolbarButton) {
+        btn.element.onclick = e => this.eventManager.raise('buttonClick', name);
     }
 
     private initWidget() {

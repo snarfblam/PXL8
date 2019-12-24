@@ -28,8 +28,8 @@ import { ROM } from './rom';
 import { PaletteView } from './paletteView';
 import { Direction, Orientation } from './util';
 import { Scrollbar } from './scrollbar';
-import { Toolbar, ToolbarButton } from './toolbar';
-import { Pxl8Toolbar } from './pxl8Toolbar';
+import { Toolbar, ToolbarButton, ToolbarSize } from './toolbar';
+import { Pxl8Toolbar } from './pxl8Toolbars';
 import { Site } from './site';
 import { showFileDialog } from './fileDialog';
 
@@ -39,6 +39,9 @@ class Pxl8 {
         var appcontainerPrepend: Site = { site: appcontainer.site, prepend: true };
 
         var toolbar = new Pxl8Toolbar();
+        var romView = new RomView();
+
+        toolbar.setSize(ToolbarSize.large);
         toolbar.setIconPath('res/icons');
         toolbar.site(appcontainerPrepend);
 
@@ -53,10 +56,12 @@ class Pxl8 {
                         })
                         .catch(console.error);
                 }
+                if (buttonName === 'export') {
+                    romView.saveRomAsDownload();
+                }
             }
         });
 
-        var romView = new RomView();
         romView.site(appcontainer);
         romView.element.style.display = 'inline-block';
         console.log(appcontainer);
