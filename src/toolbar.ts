@@ -13,6 +13,8 @@ export class Toolbar extends Widget {
 
     constructor() {
         super();
+
+        this.setSize(ToolbarSize.small);
     }
 
     protected createElement() {

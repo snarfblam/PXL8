@@ -29,7 +29,7 @@ import { PaletteView } from './paletteView';
 import { Direction, Orientation } from './util';
 import { Scrollbar } from './scrollbar';
 import { Toolbar, ToolbarButton, ToolbarSize } from './toolbar';
-import { Pxl8Toolbar } from './pxl8Toolbars';
+import { Pxl8Toolbar, Pxl8StatusBar } from './pxl8Toolbars';
 import { Site } from './site';
 import { showFileDialog } from './fileDialog';
 
@@ -39,10 +39,12 @@ class Pxl8 {
         var appcontainerPrepend: Site = { site: appcontainer.site, prepend: true };
 
         var toolbar = new Pxl8Toolbar();
+        var statusBar = new Pxl8StatusBar();
         var romView = new RomView();
 
-        toolbar.setSize(ToolbarSize.large);
         toolbar.setIconPath('res/icons');
+        statusBar.setIconPath('res/icons');
+        statusBar.site(appcontainerPrepend);
         toolbar.site(appcontainerPrepend);
 
         toolbar.events.subscribe({

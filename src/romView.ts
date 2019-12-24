@@ -7,7 +7,7 @@ import { Palette, debugPalette } from "./gfx/palette";
 import { Arrayish, Direction, saveBlob } from "./util";
 import { siteChild, Site } from "./site";
 import { EventManager, EventSubscription } from './eventManager';
-import { PaletteView } from "./paletteView";
+import { PaletteView, MiniPaletteView } from "./paletteView";
 import { Scrollbar } from "./scrollbar";
 import { Pxl8Toolbar } from "./pxl8Toolbars";
 
@@ -25,7 +25,7 @@ export enum ViewUnit {
 export class RomView {
     gfxView = new GfxView();
     tileView = new TileView();
-    palView = new PaletteView();
+    palView = new MiniPaletteView();
     element = $.create('div');
     scroll = new Scrollbar();
     private offsetDisplay = $.create('p');

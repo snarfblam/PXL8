@@ -1,7 +1,8 @@
-import { Toolbar, ToolbarButton } from "./toolbar";
+import { Toolbar, ToolbarButton, ToolbarSize } from "./toolbar";
 import { $ } from "./dollar";
 import { Widget } from "./widget";
 import { EventManager } from "./eventManager";
+import { MiniPaletteView } from "./paletteView";
 
 function newButton(text: string, icon: string) {
     var btn = new ToolbarButton();
@@ -9,18 +10,19 @@ function newButton(text: string, icon: string) {
     btn.setIcon(icon);
     return btn;
 }
-function newSpacer() {
+function newSpacer(size?: number) {
+    size = size || 24;
     var span = $.create('span');
     span.style.display = 'inline-block';
     span.style.height = '1px';
-    span.style.width = '24px';
+    span.style.width = size.toString() + "px";
     return span;
 }
 function newPxl8Logo() {
     var logo = $.create('span');
     logo.textContent = "PXL";
-    logo.style.paddingLeft = '1em';
-    logo.style.paddingRight = '1em';
+    logo.style.paddingLeft = '16px';
+    logo.style.paddingRight = '32px';
     logo.style.fontSize = '50px';
     logo.style.fontFamily = 'consolas, sans-serif';
     logo.style.position = 'relative';
@@ -71,6 +73,8 @@ export class Pxl8Toolbar extends Toolbar {
     }
 
     private initWidget() {
+        this.setSize(ToolbarSize.large);
+
         var itemList = [
             newPxl8Logo(),
             this.items.import,
@@ -90,5 +94,54 @@ export class Pxl8Toolbar extends Toolbar {
                 this.element.appendChild(item);
             }
         });
+    }
+}
+
+export class Pxl8StatusBar extends Toolbar {
+    private items = {
+        tileUp: newButton("Tile", "small_up.png"),
+        byteUp: newButton("Byte", "small_up.png"),
+        tileDown: newButton("Tile", "small_down.png"),
+        byteDown: newButton("Byte", "small_down.png"),
+    };
+    private palView = new MiniPaletteView();
+
+    private eventManager = new EventManager<Pxl8ToolbarEvents>();
+    public events = this.eventManager.subscriber;
+    
+    constructor() {
+        super();
+
+        this.initWidget();
+        this.palView.site({ site: this.element });
+    }
+
+    private initWidget() {
+        var itemList = [
+            newSpacer(),
+            this.items.tileUp,
+            this.items.byteUp,
+            this.items.tileDown,
+            this.items.byteDown,
+        ];
+
+        itemList.forEach(item => {
+            if (item instanceof Widget) {
+                item.site(this);
+            } else {
+                this.element.appendChild(item);
+            }
+        });
+
+        this.palView.element.style.display = 'inline-block';
+        this.palView.element.style.verticalAlign = 'middle';
+        this.palView.element.style.marginLeft = '24px';
+    }
+
+    protected createElement() {
+        var elem = super.createElement();
+        elem.style.background = '#EEEEEE';
+        elem.style.boxShadow = '0 -1px #00000033';
+        return elem;
     }
 }

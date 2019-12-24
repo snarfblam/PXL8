@@ -29,6 +29,13 @@ const metrics = {
     }
 }
 
+const miniMetrics = {
+    palette: {
+        width: 240,
+        height: 24,
+    }
+}
+
 const defaultPalette = [
     { r: 0, g: 0, b: 0, a: 255 },
     { r: 255, g: 0, b: 0, a: 255 },
@@ -280,6 +287,152 @@ export class PaletteView {
             var percent = i / (children.length - 1);
             children[i].style.backgroundColor = colorizer(percent);
         }
+    }
+
+    private updatePaletteColor(index: number) {
+        this.ui.palettePanes.children[index].style.backgroundColor = this.palette.getStyle(index);
+    }
+
+}
+
+export class MiniPaletteView {
+    private palette = new ManagedPalette(defaultPalette);
+    private primarySelection = 0;
+    private secondarySelection = 1;
+    
+    private eventManager = new EventManager<PaletteViewEvents>();
+    public events = this.eventManager.subscriber;
+
+    private ui = {
+        element: createElem('div', 0, 0, 300, 24),
+        selectionBox: {
+            element: createElem('div', 0, 0, 48, 24),
+            secondary: { element: createElem('div', 16, 5, 32, 18, '#444') },
+            primary: { element: createElem('div', 0, 1, 32, 18, '#888'), },
+        },
+        palettePanes: {
+            element: createElem('div', 59, 1, 240, 22),
+            children: [] as HTMLElement[],
+        },
+    };
+    readonly element = this.ui.element;
+
+    constructor() {
+        this.createComponents();  
+        this.updatePrimarySwatch();
+        this.updateSecondarySwatch();
+
+        this.ui.palettePanes.element.onmousedown = e => this.onPalMouseDown(e);
+        this.ui.element.oncontextmenu = e => e.preventDefault();
+    }
+
+    site(site: Site) {
+        siteChild(this.ui.element, site);
+    }
+
+    setPalette(palette: RGBA[]) {
+        this.palette.resize(palette.length);
+        for (var i = 0; i < palette.length; i++){
+            this.palette.setColor(i, palette[i]);
+        }
+
+        this.updateSwatchGrid();
+        this.updatePrimarySwatch();
+        this.updateSecondarySwatch();
+    }
+
+    getPalette() {
+        return this.palette.cloneColors();
+    }
+
+    updatePrimarySwatch() {
+        var colorStyle = this.palette.getStyle(this.primarySelection);
+        this.ui.selectionBox.primary.element.style.backgroundColor = colorStyle;
+    }
+
+    updateSecondarySwatch() {
+        var colorStyle = this.palette.getStyle(this.secondarySelection);
+        this.ui.selectionBox.secondary.element.style.backgroundColor = colorStyle;
+    }
+
+    onPalMouseDown(e: MouseEvent) {
+        var palIndex = this.ui.palettePanes.children.indexOf(e.target as HTMLElement);
+        if (palIndex < 0 || palIndex >= this.ui.palettePanes.children.length) return;
+
+        if (e.button === 0) {
+            this.primarySelection = palIndex;
+            this.updatePrimarySwatch();
+        } else if (e.button === 2) {
+            this.secondarySelection = palIndex;
+            this.updateSecondarySwatch();
+        } else {
+            return; // Don't raise event
+        } 
+        
+        this.eventManager.raise('colorSelected', undefined);
+    }
+  
+
+    private createComponents() {
+        this.ui.element.style.position = 'relative';
+        this.siteStaticChildren(this.ui);
+        this.updateSwatchGrid();
+    }
+
+    /** Creates or removes palette swatch according to this object's palette and rgbDetent values.*/
+    private updateSwatchGrid() {
+        this.createPaletteElements();
+    }
+
+    private siteStaticChildren(ui: MiniPaletteView["ui"]) {
+        // hack: there is no way to cleanly represent 
+        // type UiNode = { [name: string]: UiNode, element: HTMLElement } 
+        // in Typescript
+        var element = ui.element;
+        var key: keyof MiniPaletteView["ui"];
+
+        for (key in ui) if (key !== 'element' && key !== 'children' as string) { // bet you didn't know about for...in...if blocks
+            var child = ui[key];
+            element.appendChild(child.element);
+            this.siteStaticChildren(child as any);
+        }
+    }
+
+    private createPaletteElements() {
+        var parent = this.ui.palettePanes.element;
+        var elements = this.ui.palettePanes.children;
+
+        while (elements.length > this.palette.getLength()) {
+            parent.removeChild(elements.pop()!);
+        }
+        while (elements.length < this.palette.getLength()) {
+            var elem = $.create('div');
+            elements.push(elem);
+            parent.appendChild(elem);
+        }
+
+        const cellWidth = Math.floor(miniMetrics.palette.width / elements.length);
+        for (var i = 0; i < elements.length; i++) {
+            setBounds(elements[i],
+                cellWidth * i, 4,
+                cellWidth - 1, miniMetrics.palette.height - 8
+            );
+            elements[i].style.borderRadius = '3px';
+
+            this.updatePaletteColor(i);
+        }
+    }
+
+    getPrimarySelection() { return this.primarySelection;}
+    getSecondarySlection() { return this.secondarySelection;}
+
+    private updatePaletteColors() {
+        var count = this.ui.palettePanes.children.length;
+        for (var i = 0; i < count; i++){
+            this.updatePaletteColor(i);
+        }
+        this.updatePrimarySwatch();
+        this.updateSecondarySwatch();
     }
 
     private updatePaletteColor(index: number) {
