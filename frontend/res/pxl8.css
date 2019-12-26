@@ -72,6 +72,7 @@
         margin-right: 8px; */
         /* line-height: 1.3; */
         background: #888;
+        overflow: hidden;
     }
 
     p {
@@ -81,6 +82,11 @@
 
 /*** General Styles ********************************************/
 
+    html,
+    body,
+    .app-container {
+        height: 100%;
+    }
 
     h1 {
         text-align: center;

@@ -36,85 +36,95 @@ import { DocumentEvents, DocumentEditor } from './document';
 import { EventManager } from './eventManager';
 
 class Pxl8 {
+    private readonly appContainer = $('.app-container') as HTMLElement;
+    private readonly eventManager = new EventManager<DocumentEvents>();
+    private readonly toolbar = new Pxl8Toolbar();
+    private readonly statusBar = new Pxl8StatusBar();
+    private readonly romView = new RomView();
+    private readonly docEditor: DocumentEditor;
+
+    public readonly events = this.eventManager.subscriber;
+
     constructor() {
+        var palView = this.statusBar.getPaletteView();
 
-        var appcontainer = { site: document.querySelector('.app-container') as HTMLElement };
-        var appcontainerPrepend: Site = { site: appcontainer.site, prepend: true };
-
-        var toolbar = new Pxl8Toolbar();
-        var statusBar = new Pxl8StatusBar();
-        var romView = new RomView();
-        var palView = statusBar.getPaletteView();
-
-        var docEvents = new EventManager<DocumentEvents>();
-        var doc: DocumentEditor = {
-            events: docEvents.subscriber,
+        this.docEditor = {
+            events: this.events,
             getPrimaryColor: () => palView.getPrimarySelection(),
             getSecondaryColor: () => palView.getSecondarySlection(),
             getPalette: () => palView.getPalette(),
         };
 
-
-        toolbar.setIconPath('res/icons');
-        statusBar.setIconPath('res/icons');
-        statusBar.site(appcontainerPrepend);
-        toolbar.site(appcontainerPrepend);
-
+        // Init components
+        this.statusBar.setIconPath('res/icons');
+        this.toolbar.setIconPath('res/icons');
+        this.romView.element.style.display = 'inline-block';
         palView.setPalette(debugPalette);
 
-        toolbar.events.subscribe({
+        // Site components
+        var appSite = { site: this.appContainer };
+        var appSitePrepend: Site = { site: appSite.site, prepend: true };
+        this.statusBar.site(appSitePrepend);
+        this.toolbar.site(appSitePrepend);
+        this.romView.site(appSite);
+        console.log(appSite);
+        (window as any).romView = this.romView;
+
+        // Event handlers
+        this.toolbar.events.subscribe({
             buttonClick: buttonName => {
                 if (buttonName === 'import') {
                     showFileDialog()
                         .then(file => {
                             if (file) {
-                                onRomLoaded(file, doc);
+                                this.loadRom(file);
                             }
                         })
                         .catch(console.error);
                 }
                 if (buttonName === 'export') {
-                    romView.saveRomAsDownload();
+                    this.romView.saveRomAsDownload();
                 }
             }
         });
 
-        romView.site(appcontainer);
-        romView.element.style.display = 'inline-block';
-        console.log(appcontainer);
-        (window as any).romView = romView;
-
-        romView.events.subscribe({
-            offsetChanged: offset => statusBar.setOffsetValue(offset),
+        this.romView.events.subscribe({
+            offsetChanged: offset => this.statusBar.setOffsetValue(offset),
         });
 
         palView.events.subscribe({
-            primaryColorSelected: () => docEvents.raise('primaryColorSelected'),
-            secondaryColorSelected: () => docEvents.raise('secondaryColorSelected'),
-            paletteModified: () => docEvents.raise('paletteModified'),
+            primaryColorSelected: () => this.eventManager.raise('primaryColorSelected'),
+            secondaryColorSelected: () => this.eventManager.raise('secondaryColorSelected'),
+            paletteModified: () => this.eventManager.raise('paletteModified'),
         });
 
-        docEvents.raise('primaryColorSelected');
-        docEvents.raise('secondaryColorSelected');
+        // Etc
+        this.eventManager.raise('primaryColorSelected');
+        this.eventManager.raise('secondaryColorSelected');
+    }
+
+    private loadRom(file: File) {
+        this.romView.loadRom(new ROM(file), tileCodecs.nesCodec, this.docEditor);
+        this.romView.setViewOffset(0);
     }
 }
 
-function $_(selector: string) { return $(selector) as HTMLElement };
+// function $_(selector: string) { return $(selector) as HTMLElement };
 
-function onRomLoaded(file: File, doc: DocumentEditor) {
-    var romView = ((window as any).romView as RomView);
-    romView.loadRom(new ROM(file), tileCodecs.nesCodec, doc);
-    romView.setViewOffset(0);
+// function onRomLoaded(file: File, doc: DocumentEditor) {
+//     var romView = ((window as any).romView as RomView);
+//     romView.loadRom(new ROM(file), tileCodecs.nesCodec, doc);
+//     romView.setViewOffset(0);
 
-    $_('.offset-page-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.page);
-    $_('.offset-row-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.row);
-    $_('.offset-tile-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.tile);
-    $_('.offset-byte-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.byte);
-    $_('.offset-byte-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.byte);
-    $_('.offset-tile-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.tile);
-    $_('.offset-row-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.row);
-    $_('.offset-page-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.page);
-}
+//     $_('.offset-page-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.page);
+//     $_('.offset-row-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.row);
+//     $_('.offset-tile-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.tile);
+//     $_('.offset-byte-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.byte);
+//     $_('.offset-byte-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.byte);
+//     $_('.offset-tile-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.tile);
+//     $_('.offset-row-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.row);
+//     $_('.offset-page-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.page);
+// }
 
 
 
