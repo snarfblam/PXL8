@@ -45,7 +45,8 @@ const defaultPalette = [
 
 export interface PaletteViewEvents {
     paletteModified?: () => void;
-    colorSelected?: () => void;
+    primaryColorSelected?: () => void;
+    secondaryColorSelected?: () => void;
 }
 
 export class PaletteView {
@@ -132,14 +133,15 @@ export class PaletteView {
         if (e.button === 0) {
             this.primarySelection = palIndex;
             this.updatePrimarySwatch();
+            this.eventManager.raise('primaryColorSelected');
         } else if (e.button === 2) {
             this.secondarySelection = palIndex;
             this.updateSecondarySwatch();
+            this.eventManager.raise('secondaryColorSelected');
         } else {
             return; // Don't raise event
         } 
         
-        this.eventManager.raise('colorSelected');
     }
     onRgbMouseDown(e: MouseEvent) {
         // What was clicked?
@@ -362,14 +364,15 @@ export class MiniPaletteView {
         if (e.button === 0) {
             this.primarySelection = palIndex;
             this.updatePrimarySwatch();
+            this.eventManager.raise('primaryColorSelected');
         } else if (e.button === 2) {
             this.secondarySelection = palIndex;
             this.updateSecondarySwatch();
+            this.eventManager.raise('secondaryColorSelected');
         } else {
             return; // Don't raise event
         } 
         
-        this.eventManager.raise('colorSelected');
     }
   
 

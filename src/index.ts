@@ -32,20 +32,35 @@ import { Toolbar, ToolbarButton, ToolbarSize } from './toolbar';
 import { Pxl8Toolbar, Pxl8StatusBar } from './pxl8Toolbars';
 import { Site } from './site';
 import { showFileDialog } from './fileDialog';
+import { DocumentEvents, DocumentEditor } from './document';
+import { EventManager } from './eventManager';
 
 class Pxl8 {
     constructor() {
+
         var appcontainer = { site: document.querySelector('.app-container') as HTMLElement };
         var appcontainerPrepend: Site = { site: appcontainer.site, prepend: true };
 
         var toolbar = new Pxl8Toolbar();
         var statusBar = new Pxl8StatusBar();
         var romView = new RomView();
+        var palView = statusBar.getPaletteView();
+
+        var docEvents = new EventManager<DocumentEvents>();
+        var doc: DocumentEditor = {
+            events: docEvents.subscriber,
+            getPrimaryColor: () => palView.getPrimarySelection(),
+            getSecondaryColor: () => palView.getSecondarySlection(),
+            getPalette: () => palView.getPalette(),
+        };
+
 
         toolbar.setIconPath('res/icons');
         statusBar.setIconPath('res/icons');
         statusBar.site(appcontainerPrepend);
         toolbar.site(appcontainerPrepend);
+
+        palView.setPalette(debugPalette);
 
         toolbar.events.subscribe({
             buttonClick: buttonName => {
@@ -53,7 +68,7 @@ class Pxl8 {
                     showFileDialog()
                         .then(file => {
                             if (file) {
-                                onRomLoaded(file);
+                                onRomLoaded(file, doc);
                             }
                         })
                         .catch(console.error);
@@ -71,61 +86,21 @@ class Pxl8 {
 
         romView.events.subscribe({
             offsetChanged: offset => statusBar.setOffsetValue(offset),
-        })
-        // var t = new Toolbar();
-        // t.setIconPath('res/icons');
-        // t.site(document.body);
-        // console.log('WOULD YOU KINDLY');
-        // var b1 = new ToolbarButton();
-        // b1.setText('Import');
-        // b1.setIcon('import.png');
-        // b1.site(t);
-        // var b2 = new ToolbarButton();
-        // b2.setText('Export');
-        // b2.setIcon('export.png');
-        // b2.site(t);
+        });
 
-
-        // var pal = new PaletteView();
-        // pal.site({ site: document.body });
-        // pal.events.subscribe({ paletteModified: () => console.log('event!') });
-        // var editor = new TileView();
-        // editor.initialize({ tileWidth: 8, tileHeight: 8, pixelWidth: 16, pixelHeight: 16 });
-        // editor.site({ site: document.body });
-        // console.log('sited');
-        // editor.palette = debugPalette;
-        // editor.element.style.margin = '2px';
-        // var pixels = editor.pixels.data;
-        // for (var i = 0; i < pixels.length; i++){
-        //     var val = Math.floor(Math.random() * 2);
-        //     pixels[i] = val;
-        // }
-
-        // editor.redraw();
-        // (window as any).tileEditor = editor;
-
-        // var fileInput = $.create('input') as HTMLInputElement;
-        // fileInput.type = 'file';
-        // document.body.appendChild(fileInput);
-
-        // fileInput.onchange = e => {
-        //     var file = fileInput.files![0];  
-        //     onRomLoaded(file);
-            
-        //     // var reader = new FileReader();
-        //     // reader.onload = e => {
-        //     //     onFileLoaded(reader.result as ArrayBuffer);
-        //     // }
-        //     // reader.readAsArrayBuffer(file);
-        // };
+        palView.events.subscribe({
+            primaryColorSelected: () => docEvents.raise('primaryColorSelected'),
+            secondaryColorSelected: () => docEvents.raise('secondaryColorSelected'),
+            paletteModified: () => docEvents.raise('paletteModified'),
+        });
     }
 }
 
 function $_(selector: string) { return $(selector) as HTMLElement };
 
-function onRomLoaded(file: File) {
+function onRomLoaded(file: File, doc: DocumentEditor) {
     var romView = ((window as any).romView as RomView);
-    romView.loadRom(new ROM(file), tileCodecs.nesCodec);
+    romView.loadRom(new ROM(file), tileCodecs.nesCodec, doc);
     romView.setViewOffset(0);
 
     $_('.offset-page-up').onclick = e => romView.scrollView(Direction.up, ViewUnit.page);
@@ -137,39 +112,6 @@ function onRomLoaded(file: File) {
     $_('.offset-row-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.row);
     $_('.offset-page-down').onclick = e => romView.scrollView(Direction.down, ViewUnit.page);
 }
-
-// function onFileLoaded(contents: ArrayBuffer) {
-
-//     // var editor = ((window as any).tileEditor as TileView);
-    
-//     // var buffy = new Uint8Array(contents);
-//     // var view = new GfxView();
-//     // view.initialize();
-//     // view.codec = tileCodecs.nesCodec;
-//     // view.palette = debugPalette;
-//     // view.gfxData = buffy;
-//     // view.site({
-//     //     site: document.body,
-//     //     placeElement: e => {
-//     //         document.body.insertBefore(e, editor.element);
-//     //     }   
-//     // });
-//     // view.displayOffset(0x40010);
-
-//     // view.element.onmousedown = function (e) {
-//     //     var b = view.element.getBoundingClientRect();
-//     //     var x = (e.clientX - b.left) / view.metrics.pixelWidth;
-//     //     var y = (e.clientY - b.top) / view.metrics.pixelHeight;
-//     //     var tileX = Math.floor(x / view.metrics.tileWidth);
-//     //     var tileY = Math.floor(y / view.metrics.tileHeight);
-//     //     var tileIndex = tileY * view.metrics.gridWidth + tileX;
-//     //     var offset = tileIndex * view.codec!.bytesPerTile + 0x40010;
-
-//     //     var pixelData = editor.pixels;
-//     //     view.codec!.decode({ data: buffy, offset }, { data: pixelData, offset: 0 });
-//     //     editor.redraw();
-//     // };
-// }
 
 
 

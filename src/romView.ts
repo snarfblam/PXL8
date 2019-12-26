@@ -10,6 +10,7 @@ import { EventManager, EventSubscription } from './eventManager';
 import { PaletteView, MiniPaletteView } from "./paletteView";
 import { Scrollbar } from "./scrollbar";
 import { Pxl8Toolbar } from "./pxl8Toolbars";
+import { DocumentEvents, DocumentEditor } from "./document";
 
 const tileViewZoom = 32;
 const gfxViewZoom = 2;
@@ -25,7 +26,7 @@ export enum ViewUnit {
 export class RomView {
     gfxView = new GfxView();
     tileView = new TileView();
-    palView = new MiniPaletteView();
+    // palView = new MiniPaletteView();
     element = $.create('div');
     scroll = new Scrollbar();
     private offsetDisplay = $.create('p');
@@ -44,7 +45,9 @@ export class RomView {
     // private listeners: RomViewEvents[] = [];
     private readonly eventMgr: EventManager<RomViewEvents>;
     public readonly events: EventSubscription<RomViewEvents>;
-    
+
+    private document = null as DocumentEditor | null;
+
     constructor() {
         // this.gfxView = new GfxView();
         // this.tileView = new TileView();
@@ -59,20 +62,20 @@ export class RomView {
         this.eventMgr = new EventManager<RomViewEvents>();
         this.events = this.eventMgr.subscriber;
 
-        this.palView.element.style.display = 'inline-block';
+        // this.palView.element.style.display = 'inline-block';
 
-        this.palView.events.subscribe({
-            paletteModified: () => {
-                var newPal = this.palView.getPalette();
-                this.gfxView.palette = newPal; 
-                this.gfxView.displayOffset(this.viewOffset);
-                this.tileView.palette = newPal;
-                this.tileView.redraw();
-            },
-            colorSelected: () => {
-                this.tileView.selectedColor = this.palView.getPrimarySelection();
-            }
-        });
+        // this.palView.events.subscribe({
+        //     paletteModified: () => {
+        //         var newPal = this.palView.getPalette();
+        //         this.gfxView.palette = newPal; 
+        //         this.gfxView.displayOffset(this.viewOffset);
+        //         this.tileView.palette = newPal;
+        //         this.tileView.redraw();
+        //     },
+        //     colorSelected: () => {
+        //         this.tileView.selectedColor = this.palView.getPrimarySelection();
+        //     }
+        // });
         this.tileView.events.subscribe({
             commitChanges: () => {
                 this.commitTileEdit();
@@ -91,6 +94,23 @@ export class RomView {
         this.tileView.element.style.marginLeft = '8px';
     }   
 
+    private readonly documentEvents: DocumentEvents = {
+        paletteModified: () => {
+            var newPal = this.document!.getPalette();
+            this.gfxView.palette = newPal; 
+            this.gfxView.displayOffset(this.viewOffset);
+            this.tileView.palette = newPal;
+            this.tileView.redraw();
+        },
+        primaryColorSelected: () => {
+            this.tileView.selectedColor = this.document!.getPrimaryColor();
+        },
+        secondaryColorSelected: () => {
+            this.tileView.selectedColor = this.document!.getSecondaryColor();
+        },
+
+    }
+
     site(site: Site) {
         this.statusPane.appendChild(this.offsetDisplay);
 
@@ -99,14 +119,15 @@ export class RomView {
         this.scroll.site(thisSite);
         this.tileView.site(thisSite);
         this.element.appendChild($.create('br'));
-        this.palView.site(thisSite);
+        // this.palView.site(thisSite);
         this.element.appendChild(this.statusPane);
         siteChild(this.element, site);
     }
 
-    loadRom(rom: ROM, codec: TileCodec) {
+    loadRom(rom: ROM, codec: TileCodec, editor: DocumentEditor) {
         const gridHeight = 16;
 
+        this.document = editor;
         this.romLoaded = false;
         this.rom = rom;
         this.codec = codec;
@@ -129,7 +150,7 @@ export class RomView {
             gridHeight: gridHeight,
         });
 
-        this.palView.setPalette(debugPalette);
+        // this.palView.setPalette(debugPalette);
 
         this.viewableByteCount = this.gfxView.metrics.gridWidth * this.gfxView.metrics.gridHeight * this.codec.bytesPerTile;
         this.romBuffer = new Uint8Array(this.viewableByteCount);
@@ -220,7 +241,7 @@ export class RomView {
         var { codec, rom } = this;
         if (codec == null || rom == null) return false;
 
-        var palette = this.palView.getPalette();
+        var palette = this.document!.getPalette();
         this.tileView.palette = palette;
         this.gfxView.palette = palette;
         this.gfxView.codec = codec;

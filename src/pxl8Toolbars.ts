@@ -98,17 +98,17 @@ export class Pxl8Toolbar extends Toolbar {
 }
 
 export class Pxl8StatusBar extends Toolbar {
-    private items = {
+    private readonly items = {
         tileUp: newButton("Tile", "small_up.png"),
         byteUp: newButton("Byte", "small_up.png"),
         tileDown: newButton("Tile", "small_down.png"),
         byteDown: newButton("Byte", "small_down.png"),
     };
-    private palView = new MiniPaletteView();
-    private offsetLabel = new ToolbarLabel();
+    private readonly palView = new MiniPaletteView();
+    private readonly offsetLabel = new ToolbarLabel();
 
-    private eventManager = new EventManager<Pxl8ToolbarEvents>();
-    public events = this.eventManager.subscriber;
+    private readonly eventManager = new EventManager<Pxl8ToolbarEvents>();
+    public readonly events = this.eventManager.subscriber;
     
     constructor() {
         super();
@@ -141,6 +141,8 @@ export class Pxl8StatusBar extends Toolbar {
         this.palView.element.style.verticalAlign = 'middle';
         this.palView.element.style.marginLeft = '24px';
     }
+
+    public getPaletteView() { return this.palView; }
 
     protected createElement() {
         var elem = super.createElement();
