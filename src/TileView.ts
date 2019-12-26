@@ -88,7 +88,7 @@ export class TileView {
         
             this.pixels.setPixel(px, py, this.selectedColor);
             console.log(this.selectedColor);
-            this.eventManager.raise("commitChanges", undefined);
+            this.eventManager.raise("commitChanges");
         } else if (e.button === 2) {
             // var nesTile = demoNesTile;
             // var codec = tileCodecs.nesCodec;

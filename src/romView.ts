@@ -191,6 +191,7 @@ export class RomView {
             this.rom.rawDataPromise.then(() => this.setViewOffset(offset));
         } else {
             this.viewOffset = offset;
+            this.eventMgr.raise('offsetChanged', offset);
             this.tileViewOffset = this.viewOffset + 0x10;
             if (this.isRenderReady()) {
                 var dataBytes = this.rom.rawData!; // this.romLoaded indicates raw data was loaded
@@ -250,8 +251,9 @@ export class RomView {
 
 export interface RomViewEvents {
     tilePicked?: (arg: { relativeIndex: number, offset: number }) => void;
-    test?: (arg: number) => void;
+    test?: (arg: number, arg2: string) => void;
     tesy?: (arg: string) => void;
+    offsetChanged?: (offset: number) => void;
 }
 // type EventHandler<T extends keyof RomViewEvents> = NonNullable<RomViewEvents[T]>
 // type EventArg<T extends keyof RomViewEvents> = Parameters<EventHandler<T>>[0];

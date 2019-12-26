@@ -69,6 +69,9 @@ class Pxl8 {
         console.log(appcontainer);
         (window as any).romView = romView;
 
+        romView.events.subscribe({
+            offsetChanged: offset => statusBar.setOffsetValue(offset),
+        })
         // var t = new Toolbar();
         // t.setIconPath('res/icons');
         // t.site(document.body);

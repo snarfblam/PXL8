@@ -49,8 +49,8 @@ export class Scrollbar{
         this.applyMetrics();
 
         this.element.onmousedown = e => this.onMouseDown(e);
-        this.ui.up.onclick = e => this.eventManager.raise('tickUp', undefined);
-        this.ui.down.onclick = e => this.eventManager.raise('tickDown', undefined);
+        this.ui.up.onclick = e => this.eventManager.raise('tickUp');
+        this.ui.down.onclick = e => this.eventManager.raise('tickDown');
     }
 
     site(site: Site) {
@@ -107,9 +107,9 @@ export class Scrollbar{
             var { x, y } = eventToClientCoords(this.element, e);
         
             if (y < this.ui.scroll.offsetTop) {
-                this.eventManager.raise('pageUp', undefined);
+                this.eventManager.raise('pageUp');
             } else {
-                this.eventManager.raise('pageDown', undefined);
+                this.eventManager.raise('pageDown');
             }
         }    
     }
