@@ -29,7 +29,7 @@ export class RomView {
     // palView = new MiniPaletteView();
     element = $.create('div');
     scroll = new Scrollbar();
-    private offsetDisplay = $.create('p');
+    // private offsetDisplay = $.create('p');
     private statusPane = $.create('div');
 
     private rom: ROM | null = null;
@@ -57,7 +57,6 @@ export class RomView {
         this.romBuffer = new Uint8Array(1);
 
         this.statusPane.style.display = 'inline-block';
-        this.offsetDisplay.textContent = "No ROM loaded";
 
         this.eventMgr = new EventManager<RomViewEvents>();
         this.events = this.eventMgr.subscriber;
@@ -103,17 +102,15 @@ export class RomView {
             this.tileView.redraw();
         },
         primaryColorSelected: () => {
-            this.tileView.selectedColor = this.document!.getPrimaryColor();
+            this.tileView.primaryColor = this.document!.getPrimaryColor();
         },
         secondaryColorSelected: () => {
-            this.tileView.selectedColor = this.document!.getSecondaryColor();
+            this.tileView.secondaryColor = this.document!.getSecondaryColor();
         },
 
     }
 
     site(site: Site) {
-        this.statusPane.appendChild(this.offsetDisplay);
-
         var thisSite = { site: this.element };
         this.gfxView.site(thisSite);
         this.scroll.site(thisSite);
@@ -127,7 +124,10 @@ export class RomView {
     loadRom(rom: ROM, codec: TileCodec, editor: DocumentEditor) {
         const gridHeight = 16;
 
+        if (this.document) this.document.events.unsubscribe(this.documentEvents);
         this.document = editor;
+        if (this.document) this.document.events.subscribe(this.documentEvents);
+
         this.romLoaded = false;
         this.rom = rom;
         this.codec = codec;
@@ -149,8 +149,6 @@ export class RomView {
             gridWidth: 16,
             gridHeight: gridHeight,
         });
-
-        // this.palView.setPalette(debugPalette);
 
         this.viewableByteCount = this.gfxView.metrics.gridWidth * this.gfxView.metrics.gridHeight * this.codec.bytesPerTile;
         this.romBuffer = new Uint8Array(this.viewableByteCount);
@@ -201,7 +199,6 @@ export class RomView {
             newOffset = this.rom!.rawData!.length - bytesPerRow;
         }
         if (newOffset < 0) newOffset = 0;
-        console.log('Scrolling to: $' + newOffset.toString(16).toUpperCase());
         this.setViewOffset(newOffset);
     }
 
@@ -224,7 +221,6 @@ export class RomView {
                 this.tileView.redraw();
 
                 this.scroll.setValue(offset / dataBytes.length);
-                this.offsetDisplay.textContent = "Offset: $" + offset.toString(16).toUpperCase();
             } else {
                 console.warn('RomView not ready to render.');
             }

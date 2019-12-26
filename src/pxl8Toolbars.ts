@@ -117,7 +117,7 @@ export class Pxl8StatusBar extends Toolbar {
         this.palView.site({ site: this.element });
         this.offsetLabel.site(this);
 
-        this.setOffsetValue(0x10010);
+        this.setOffsetValue(-1);
     }
 
     private initWidget() {
@@ -152,6 +152,9 @@ export class Pxl8StatusBar extends Toolbar {
     }
 
     setOffsetValue(offset: number) {
-        this.offsetLabel.setText("Offset: $" + offset.toString(16).toUpperCase());
+        var text = (offset < 0) ?
+            "No ROM Loaded" :
+            "Offset: $" + offset.toString(16).toUpperCase();
+        this.offsetLabel.setText(text);
     }
 }

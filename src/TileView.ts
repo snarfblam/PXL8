@@ -26,8 +26,10 @@ export class TileView {
     owner: Site | null = null;
     pixels: TileData = defaultTileData;
     palette: Palette = defaultPalette;
-    selectedColor = 2; // todo: default to 0
-    private cachedColor: number | null = 0;
+    primaryColor = 0;
+    secondaryColor = 1;
+
+    private cachedColor: number | null = null;
     private cachedColorStyle: string = 'black';
     
     private eventManager = new EventManager<TileViewEvents>();
@@ -75,31 +77,27 @@ export class TileView {
         e.preventDefault();
 
         var { x, y } = coords.absToElement(Volatile.point(e.clientX, e.clientY), this.element);
+        var iColor = 0 as number | null;
 
         if (e.button === 0) {
+            iColor = this.primaryColor;
+        } else if (e.button === 2) {
+            iColor = this.secondaryColor;
+            // this.redraw();
+        }
+
+        if (iColor !== null) {
             var px = Math.floor(x / this.metrics.pixelWidth);
             var py = Math.floor(y / this.metrics.pixelHeight);
             var top = py * this.metrics.pixelWidth;
             var left = px * this.metrics.pixelHeight;
-            var iColor = this.selectedColor;
             if (iColor >= this.palette.length) iColor = this.palette.length - 1;
-            this.context!.fillStyle = this.getCachedColor(this.selectedColor);
+            this.context!.fillStyle = this.getCachedColor(iColor);
             this.context!.fillRect(left, top, this.metrics.pixelWidth, this.metrics.pixelHeight);
         
-            this.pixels.setPixel(px, py, this.selectedColor);
-            console.log(this.selectedColor);
+            this.pixels.setPixel(px, py, iColor);
             this.eventManager.raise("commitChanges");
-        } else if (e.button === 2) {
-            // var nesTile = demoNesTile;
-            // var codec = tileCodecs.nesCodec;
-
-            // codec.decode(
-            //     { data: nesTile, offset: 0 },
-            //     { data: this.pixels, offset: 0 }
-            // );
-
-            this.redraw();
-        }    
+        }
     }
  
     onMouseUp(e: MouseEvent) {
@@ -122,7 +120,6 @@ export class TileView {
         var iPxl = 0;
         var data = this.pixels.data;
         var pal = this.palette;
-        console.log(this.palette);
 
         for (var y = 0; y < tileHeight; y++){
             for (var x = 0; x < tileWidth; x++) {

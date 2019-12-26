@@ -93,6 +93,9 @@ class Pxl8 {
             secondaryColorSelected: () => docEvents.raise('secondaryColorSelected'),
             paletteModified: () => docEvents.raise('paletteModified'),
         });
+
+        docEvents.raise('primaryColorSelected');
+        docEvents.raise('secondaryColorSelected');
     }
 }
 

@@ -113,7 +113,6 @@ export class GfxView {
             var outY = tileY * metrics.tileHeight * metrics.pixelHeight;
             var outWidth = metrics.tileWidth * metrics.pixelWidth;
             var outHeight = metrics.tileHeight * metrics.pixelHeight;
-            console.log({ index, src, tileX, tileY, outX, outY, outWidth, outHeight });
             context.drawImage(buffer.canvas,
                 // src
                 0, 0, this.metrics.tileWidth, this.metrics.tileHeight,
