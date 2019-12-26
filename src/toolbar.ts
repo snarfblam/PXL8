@@ -125,3 +125,24 @@ export class ToolbarButton extends Widget {
         return result;
     }
 }
+
+export class ToolbarLabel extends Widget {
+    text = 'label';
+
+    constructor() {
+        super();
+    }
+
+    createElement() { 
+        var elem = $.create('span');
+        elem.textContent = this.text;
+        elem.style.marginLeft = elem.style.marginRight = '0.7em';
+        return elem;
+    }
+    
+    getText() { return this.text; }
+    setText(text: string) {
+        this.text = text;
+        this.element.textContent = text;
+    }
+}

@@ -1,4 +1,4 @@
-import { Toolbar, ToolbarButton, ToolbarSize } from "./toolbar";
+import { Toolbar, ToolbarButton, ToolbarSize, ToolbarLabel } from "./toolbar";
 import { $ } from "./dollar";
 import { Widget } from "./widget";
 import { EventManager } from "./eventManager";
@@ -105,6 +105,7 @@ export class Pxl8StatusBar extends Toolbar {
         byteDown: newButton("Byte", "small_down.png"),
     };
     private palView = new MiniPaletteView();
+    private offsetLabel = new ToolbarLabel();
 
     private eventManager = new EventManager<Pxl8ToolbarEvents>();
     public events = this.eventManager.subscriber;
@@ -114,6 +115,9 @@ export class Pxl8StatusBar extends Toolbar {
 
         this.initWidget();
         this.palView.site({ site: this.element });
+        this.offsetLabel.site(this);
+
+        this.setOffsetValue(0x10010);
     }
 
     private initWidget() {
@@ -143,5 +147,9 @@ export class Pxl8StatusBar extends Toolbar {
         elem.style.background = '#EEEEEE';
         elem.style.boxShadow = '0 -1px #00000033';
         return elem;
+    }
+
+    setOffsetValue(offset: number) {
+        this.offsetLabel.setText("Offset: $" + offset.toString(16).toUpperCase());
     }
 }

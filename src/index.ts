@@ -101,20 +101,20 @@ class Pxl8 {
         // editor.redraw();
         // (window as any).tileEditor = editor;
 
-        var fileInput = $.create('input') as HTMLInputElement;
-        fileInput.type = 'file';
-        document.body.appendChild(fileInput);
+        // var fileInput = $.create('input') as HTMLInputElement;
+        // fileInput.type = 'file';
+        // document.body.appendChild(fileInput);
 
-        fileInput.onchange = e => {
-            var file = fileInput.files![0];  
-            onRomLoaded(file);
+        // fileInput.onchange = e => {
+        //     var file = fileInput.files![0];  
+        //     onRomLoaded(file);
             
-            // var reader = new FileReader();
-            // reader.onload = e => {
-            //     onFileLoaded(reader.result as ArrayBuffer);
-            // }
-            // reader.readAsArrayBuffer(file);
-        };
+        //     // var reader = new FileReader();
+        //     // reader.onload = e => {
+        //     //     onFileLoaded(reader.result as ArrayBuffer);
+        //     // }
+        //     // reader.readAsArrayBuffer(file);
+        // };
     }
 }
 

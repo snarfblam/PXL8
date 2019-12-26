@@ -29,7 +29,6 @@ export class RomView {
     element = $.create('div');
     scroll = new Scrollbar();
     private offsetDisplay = $.create('p');
-    private saveLink = $.create('a') as HTMLAnchorElement;
     private statusPane = $.create('div');
 
     private rom: ROM | null = null;
@@ -56,9 +55,6 @@ export class RomView {
 
         this.statusPane.style.display = 'inline-block';
         this.offsetDisplay.textContent = "No ROM loaded";
-        this.saveLink.textContent = "Click to save";
-        this.saveLink.href = '#';
-        this.saveLink.onclick = e => this.onSave(e);
 
         this.eventMgr = new EventManager<RomViewEvents>();
         this.events = this.eventMgr.subscriber;
@@ -97,7 +93,6 @@ export class RomView {
 
     site(site: Site) {
         this.statusPane.appendChild(this.offsetDisplay);
-        this.statusPane.appendChild(this.saveLink);
 
         var thisSite = { site: this.element };
         this.gfxView.site(thisSite);
@@ -241,10 +236,10 @@ export class RomView {
         this.gfxView.refreshTile(this.viewOffset, index);
     }
 
-    private onSave(e: Event) {
-        e.preventDefault();
-        this.saveRomAsDownload();
-    }
+    // private onSave(e: Event) {
+    //     e.preventDefault();
+    //     this.saveRomAsDownload();
+    // }
 
     public saveRomAsDownload() {
         var blob = new Blob([this.rom!.rawData!]);
