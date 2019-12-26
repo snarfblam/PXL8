@@ -7,7 +7,7 @@ export interface EventSubscription<TEvents> {
  * several attempts to get the generic type arguments correctly orchestrated
  * as to allow the inference of event data types for the 'raise' method.
  */
-export class EventManager<TEvents extends { [prop in keyof TEvents]: (x: any) => void }> {
+export class EventManager<TEvents extends { [prop in keyof TEvents]: (...x: any[]) => void }> {
     listeners = [] as TEvents[];
     readonly subscriber: EventSubscription<TEvents>;
 
@@ -28,13 +28,13 @@ export class EventManager<TEvents extends { [prop in keyof TEvents]: (x: any) =>
     raise // forgive the syntax
         <
             T extends keyof TEvents,
-            TArg extends Parameters<TEvents[T]>[0]
+            TArg extends Parameters<TEvents[T]>
         >
-        (eventName: T, args: TArg) {
+        (eventName: T, ...args: TArg) {
         {
             this.listeners.forEach(l => {
                 var handler = l[eventName];
-                if (handler) handler(args);
+                if (handler) handler(...args);
             });
         }
     }

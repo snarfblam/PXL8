@@ -139,7 +139,7 @@ export class PaletteView {
             return; // Don't raise event
         } 
         
-        this.eventManager.raise('colorSelected', undefined);
+        this.eventManager.raise('colorSelected');
     }
     onRgbMouseDown(e: MouseEvent) {
         // What was clicked?
@@ -160,7 +160,7 @@ export class PaletteView {
 
         this.palette.setColor(palIndex, newColor);
         this.updatePaletteColors();
-        this.eventManager.raise('paletteModified', undefined);
+        this.eventManager.raise('paletteModified');
     }
 
     private createComponents() {
@@ -369,7 +369,7 @@ export class MiniPaletteView {
             return; // Don't raise event
         } 
         
-        this.eventManager.raise('colorSelected', undefined);
+        this.eventManager.raise('colorSelected');
     }
   
 
