@@ -61,6 +61,8 @@ export class Scrollbar{
         (this as any).metrics = { ...metrics };
     }
 
+    getValue() { return this.value; }
+
     setValue(value: number) {
         this.value = value;
         if (this.metrics.orientation === Orientation.vertical) {
@@ -100,6 +102,8 @@ export class Scrollbar{
         } else if (this.metrics.orientation === 'horizontal') {
             this.element.style.width = size + 'px';
         }
+
+        this.setValue(this.getValue());
     }
 
     private onMouseDown(e: MouseEvent) {

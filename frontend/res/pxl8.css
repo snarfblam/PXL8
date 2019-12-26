@@ -181,20 +181,20 @@
 }
 
 div.scroller {
-    outline: 1px solid #888;
+    /* outline: 1px solid #888; */
     display:inline-block;
 }
 
 .scroller-up {
-    border: 1px solid #666;
+    /* border: 1px solid #666; */
     background: url('scroll-up.png');
 }
 .scroller-down {
-    border: 1px solid #666;
+    /* border: 1px solid #666; */
     background: url('scroll-down.png');
 }
 .scroller-scroll {
-    border: 1px solid #666;
+    /* border: 1px solid #666; */
     background: url('scroll-scroll.png');
 }
 

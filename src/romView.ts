@@ -30,7 +30,7 @@ export class RomView {
     element = $.create('div');
     scroll = new Scrollbar();
     // private offsetDisplay = $.create('p');
-    private statusPane = $.create('div');
+    // private statusPane = $.create('div');
 
     private rom: ROM | null = null;
     private codec: TileCodec | null = null;
@@ -56,7 +56,7 @@ export class RomView {
         // this.element = $.create('div');
         this.romBuffer = new Uint8Array(1);
 
-        this.statusPane.style.display = 'inline-block';
+        // this.statusPane.style.display = 'inline-block';
 
         this.eventMgr = new EventManager<RomViewEvents>();
         this.events = this.eventMgr.subscriber;
@@ -90,7 +90,13 @@ export class RomView {
             tickDown: () => this.scrollView(Direction.down, ViewUnit.row),
         });
 
-        this.tileView.element.style.marginLeft = '8px';
+        this.tileView.element.style.marginLeft = '4px';
+        this.tileView.element.style.marginTop = '4px';
+        this.element.style.height = '100%';
+        this.element.style.position = 'relative';
+
+        this.tileView.element.style.position = 'absolute';
+        this.tileView.element.style.top = '0px';
     }   
 
     private readonly documentEvents: DocumentEvents = {
@@ -115,9 +121,9 @@ export class RomView {
         this.gfxView.site(thisSite);
         this.scroll.site(thisSite);
         this.tileView.site(thisSite);
-        this.element.appendChild($.create('br'));
+        // this.element.appendChild($.create('br'));
         // this.palView.site(thisSite);
-        this.element.appendChild(this.statusPane);
+        // this.element.appendChild(this.statusPane);
         siteChild(this.element, site);
     }
 
@@ -263,6 +269,14 @@ export class RomView {
         var blob = new Blob([this.rom!.rawData!]);
         var filename = this.rom!.filename;
         saveBlob(blob, filename);
+    }
+
+    public resize(height: number) {
+        this.gfxView.resize(height);
+        if (this.romLoaded) {
+            this.gfxView.displayOffset(this.viewOffset);
+        }
+        this.scroll.setSize(height);
     }
 }
 

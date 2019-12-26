@@ -3,6 +3,8 @@ import { $ } from "./dollar";
 import { Widget } from "./widget";
 import { EventManager } from "./eventManager";
 import { MiniPaletteView } from "./paletteView";
+import { ViewUnit } from "./romView";
+import { Direction } from "./util";
 
 function newButton(text: string, icon: string) {
     var btn = new ToolbarButton();
@@ -41,6 +43,10 @@ export type Pxl8ToolbarButton = 'import' | 'export' | 'copy' | 'paste' | 'zoomin
 
 export interface Pxl8ToolbarEvents {
     buttonClick?: (name: Pxl8ToolbarButton) => void;
+}
+
+export interface Pxl8StatusbarEvents {
+    scroll?: (unit: ViewUnit, dir: Direction.up | Direction.down) => void;
 }
 
 export class Pxl8Toolbar extends Toolbar {
@@ -107,7 +113,7 @@ export class Pxl8StatusBar extends Toolbar {
     private readonly palView = new MiniPaletteView();
     private readonly offsetLabel = new ToolbarLabel();
 
-    private readonly eventManager = new EventManager<Pxl8ToolbarEvents>();
+    private readonly eventManager = new EventManager<Pxl8StatusbarEvents>();
     public readonly events = this.eventManager.subscriber;
     
     constructor() {
@@ -140,6 +146,23 @@ export class Pxl8StatusBar extends Toolbar {
         this.palView.element.style.display = 'inline-block';
         this.palView.element.style.verticalAlign = 'middle';
         this.palView.element.style.marginLeft = '24px';
+
+        this.items.tileUp.events.subscribe({
+            click: () =>
+                this.eventManager.raise("scroll", ViewUnit.tile, Direction.up)
+        });
+        this.items.byteUp.events.subscribe({
+            click: () =>
+                this.eventManager.raise("scroll", ViewUnit.byte, Direction.up)
+        });
+        this.items.tileDown.events.subscribe({
+            click: () =>
+                this.eventManager.raise("scroll", ViewUnit.tile, Direction.down)
+        });
+        this.items.byteDown.events.subscribe({
+            click: () =>
+                this.eventManager.raise("scroll", ViewUnit.byte, Direction.down)
+        });
     }
 
     public getPaletteView() { return this.palView; }

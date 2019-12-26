@@ -35,8 +35,7 @@ export class GfxView {
         this.element.width = newMetrics.pixelWidth * newMetrics.tileWidth * newMetrics.gridWidth;
         this.element.height = newMetrics.pixelHeight * newMetrics.tileHeight * newMetrics.gridHeight;
         this.element.style.background = 'white';
-        this.context = this.element.getContext('2d')!;
-        this.context.imageSmoothingEnabled = false;
+        this.createContext();
 
         this.metrics = { ...newMetrics };
 
@@ -47,6 +46,11 @@ export class GfxView {
             tileHeight: newMetrics.tileHeight
         };
         this.buffer = new GfxBuffer(bufferMetrics);
+    }
+
+    private createContext() {
+        this.context = this.element.getContext('2d')!;
+        this.context.imageSmoothingEnabled = false;
     }
 
     displayOffset(offset: number) {
@@ -122,6 +126,20 @@ export class GfxView {
         }
     }
 
+    /** 
+     * Configures the element to display the specified amount of content, but
+     * does not actually update the display (displayOffset should be called
+     * after resizing.)
+     */
+    resize(height: number) {
+        console.log(height);
+
+        const tileHeightPx = this.metrics.pixelHeight * this.metrics.tileHeight;
+        var visibleRows = Math.floor((height + tileHeightPx - 1) / tileHeightPx);
+        this.metrics.gridHeight = visibleRows;
+        this.element.height = height;
+        this.createContext();
+    }
 
     site(owner: Site) {
         siteChild(this.element, owner);

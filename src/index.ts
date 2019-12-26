@@ -98,14 +98,31 @@ class Pxl8 {
             paletteModified: () => this.eventManager.raise('paletteModified'),
         });
 
+        this.statusBar.events.subscribe({
+            scroll: (unit, dir) => {
+                this.romView.scrollView(dir, unit);
+            }
+        });
+
         // Etc
         this.eventManager.raise('primaryColorSelected');
         this.eventManager.raise('secondaryColorSelected');
+
+        window.addEventListener('resize', e => this.performLayout());
     }
 
     private loadRom(file: File) {
         this.romView.loadRom(new ROM(file), tileCodecs.nesCodec, this.docEditor);
         this.romView.setViewOffset(0);
+        this.performLayout();
+    }
+
+    private performLayout() {
+        var containerHeight = this.appContainer.getBoundingClientRect().height;
+        var availHeight = containerHeight -
+            this.toolbar.element.getBoundingClientRect().height -
+            this.statusBar.element.getBoundingClientRect().height;
+        this.romView.resize(availHeight);
     }
 }
 

@@ -1,6 +1,7 @@
 import { Widget } from './widget';
 import { $, $$ } from './dollar';
 import { removeFrom } from './util';
+import { EventManager } from './eventManager';
 
 
 
@@ -51,10 +52,17 @@ export class Toolbar extends Widget {
     private unregisterButton(b: ToolbarButton) { removeFrom(this.buttons, b); }
 }
 
+export interface ToolbarButtonEvents{
+    click: () => void;
+}
+
 export class ToolbarButton extends Widget {
     iconElement: HTMLImageElement;
     captionElement: HTMLSpanElement;
     iconName = "";
+
+    private eventManager = new EventManager<ToolbarButtonEvents>();
+    public events = this.eventManager.subscriber;
 
     constructor() {
         super();
@@ -67,6 +75,8 @@ export class ToolbarButton extends Widget {
 
         this.element.appendChild(this.iconElement);
         this.element.appendChild(this.captionElement);
+
+        this.element.addEventListener('click', () => this.eventManager.raise('click'));
     }
 
     protected createElement() {
