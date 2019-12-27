@@ -29,6 +29,13 @@ export class TileView {
     primaryColor = 0;
     secondaryColor = 1;
 
+    /** The color currently being drawn, or null if no draw operation is in progress. */
+    private drawColor = null as number | null;
+    private lastDrawnPixel = {
+        x: 0,
+        y: 0,
+    };
+
     private cachedColor: number | null = null;
     private cachedColorStyle: string = 'black';
     
@@ -37,6 +44,9 @@ export class TileView {
 
     constructor() {
         this.element = $.create('canvas') as HTMLCanvasElement;
+
+        // DOM does not support mouse capture? Stop drawing on any mouse-up ever.
+        window.addEventListener('mouseup', () => this.endDrawOperation());
     }
 
     /** Initializes this element for use. Can be called multiple times if the object is re-used. */
@@ -71,7 +81,13 @@ export class TileView {
     }
 
     onMouseMove(e: MouseEvent) {
-        var { x, y } = coords.absToElement(Volatile.point(e.clientX, e.clientY), this.element);
+        if (this.drawColor !== null) {
+            var { x, y } = coords.absToElement(Volatile.point(e.clientX, e.clientY), this.element);
+            var px = Math.floor(x / this.metrics.pixelWidth);
+            var py = Math.floor(y / this.metrics.pixelHeight);
+            this.updateDrawOperation(px, py);
+        }
+
     }
     onMouseDown(e: MouseEvent) {
         e.preventDefault();
@@ -89,6 +105,7 @@ export class TileView {
         if (iColor !== null) {
             var px = Math.floor(x / this.metrics.pixelWidth);
             var py = Math.floor(y / this.metrics.pixelHeight);
+            this.beginDrawOperation(iColor, px, py);
             var top = py * this.metrics.pixelWidth;
             var left = px * this.metrics.pixelHeight;
             if (iColor >= this.palette.length) iColor = this.palette.length - 1;
@@ -99,10 +116,48 @@ export class TileView {
             this.eventManager.raise("commitChanges");
         }
     }
+
  
     onMouseUp(e: MouseEvent) {
         e.preventDefault();
         var { x, y } = coords.absToElement(Volatile.point(e.clientX, e.clientY), this.element);
+        // this.endDrawOperation();
+    }
+
+    private beginDrawOperation(color: number, px: number, py: number) {
+        if (this.drawColor != null) {
+            this.endDrawOperation();
+        }
+
+        this.drawColor = color;
+        this.applyDrawnPixel(px, py);
+    }
+
+    private updateDrawOperation(px: number, py: number) {
+        if (this.drawColor === null) return;
+        if (this.lastDrawnPixel.x !== px || this.lastDrawnPixel.y !== py) {
+            this.applyDrawnPixel(px, py);
+        }
+    }
+
+    private endDrawOperation() {
+        this.drawColor = null;
+    }
+
+    private applyDrawnPixel(px: number, py: number) {
+        var color = this.drawColor!;
+
+        this.lastDrawnPixel.x = px;
+        this.lastDrawnPixel.y = py;
+
+        var top = py * this.metrics.pixelWidth;
+        var left = px * this.metrics.pixelHeight;
+        if (color >= this.palette.length) color = this.palette.length - 1;
+        this.context!.fillStyle = this.getCachedColor(color);
+        this.context!.fillRect(left, top, this.metrics.pixelWidth, this.metrics.pixelHeight);
+    
+        this.pixels.setPixel(px, py, color);
+        this.eventManager.raise("commitChanges");
     }
 
     private getCachedColor(color: number) {
