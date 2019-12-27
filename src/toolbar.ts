@@ -80,7 +80,7 @@ export class ToolbarButton extends Widget {
     }
 
     protected createElement() {
-        var elem = $.create('div');
+        var elem = $.create('button');
         elem.classList.add('toolbar-button');
 
         return elem;        

@@ -175,7 +175,7 @@
 }
 
 .scroller {
-    background: white;
+    background: #D8E8E8;
     border-radius: 0px;
     border: none;
 }
@@ -188,14 +188,26 @@ div.scroller {
 .scroller-up {
     /* border: 1px solid #666; */
     background: url('scroll-up.png');
+    opacity: .6;
+}
+.scroller-up:hover {
+    opacity: 1;
 }
 .scroller-down {
     /* border: 1px solid #666; */
     background: url('scroll-down.png');
+    opacity: .6;
+}
+.scroller-down:hover {
+    opacity: 1;
 }
 .scroller-scroll {
     /* border: 1px solid #666; */
     background: url('scroll-scroll.png');
+    opacity: .6;
+}
+.scroller-scroll:hover{
+    opacity: 1;
 }
 
 
@@ -219,6 +231,9 @@ div.toolbar {
     padding-bottom: 4px;
     position: relative;
     top: 0px;
+
+    background: none;
+    border: none;
 }
 
 .toolbar-small .toolbar-button {
