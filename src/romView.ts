@@ -216,7 +216,7 @@ export class RomView {
         } else {
             this.viewOffset = offset;
             this.eventMgr.raise('offsetChanged', offset);
-            this.tileViewOffset = this.viewOffset + 0x10;
+            // this.tileViewOffset = this.viewOffset + 0x10;
             if (this.isRenderReady()) {
                 var dataBytes = this.rom.rawData!; // this.romLoaded indicates raw data was loaded
                 this.gfxView.gfxData = dataBytes;

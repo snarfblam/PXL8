@@ -4,7 +4,7 @@ import { Site, siteChild } from './site';
 import { coords, Volatile, Arrayish, eventToClientCoords } from './util';
 import { GfxBuffer, GfxBufferMetrics } from './gfx/gfxBuffer';
 import { TileCodec } from './gfx/tileCodec';
-import { Palette } from './gfx/palette';
+import { Palette, RGBA } from './gfx/palette';
 import { TileData } from './gfx/TileData';
 import { EventManager } from './eventManager';
 
@@ -62,6 +62,7 @@ export class GfxView {
         
         buffer.palette = palette; 
         buffer.codec = codec;
+        var blankStyle = RGBA.toStyle(palette[0]);
 
         var availLen = gfxData.length - offset;
         var availTiles = Math.floor(availLen / codec.bytesPerTile);
@@ -79,6 +80,13 @@ export class GfxView {
             var outY = tileY * metrics.tileHeight * metrics.pixelHeight;
             var outWidth = tilesToRender * metrics.tileWidth * metrics.pixelWidth;
             var outHeight = metrics.tileHeight * metrics.pixelHeight;
+
+            // Need to render any areas that we don't have data for as blank
+            if (availTiles < this.metrics.gridWidth) {
+                context.fillStyle = blankStyle;
+                var rowWidth = metrics.tileHeight * metrics.pixelHeight * metrics.gridHeight;
+                context.fillRect(0, outY, rowWidth, outHeight);
+            }
             context.drawImage(buffer.canvas,
                 // src
                 0, 0, this.metrics.tileWidth * tilesToRender, this.metrics.tileHeight,
@@ -88,6 +96,16 @@ export class GfxView {
 
             tileY++;
             availTiles -= tilesToRender;
+        }
+
+        // Need to render any areas that we don't have data for as blank
+        if (tileY < this.metrics.gridHeight) {
+            context.fillStyle = blankStyle;
+            
+            var outY = tileY * metrics.tileHeight * metrics.pixelHeight;
+            var outWidth = metrics.gridWidth * metrics.tileWidth * metrics.pixelWidth;
+            var outHeight = metrics.tileHeight * metrics.pixelHeight * (metrics.gridHeight - tileY);
+            context.fillRect(0, tileY * metrics.tileHeight * metrics.pixelHeight, outWidth, outHeight);
         }
     }
 

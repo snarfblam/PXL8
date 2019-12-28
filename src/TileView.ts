@@ -106,14 +106,14 @@ export class TileView {
             var px = Math.floor(x / this.metrics.pixelWidth);
             var py = Math.floor(y / this.metrics.pixelHeight);
             this.beginDrawOperation(iColor, px, py);
-            var top = py * this.metrics.pixelWidth;
-            var left = px * this.metrics.pixelHeight;
-            if (iColor >= this.palette.length) iColor = this.palette.length - 1;
-            this.context!.fillStyle = this.getCachedColor(iColor);
-            this.context!.fillRect(left, top, this.metrics.pixelWidth, this.metrics.pixelHeight);
+            // var top = py * this.metrics.pixelWidth;
+            // var left = px * this.metrics.pixelHeight;
+            // if (iColor >= this.palette.length) iColor = this.palette.length - 1;
+            // this.context!.fillStyle = this.getCachedColor(iColor);
+            // this.context!.fillRect(left, top, this.metrics.pixelWidth, this.metrics.pixelHeight);
         
-            this.pixels.setPixel(px, py, iColor);
-            this.eventManager.raise("commitChanges");
+            // this.pixels.setPixel(px, py, iColor);
+            // this.eventManager.raise("commitChanges");
         }
     }
 
