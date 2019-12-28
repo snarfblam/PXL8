@@ -169,11 +169,17 @@ export class RomView {
             this.rom.rawDataPromise.then(() => this.openTileForEdit(tileIndex));
         } else {
             if (this.isRenderReady()) {
-                this.tileViewOffset = this.viewOffset + tileIndex * this.codec!.bytesPerTile;
-                this.codec!.decode(
-                    { data: this.rom.rawData!, offset: this.tileViewOffset }, // src
-                    { data: this.tileView.pixels, offset: 0 }); // dest
-                this.tileView.redraw();
+                var tileOffset = this.viewOffset + tileIndex * this.codec!.bytesPerTile;
+                var nextTileOffset = tileOffset + this.codec!.bytesPerTile;
+                var inBounds = tileOffset >= 0 && nextTileOffset <= this.rom.length;
+
+                if (inBounds) {
+                    this.tileViewOffset = tileOffset;
+                    this.codec!.decode(
+                        { data: this.rom.rawData!, offset: this.tileViewOffset }, // src
+                        { data: this.tileView.pixels, offset: 0 }); // dest
+                    this.tileView.redraw();
+                }
             } else {
                 console.warn('Not ready for render in openTileForEdit');
             }    

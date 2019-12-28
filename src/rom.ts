@@ -36,6 +36,7 @@ export class ROM {
     /** Contains the ROM as a raw byte array if it is able to be loaded. Otherwise, null. */
     public rawData: Uint8Array | null = null;
     public rawDataPromise: Promise<Uint8Array>;
+    public readonly length: number;
     private reader = new FileReader();
     private isReading = false;
     private promise = {
@@ -50,6 +51,7 @@ export class ROM {
         this.reader.onerror = e => this.onDataError();
 
         if ((data as File).name) this.filename = (data as File).name;
+        this.length = data.size;
             
         this.rawDataPromise = this.getData(0, data.size)
             .then(data => new Uint8Array(data));
