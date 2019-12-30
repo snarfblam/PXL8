@@ -27,7 +27,6 @@ import { RomView, ViewUnit } from './romView';
 import { ROM } from './rom';
 import { PaletteView } from './paletteView';
 import { Direction, Orientation } from './util';
-import { Scrollbar } from './scrollbar';
 import { Toolbar, ToolbarButton, ToolbarSize } from './toolbar';
 import { Pxl8Toolbar, Pxl8StatusBar } from './pxl8Toolbars';
 import { Site } from './site';

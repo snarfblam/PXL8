@@ -8,7 +8,7 @@ import { Arrayish, Direction, saveBlob } from "./util";
 import { siteChild, Site } from "./site";
 import { EventManager, EventSubscription } from './eventManager';
 import { PaletteView, MiniPaletteView } from "./paletteView";
-import { Scrollbar } from "./scrollbar";
+import { ScrollWidget, ScrollbarValueEvent } from "./scrollWidget";
 import { Pxl8Toolbar } from "./pxl8Toolbars";
 import { DocumentEvents, DocumentEditor } from "./document";
 
@@ -28,7 +28,7 @@ export class RomView {
     tileView = new TileView();
     // palView = new MiniPaletteView();
     element = $.create('div');
-    scroll = new Scrollbar();
+    scroll = new ScrollWidget();
     // private offsetDisplay = $.create('p');
     // private statusPane = $.create('div');
 
@@ -84,10 +84,12 @@ export class RomView {
             tilePicked: index => this.openTileForEdit(index)
         });
         this.scroll.events.subscribe({
-            pageUp: () => this.scrollView(Direction.up, ViewUnit.page),
-            pageDown: () => this.scrollView(Direction.down, ViewUnit.page),
-            tickUp: () => this.scrollView(Direction.up, ViewUnit.row),
-            tickDown: () => this.scrollView(Direction.down, ViewUnit.row),
+            // pageUp: () => this.scrollView(Direction.up, ViewUnit.page),
+            // pageDown: () => this.scrollView(Direction.down, ViewUnit.page),
+            // tickUp: () => this.scrollView(Direction.up, ViewUnit.row),
+            // tickDown: () => this.scrollView(Direction.down, ViewUnit.row),
+            previewChange: e => this.previewScrollChange(e),
+            valueChanged: val => this.onScrollValueChange(val),
         });
 
         this.tileView.element.style.marginLeft = '4px';
@@ -160,6 +162,7 @@ export class RomView {
         this.romBuffer = new Uint8Array(this.viewableByteCount);
 
         this.rom.rawDataPromise.then(() => this.romLoaded = true);
+        this.performLayout();
     }
 
     private openTileForEdit(tileIndex: number) {
@@ -184,6 +187,26 @@ export class RomView {
                 console.warn('Not ready for render in openTileForEdit');
             }    
         }
+    }
+
+    private previewScrollChange(e: ScrollbarValueEvent) {
+        console.log('problem?');
+        if (this.codec && this.rom) {
+            var proposedValue = e.value || 0;
+            var bytesPerRow = this.codec.bytesPerTile * this.gfxView.metrics.gridWidth;
+            var curAlignment = this.viewOffset % bytesPerRow;
+            var proposedAlignment = proposedValue % bytesPerRow;
+            var finalValue = proposedValue - proposedAlignment + curAlignment;
+            
+            while (finalValue >= this.rom.length) finalValue -= bytesPerRow;
+            while (finalValue < 0) finalValue += bytesPerRow;
+            if (finalValue >= this.rom.length) finalValue = 0;
+
+            e.value = finalValue;
+        }
+    }
+    private onScrollValueChange(value: number) {
+        this.setViewOffset(value);
     }
 
     scrollView(dir: Direction, unit: ViewUnit) {
@@ -232,7 +255,8 @@ export class RomView {
                 this.codec!.decode({ data: dataBytes, offset: this.tileViewOffset }, { data: pixelData, offset: 0 });
                 this.tileView.redraw();
 
-                this.scroll.setValue(offset / dataBytes.length);
+                this.scroll.setValue(offset);
+                // this.scroll.setValue(offset / dataBytes.length);
             } else {
                 console.warn('RomView not ready to render.');
             }
@@ -278,11 +302,24 @@ export class RomView {
     }
 
     public resize(height: number) {
+        this.performLayout(height);
+    }
+    private performLayout(height?: number) {
+        if (height === undefined) height = this.element.offsetHeight;
+        
         this.gfxView.resize(height);
         if (this.romLoaded) {
             this.gfxView.displayOffset(this.viewOffset);
         }
         this.scroll.setSize(height);
+        if (this.rom && this.codec) {
+            var rowSize = this.codec.bytesPerTile * this.gfxView.metrics.gridWidth;
+            var pageSize = this.gfxView.metrics.gridHeight * rowSize;
+            // var tileCount = this.rom.length / this.codec.bytesPerTile;
+            // var tilesPerRow = this.gfxView.metrics.gridWidth;
+            // var rowCount = Math.floor((tileCount + tilesPerRow - 1) / tilesPerRow);
+            this.scroll.setRange(this.rom.length, rowSize, pageSize);
+        }
     }
 }
 

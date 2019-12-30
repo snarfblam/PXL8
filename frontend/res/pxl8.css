@@ -201,12 +201,13 @@ div.scroller {
 .scroller-down:hover {
     opacity: 1;
 }
-.scroller-scroll {
+.scroller-thumb {
     /* border: 1px solid #666; */
     background: url('scroll-scroll.png');
     opacity: .6;
+    background-size: 100% 100%;
 }
-.scroller-scroll:hover{
+.scroller-thumb:hover{
     opacity: 1;
 }
 
