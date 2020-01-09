@@ -10,6 +10,12 @@ export interface Rect {
     height: number;
 }
 
+export function clamp(value: number, min: number, max: number) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+}
+
 /** Formats a 32-bit integer as an 8-digit hexadecimal value. */
 export function intToHex(value: number) {
     (((value | 0) + 4294967296).toString(16)).substr(-8); /*

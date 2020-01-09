@@ -1,7 +1,8 @@
-import { StylePalette } from "./palette";
+import { StylePalette, RGBA } from "./palette";
 import { TileData } from "./TileData";
 import { Arrayish } from '../util';
 
+import { nesCodec } from './nesCodec';
 
 export interface BufferPointer {
     data: ArrayLike<number>;
@@ -22,62 +23,60 @@ export interface TileCodec {
 
     decode: (source: BufferPointer, dest: TilePointer) => void;
     encode: (source: TilePointer, dest: BufferPointer) => void;
+
+    paletteCue?: PaletteCue,
 }
 
-const nesCodec = {
-    bytesPerTile: 0x10,
-    bitsPerPixel: 2,
-    tileWidth: 8,
-    tileHeight: 8,
-    decode: function decode(source: BufferPointer, dest: TilePointer) {
-        var destTile = dest.data;
-        if (destTile.width < 8) throw Error("nesCodec requires 8-px-wide TileData");
+export type PaletteCue = RgbPaletteCue | SwatchPaletteCue;
+export var PaletteCue = {
+    default: {
+        type: 'rgb',
+        rMax: 255,
+        gMax: 255,
+        bMax: 255,
+    } as PaletteCue,
+};
 
-        var src = source.data;
-        var pSrc = source.offset;
-        var dst: Arrayish<number> = destTile.data;
-        var pDst = dest.offset;
-        var stride = destTile.width;
+/** Serves as a cue that the specified format uses colors specified as RGB values. */
+export interface RgbPaletteCue {
+    /** Fixed color selection */
+    type: 'rgb',
+    /** The highest value that can be specified for a component. E.g. for 
+     * 24-bit color the max for each component would be 255. */
+    rMax: number,
+    /** The highest value that can be specified for a component. E.g. for 
+     * 24-bit color the max for each component would be 255. */
+    gMax: number,
+    /** The highest value that can be specified for a component. E.g. for 
+     * 24-bit color the max for each component would be 255. */
+    bMax: number,
+}
 
-        for (var y = 0; y < 8; y++) {
-            var rowLo = src[pSrc];
-            var rowHi = src[pSrc + 8];
-            for (var x = 0; x < 8; x++) {
-                var color = (rowLo & 1) | ((rowHi & 1) << 1);
-                rowLo = rowLo >> 1;
-                rowHi = rowHi >> 1;
-                dst[pDst + 7 - x] = color;
-            }
-            pDst += stride;
-            pSrc++;
-        }
+/** Serves as a cue that the specified format uses a predefined color palette. */
+export interface SwatchPaletteCue {
+    /** Fixed color selection */
+    type: 'swatches',
+    /** The number of swatches to present to the user in UI. Optional. */
+    gridWidth?: number,
+    /** An array of strings in the format of RRGGBB */
+    rrggbb: string[],
+};
+
+export var SwatchPaletteCue = {
+    rrggbbToRGBA: function rrggbbToRGBA(rrggbb: string[]) {
+        var result: RGBA[] = [];
+        rrggbb.forEach(value => {
+            if (value.length != 6) result.push({ r: 0, g: 0, b: 0, a: 255 });
+            var r = parseInt(value.substring(0, 2), 16);
+            var g = parseInt(value.substring(2, 4), 16);
+            var b = parseInt(value.substring(4, 6), 16);
+            result.push({ r, g, b, a: 255 });
+        });
+
+        return result;
     },
-    encode: function encode(source: TilePointer, dest: BufferPointer) {
-        var srcData = source.data.data;
-        var srcOffset = source.offset;
-        var dstData = dest.data as Arrayish<number>;
-        var dstOffset = dest.offset;
 
-        for (var y = 0; y < 8; y++) {
-            var byte1 = 0; // contains the low bit of each pixel in this row
-            var byte2 = 0; // contains the high bit of each pixel in this row
-            var flag = 0x80;
-            for (var x = 0; x < 8; x++){
-                var pixel = srcData[srcOffset];
-                if (pixel & 1) byte1 = byte1 | flag;
-                if (pixel & 2) byte2 = byte2 | flag;
-                flag = flag >>> 1;
-                srcOffset++;
-            }
-
-            dstData[dstOffset + y] = byte1;
-            dstData[dstOffset + y + 8] = byte2;
-        }
-        // throw Error('not implementing this until I can test it');
-        // cause I know that I'll write a broken implementation, and when it 
-        // doesn't work down the road I'll spend hours trying to debug it
-    },
-} as TileCodec;
+};
 
 export const tileCodecs = {
     nesCodec,

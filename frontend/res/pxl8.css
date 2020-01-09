@@ -154,6 +154,17 @@
     }
 
 /*** General ***************************************************/
+
+.swatch-grid {
+    line-height: 0px;
+}
+
+.swatch-grid .swatch {
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,.33);
+    border-radius: 3px;
+}
+
 .offset-pane {
     /* display: inline-block; */
     width: 64px;
@@ -287,81 +298,16 @@ img.toolbar-icon {
         /* overflow: hidden; */
     }
 
-    body.modal-hashing {
-        overflow: hidden;
-    }
-    #killjoy {
-        display: none;
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-
-        z-index: 1000;
-
-        background: transparent;
+    .modal-host{
+        background: rgba(0, 0, 0, 0.7);
     }
 
-    .modal-kill #killjoy {
-        display: block;
+    div.modal {
+        background: white;
+        padding: 8px;
+        border-radius: 3px;
+        box-shadow: 0 6px 8px 0px black;
     }
-
-    #hashing-modal-container {
-        display:none;
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-
-        z-index: 1000;
-
-        background: rgba(0, 0, 0, 0.75);
-    }
-
-    .modal-hashing #hashing-modal-container {
-        display:block;
-    }
-
-    #hashing-modal {
-        position: relative;
-        width: 600px;
-        height: 400px;
-        margin: 100px auto 0 auto;
-        padding: 1em;
-
-        text-align: center;
-        background: black;
-        color: #ccc;
-
-        -webkit-border-radius: 5px;
-        -moz-border-radius: 5px;
-        border-radius: 5px;
-
-        /* color: #fff; */
-        background-color: #292929;
-        border: 1px solid #101010;
-        background-image: linear-gradient(bottom, rgb(34, 34, 34) 0%, rgb(66, 66, 66) 100%);
-        background-image: -o-linear-gradient(bottom, rgb(34, 34, 34) 0%, rgb(66, 66, 66) 100%);
-        background-image: -moz-linear-gradient(bottom, rgb(34, 34, 34) 0%, rgb(66, 66, 66) 100%);
-        background-image: -webkit-linear-gradient(bottom, rgb(34, 34, 34) 0%, rgb(66, 66, 66) 100%);
-        background-image: -ms-linear-gradient(bottom, rgb(34, 34, 34) 0%, rgb(66, 66, 66) 100%);
-    
-        -webkit-box-shadow: 0px 12px 0px #1b1b1b, 0px 3px 15px rgba(0,0,0,.4), inset 0px 1px 0px rgba(255,255,255,.44), inset 0px 0px 3px rgba(255,255,255,.22), 0px 0px 40px rgba(255,255,255,.5), 0px 12px 40px rgba(255,255,255,.5);
-        -moz-box-shadow: 0px 12px 0px #1b1b1b, 0px 3px 15px rgba(0,0,0,.4), inset 0px 1px 0px rgba(255,255,255,.44), inset 0px 0px 3px rgba(255,255,255,.22), 0px 0px 40px rgba(255,255,255,.5), 0px 12px 40px rgba(255,255,255,.5);
-        box-shadow: 0px 12px 0px #1b1b1b, 0px 3px 15px rgba(0,0,0,.4), inset 0px 1px 0px rgba(255,255,255,.44), inset 0px 0px 3px rgba(255,255,255,.22), 0px 0px 40px rgba(255,255,255,.5), 0px 12px 40px rgba(255,255,255,.5);
-
-        background-image: -webkit-gradient(
-            linear,
-            left bottom,
-            left top,
-            color-stop(0, rgb(34, 34, 34)),
-            color-stop(1, rgb(66, 66, 66))
-        );
-
-    }
-
     #hashing-modal h3 {
         margin-top: 0;
         font-weight: normal;

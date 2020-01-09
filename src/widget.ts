@@ -1,4 +1,5 @@
 import { Site, siteChild } from "./site";
+import { $ } from "./dollar";
 
 var elementWidgetSymbol = '#element.widget#';
 
@@ -11,7 +12,9 @@ export abstract class Widget {
     }
 
     /** Override to create an HTMLElement that will serve  */
-    protected abstract createElement(): HTMLElement;
+    protected createElement(): HTMLElement{
+        return $.create('div');
+    }
     
     /** Places this element into a parent element */
     public site(site: Site | HTMLElement | Widget) {

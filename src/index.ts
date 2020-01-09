@@ -21,7 +21,7 @@
 import { TileView } from './TileView';
 import { GfxView } from './gfxView';
 import { $, $$ } from './dollar';
-import { tileCodecs } from './gfx/tileCodec';
+import { tileCodecs, SwatchPaletteCue } from './gfx/tileCodec';
 import { debugPalette } from './gfx/palette';
 import { RomView, ViewUnit } from './romView';
 import { ROM } from './rom';
@@ -33,6 +33,9 @@ import { Site } from './site';
 import { showFileDialog } from './fileDialog';
 import { DocumentEvents, DocumentEditor } from './document';
 import { EventManager } from './eventManager';
+import { Modal, DemoModal } from './modal';
+import { SwatchGrid } from './swatchGrid';
+import { nesCodec } from './gfx/nesCodec';
 
 class Pxl8 {
     private readonly appContainer = $('.app-container') as HTMLElement;
@@ -108,6 +111,14 @@ class Pxl8 {
         this.eventManager.raise('secondaryColorSelected');
 
         window.addEventListener('resize', e => this.performLayout());
+
+        var swatches = new SwatchGrid();
+        swatches.loadSwatches(
+            SwatchPaletteCue.rrggbbToRGBA(((nesCodec.paletteCue as SwatchPaletteCue).rrggbb)),
+            14);
+        var mahModal = new DemoModal();
+        swatches.site(mahModal);
+        mahModal.showModal();
     }
 
     private loadRom(file: File) {

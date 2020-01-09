@@ -7,6 +7,7 @@ import { TileCodec } from './gfx/tileCodec';
 import { Palette, RGBA } from './gfx/palette';
 import { TileData } from './gfx/TileData';
 import { EventManager } from './eventManager';
+import { GfxSelection } from './gfxSelection';
 
 export interface GfxViewEvents {
     tilePicked?: (index: number) => void;
@@ -22,9 +23,11 @@ export class GfxView {
     palette: Palette | null = null;
     private eventManager = new EventManager<GfxViewEvents>();
     public events = this.eventManager.subscriber;
+    public readonly selection: GfxSelection;
 
     constructor() {
         this.element = $.create('canvas') as HTMLCanvasElement;
+        this.selection = new GfxSelection(this);
     }
 
     /** Initializes this element for use. Can be called multiple times if the object is re-used. */
@@ -35,6 +38,8 @@ export class GfxView {
         this.element.width = newMetrics.pixelWidth * newMetrics.tileWidth * newMetrics.gridWidth;
         this.element.height = newMetrics.pixelHeight * newMetrics.tileHeight * newMetrics.gridHeight;
         this.element.style.background = 'white';
+        this.element.style.position = 'relative';
+
         this.createContext();
 
         this.metrics = { ...newMetrics };

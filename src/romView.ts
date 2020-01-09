@@ -22,7 +22,10 @@ export enum ViewUnit {
     "page" = "page",
 }
 
-/** Provides an interface composed of a GfxView, a TileView, and a PalettView. */
+/** 
+ * Provides an interface composed of a GfxView, a TileView, and a PalettView.
+ * 
+ */
 export class RomView {
     gfxView = new GfxView();
     tileView = new TileView();
@@ -99,6 +102,14 @@ export class RomView {
 
         this.tileView.element.style.position = 'absolute';
         this.tileView.element.style.top = '0px';
+
+        this.gfxView.selection.events.subscribe({
+            // queryOffset: query => query.offset = this.viewOffset
+            queryOffset: q => {
+                q.offset = this.viewOffset;
+                console.log('q');
+            }
+        });
     }   
 
     private readonly documentEvents: DocumentEvents = {
@@ -256,6 +267,7 @@ export class RomView {
                 this.tileView.redraw();
 
                 this.scroll.setValue(offset);
+                this.gfxView.selection.updateSelectionUi();
                 // this.scroll.setValue(offset / dataBytes.length);
             } else {
                 console.warn('RomView not ready to render.');
