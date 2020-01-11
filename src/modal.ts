@@ -22,6 +22,13 @@ function ensureCssReady() {
     }
 }
 
+export enum ModalCloseReason{
+    /** Modal was closed by user hitting escape or clicking outside the modal. */
+    userDismiss,
+    /** Modal was closed programatically */
+    code,
+}
+
 
 export class ModalHost extends Widget {
     private visible = false;
@@ -63,7 +70,7 @@ export class ModalHost extends Widget {
     protected onMouseDown(e: MouseEvent) {
         if (e.target === this.element) {
             if (this.currentModal && this.currentModal.closeOnClickOutside) {
-                this.hideModal();
+                this.hideModalBecause(ModalCloseReason.userDismiss);
             }
         }
     }
@@ -72,7 +79,7 @@ export class ModalHost extends Widget {
         console.log(e.key, e.keyCode);
         if (this.visible && this.currentModal && this.currentModal.closeOnEscape) {
             if (e.key === 'Esc' || e.key === 'Escape' || e.keyCode === 27) {
-                this.hideModal();
+                this.hideModalBecause(ModalCloseReason.userDismiss);
             }
         }
     }
@@ -93,9 +100,17 @@ export class ModalHost extends Widget {
         }
     }
 
+    private hideModalBecause(reason: ModalCloseReason) {
+        if (this.currentModal) {
+            this.currentModal['setCloseReason'](reason);
+            this.hideModal();
+        }
+    }
+
     public hideModal() {
         this.showModal(null);
     }
+
 }
 
 /** 
@@ -110,6 +125,7 @@ export class Modal extends Widget {
     /** If true, the modal will be close if the user presses escape. */
     closeOnEscape = true;
     protected captionElement: HTMLElement | null = null;
+    private closingReason: ModalCloseReason = ModalCloseReason.code;
 
     constructor(host?: ModalHost) {
         super();
@@ -143,9 +159,22 @@ export class Modal extends Widget {
     }
 
     hideModal() {
-        this.host['hideModal']();
+        if (this.isVisible()) {
+            this.closingModal(this.closingReason);
+            this.host['hideModal']();
+        }
     }
 
+    private setCloseReason(reason: ModalCloseReason) {
+        this.closingReason = reason;
+    }
+
+    protected closingModal(reason: ModalCloseReason) { }
+    
+
+    isVisible() {
+        return this.element.style.display === 'none';
+    }
     /**
      * Sets the caption text for the modal, or hides it if a value of null is specified.
      * @param text The text to display, or null to hide the caption.
