@@ -4,7 +4,6 @@ import { EventManager, nullEventManager, Events } from "./eventManager";
 
 var elementWidgetSymbol = '#element.widget#';
 
-
 export abstract class Widget
     <TEvents extends Events<TEvents> = {}> {
     
@@ -12,6 +11,7 @@ export abstract class Widget
     //@ts-ignore
     elementType: string;
     protected eventManager: EventManager<TEvents> = nullEventManager as any;
+    protected raise = this.eventManager.raise;
 
     constructor(hasevents?: boolean) {
         this.element = this.createElement();
@@ -19,6 +19,7 @@ export abstract class Widget
 
         if (hasevents) {
             this.eventManager = new EventManager<TEvents>();
+            this.raise = this.eventManager.raise.bind(this.eventManager as any);
         }
     }
 
@@ -67,6 +68,13 @@ export abstract class Widget
 
     /** Returns whether this element is sited. */
     public isSited() { return !!this.element.parentElement; }
+
+    on(handler: TEvents) {
+        this.eventManager.subscriber.subscribe(handler);
+    }
+    unhandle(handler: TEvents) {
+        this.eventManager.subscriber.unsubscribe(handler);
+    }
 
     public dispose() {
         this.doDispose();

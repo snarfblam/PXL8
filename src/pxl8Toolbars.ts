@@ -59,7 +59,7 @@ export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarEvents> {
         zoomOut: newButton("Zoom Out", "zoomout.png"),
     };
     // private eventManager = new EventManager<Pxl8ToolbarEvents>();
-    public events = this.eventManager.subscriber;
+    // public events = this.eventManager.subscriber;
 
     constructor() {
         super(true);
@@ -114,7 +114,7 @@ export class Pxl8StatusBar extends Toolbar<Pxl8StatusbarEvents> {
     private readonly offsetLabel = new ToolbarLabel();
 
     // private readonly eventManager = new EventManager<Pxl8StatusbarEvents>();
-    public readonly events = this.eventManager.subscriber;
+    // public readonly events = this.eventManager.subscriber;
     
     constructor() {
         super(true);

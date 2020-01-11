@@ -75,7 +75,7 @@ class Pxl8 {
         (window as any).romView = this.romView;
 
         // Event handlers
-        this.toolbar.events.subscribe({
+        this.toolbar.on({
             buttonClick: buttonName => {
                 if (buttonName === 'import') {
                     showFileDialog()
@@ -102,7 +102,7 @@ class Pxl8 {
             paletteModified: () => this.eventManager.raise('paletteModified'),
         });
 
-        this.statusBar.events.subscribe({
+        this.statusBar.on({
             scroll: (unit, dir) => {
                 this.romView.scrollView(dir, unit);
             }
