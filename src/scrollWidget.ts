@@ -74,7 +74,8 @@ export class ScrollWidget extends Widget<ScrollbarEvents> {
         this.createChildElements();
         this.applyMetrics();
 
-        this.element.onmousedown = e => this.onMouseDown(e);
+        // this.element.onmousedown = e => this.onMouseDown(e);
+        this.subscribeToEvent('mousedown');
         // this.ui.up.onclick = e => this.eventManager.raise('tickUp');
         // this.ui.down.onclick = e => this.eventManager.raise('tickDown');
         this.ui.up.onclick = e => {
@@ -222,7 +223,7 @@ export class ScrollWidget extends Widget<ScrollbarEvents> {
         this.positionThumb();
     }
 
-    private onMouseDown(e: MouseEvent) {
+    protected onMouseDown(e: MouseEvent) {
         if (e.target === this.element) {
             var { x, y } = eventToClientCoords(this.element, e);
         

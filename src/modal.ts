@@ -30,6 +30,8 @@ export class ModalHost extends Widget {
 
     constructor() {
         super();
+
+        this.subscribeToEvent('mousedown');
     }
 
     createElement() {
@@ -44,7 +46,7 @@ export class ModalHost extends Widget {
         elem.classList.add('modal-host');
         elem.style.whiteSpace = 'nowrap';
         elem.style.textAlign = 'center';
-        elem.addEventListener('mousedown', e => this.onMouseDown(e));
+        // elem.addEventListener('mousedown', e => this.onMouseDown(e));
 
         return elem;
     }
@@ -58,7 +60,7 @@ export class ModalHost extends Widget {
         }
     }
 
-    private onMouseDown(e: MouseEvent) {
+    protected onMouseDown(e: MouseEvent) {
         if (e.target === this.element) {
             if (this.currentModal && this.currentModal.closeOnClickOutside) {
                 this.hideModal();
