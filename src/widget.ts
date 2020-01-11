@@ -3,17 +3,24 @@ import { $ } from "./dollar";
 
 var elementWidgetSymbol = '#element.widget#';
 
+
 export abstract class Widget {
     element: HTMLElement;
+    //@ts-ignore
+    elementType: string;
 
     constructor() {
         this.element = this.createElement();
         (this.element as any)[elementWidgetSymbol] = this;
     }
 
-    /** Override to create an HTMLElement that will serve  */
+    /** 
+     * Override to customize creation of the widget element. 
+     * NOTE: this method is called from the constructor. Overriding code
+     * should not reference 'this'!
+     */
     protected createElement(): HTMLElement{
-        return $.create('div');
+        return $.create(this.elementType);
     }
     
     /** Places this element into a parent element */
@@ -51,5 +58,16 @@ export abstract class Widget {
     }
 
     /** Returns whether this element is sited. */
-    public isSited() { return !!this.element.parentElement;}
+    public isSited() { return !!this.element.parentElement; }
+
+    public dispose() {
+        this.doDispose();
+    }
+
+    /** 
+     * Override to perform cleanup logic. Overriders should call the
+     * super doDispose method to ensure base classes can clean up.
+     */
+    protected doDispose() { }
 }
+Widget.prototype.elementType = 'div';

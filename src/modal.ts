@@ -107,6 +107,7 @@ export class Modal extends Widget {
     closeOnClickOutside = true;
     /** If true, the modal will be close if the user presses escape. */
     closeOnEscape = true;
+    protected captionElement: HTMLElement | null = null;
 
     constructor(host?: ModalHost) {
         super();
@@ -123,17 +124,17 @@ export class Modal extends Widget {
     createElement() {
         var element = $.create('div') as HTMLDivElement;
         element.classList.add('modal');
-        this.createContents(element);
+        // this.createContents(element);
         return element;
     }
 
-    /**
-     * Override this method to populate the modal element with children.
-     * @param modal The modal element
-     */
-    protected createContents(modal: HTMLDivElement) {
+    // /**
+    //  * Override this method to populate the modal element with children.
+    //  * @param modal The modal element
+    //  */
+    // protected createContents(modal: HTMLDivElement) {
         
-    }
+    // }
 
     showModal() {
         this.host['showModal'](this);
@@ -142,13 +143,36 @@ export class Modal extends Widget {
     hideModal() {
         this.host['hideModal']();
     }
-}
 
-export class DemoModal extends Modal {
-    createContents(e: HTMLDivElement) {
-        super.createContents(e);
-        var p = $.create('p');
-        p.textContent = 'Modal';
-        e.appendChild(p);
+    /**
+     * Sets the caption text for the modal, or hides it if a value of null is specified.
+     * @param text The text to display, or null to hide the caption.
+     */
+    setCaption(text: string | null) {
+        if (text == null) {
+            if (this.captionElement) {
+                this.captionElement.style.display = 'none';
+            }
+        } else {
+            if (!this.captionElement) {
+                this.captionElement = $.create('h1');
+                this.element.prepend(this.captionElement);
+            }
+            this.captionElement.textContent = text;
+            this.captionElement.style.display = 'block';
+        }
+    }
+
+    getCaption(): string | null {
+        if (!this.captionElement || this.captionElement.style.display === 'none') return null;
+        return this.captionElement.textContent;
+    }
+
+    /** 
+     * Sets the preferred width of the modal. Should be specified as a CSS
+     * px or % value.
+     */
+    setPreferredWidth(style: string) {
+        this.element.style.width = style;
     }
 }

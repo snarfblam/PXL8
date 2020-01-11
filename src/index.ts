@@ -33,9 +33,10 @@ import { Site } from './site';
 import { showFileDialog } from './fileDialog';
 import { DocumentEvents, DocumentEditor } from './document';
 import { EventManager } from './eventManager';
-import { Modal, DemoModal } from './modal';
+import { Modal } from './modal';
 import { SwatchGrid } from './swatchGrid';
 import { nesCodec } from './gfx/nesCodec';
+import { SwatchModal } from './pxl8ui/swatchModal';
 
 class Pxl8 {
     private readonly appContainer = $('.app-container') as HTMLElement;
@@ -112,12 +113,16 @@ class Pxl8 {
 
         window.addEventListener('resize', e => this.performLayout());
 
-        var swatches = new SwatchGrid();
-        swatches.loadSwatches(
-            SwatchPaletteCue.rrggbbToRGBA(((nesCodec.paletteCue as SwatchPaletteCue).rrggbb)),
-            14);
-        var mahModal = new DemoModal();
-        swatches.site(mahModal);
+        // var swatches = new SwatchGrid();
+        // swatches.loadSwatches(
+        //     SwatchPaletteCue.rrggbbToRGBA(((nesCodec.paletteCue as SwatchPaletteCue).rrggbb)),
+        //     14);
+        // var mahModal = new Modal();
+        var mahModal = new SwatchModal();
+        mahModal.loadSwatchesFor(nesCodec);
+        // swatches.site(mahModal);
+        // mahModal.setCaption('Select a Color');
+        // mahModal.setPreferredWidth('500px');
         mahModal.showModal();
     }
 

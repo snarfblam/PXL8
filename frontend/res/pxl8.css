@@ -88,17 +88,16 @@
         height: 100%;
     }
 
-    h1 {
+    /* h1 {
         text-align: center;
         font-size: 2em;
         font-weight: bold;
-        /* margin: -8px -8px 0 -8px; */
         margin: -8px 0 0 0;
         padding: 1rem 16px;
         background: #666;
         color: white;
         font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    }
+    } */
     
     h2 {
         text-align: center;
@@ -307,13 +306,24 @@ img.toolbar-icon {
         padding: 8px;
         border-radius: 3px;
         box-shadow: 0 6px 8px 0px black;
+        max-width: 90%;
     }
-    #hashing-modal h3 {
-        margin-top: 0;
-        font-weight: normal;
-        font-size: 1.5rem;
+    
+    .modal h1 {
+        font-size: 24px;
+        margin-bottom: 16px;
     }
 
+    .modal h1:after {
+        display: block;
+        height: 1px;
+        width: 80%;
+        background: gainsboro;
+        content: '';
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 2px;
+    }
     hr.bevel {
         width: 90%;
         background: transparent;
