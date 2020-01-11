@@ -86,7 +86,7 @@ export class RomView {
         this.gfxView.events.subscribe({
             tilePicked: index => this.openTileForEdit(index)
         });
-        this.scroll.events.subscribe({
+        this.scroll.on({
             // pageUp: () => this.scrollView(Direction.up, ViewUnit.page),
             // pageDown: () => this.scrollView(Direction.down, ViewUnit.page),
             // tickUp: () => this.scrollView(Direction.up, ViewUnit.row),

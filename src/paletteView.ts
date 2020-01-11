@@ -2,6 +2,7 @@ import { $, $$ } from './dollar';
 import { Palette, ManagedPalette, RGBA } from './gfx/palette';
 import { Site, siteChild, Siteable } from './site';
 import { EventManager } from './eventManager';
+import { Widget } from './widget';
 
 function createElem(tag: string, x: number, y: number, w: number, h: number, color?: string) {
     var result = $.create(tag);
@@ -47,8 +48,12 @@ export interface PaletteViewEvents {
     paletteModified?: () => void;
     primaryColorSelected?: () => void;
     secondaryColorSelected?: () => void;
+    colorEditRequest?: (index: number) => void;
 }
 
+/**
+ * __WARNING__: This class is obsolete an not being maintained.
+ */
 export class PaletteView {
     private rgbDetents = 8;
     private palette = new ManagedPalette(defaultPalette);
@@ -297,16 +302,16 @@ export class PaletteView {
 
 }
 
-export class MiniPaletteView {
+export class MiniPaletteView extends Widget<PaletteViewEvents> {
     private palette = new ManagedPalette(defaultPalette);
     private primarySelection = 0;
     private secondarySelection = 1;
     
-    private eventManager = new EventManager<PaletteViewEvents>();
-    public events = this.eventManager.subscriber;
+    // private eventManager = new EventManager<PaletteViewEvents>();
+    // public events = this.eventManager.subscriber;
 
     private ui = {
-        element: createElem('div', 0, 0, 300, 24),
+        element: null! as HTMLElement,
         selectionBox: {
             element: createElem('div', 0, 0, 48, 24),
             secondary: { element: createElem('div', 16, 5, 32, 18, '#444') },
@@ -317,21 +322,30 @@ export class MiniPaletteView {
             children: [] as HTMLElement[],
         },
     };
-    readonly element = this.ui.element;
+    // readonly element = this.ui.element;
 
     constructor() {
+        super(true);
+
         this.createComponents();  
         this.updatePrimarySwatch();
         this.updateSecondarySwatch();
 
         this.ui.palettePanes.element.onmousedown = e => this.onPalMouseDown(e);
+        this.ui.palettePanes.element.ondblclick = e => this.onPalDblClick(e);
         this.ui.element.oncontextmenu = e => e.preventDefault();
     }
 
-    site(site: Site) {
-        siteChild(this.ui.element, site);
+    createElement() {
+        return createElem('div', 0, 0, 300, 24);
     }
 
+    private createComponents() {
+        this.ui.element = this.element;
+        this.ui.element.style.position = 'relative';
+        this.siteStaticChildren(this.ui);
+        this.updateSwatchGrid();
+    }
     setPalette(palette: RGBA[]) {
         this.palette.resize(palette.length);
         for (var i = 0; i < palette.length; i++){
@@ -357,6 +371,14 @@ export class MiniPaletteView {
         this.ui.selectionBox.secondary.element.style.backgroundColor = colorStyle;
     }
 
+    onPalDblClick(e: MouseEvent) {
+        var palIndex = this.ui.palettePanes.children.indexOf(e.target as HTMLElement);
+        if (palIndex < 0 || palIndex >= this.ui.palettePanes.children.length) return;
+
+        if (e.button === 0) {
+            this.raise('colorEditRequest', palIndex);
+        }
+    }
     onPalMouseDown(e: MouseEvent) {
         var palIndex = this.ui.palettePanes.children.indexOf(e.target as HTMLElement);
         if (palIndex < 0 || palIndex >= this.ui.palettePanes.children.length) return;
@@ -364,11 +386,11 @@ export class MiniPaletteView {
         if (e.button === 0) {
             this.primarySelection = palIndex;
             this.updatePrimarySwatch();
-            this.eventManager.raise('primaryColorSelected');
+            this.raise('primaryColorSelected');
         } else if (e.button === 2) {
             this.secondarySelection = palIndex;
             this.updateSecondarySwatch();
-            this.eventManager.raise('secondaryColorSelected');
+            this.raise('secondaryColorSelected');
         } else {
             return; // Don't raise event
         } 
@@ -376,11 +398,6 @@ export class MiniPaletteView {
     }
   
 
-    private createComponents() {
-        this.ui.element.style.position = 'relative';
-        this.siteStaticChildren(this.ui);
-        this.updateSwatchGrid();
-    }
 
     /** Creates or removes palette swatch according to this object's palette and rgbDetent values.*/
     private updateSwatchGrid() {

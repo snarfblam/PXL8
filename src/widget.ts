@@ -41,7 +41,7 @@ export abstract class Widget
      * different value to elementType on your class's __prototype__. */
     //@ts-ignore
     readonly elementType: string;
-    protected eventManager: EventManager<TEvents> = nullEventManager as any;
+    private eventManager: EventManager<TEvents> = nullEventManager as any;
     protected raise = this.eventManager.raise;
     private elementEventHandlers: ElementEventHandlers = {};
 
@@ -55,6 +55,7 @@ export abstract class Widget
         }
     }
 
+    protected getEventManager() { return this.eventManager;}
     /** 
      * Override to customize creation of the widget element. 
      * NOTE: this method is called from the constructor. Overriding code
@@ -179,4 +180,4 @@ export abstract class Widget
         }
     }
 }
-Widget.prototype.elementType = 'div';
+(Widget.prototype as any).elementType = 'div';

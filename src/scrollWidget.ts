@@ -48,7 +48,7 @@ export class ScrollWidget extends Widget<ScrollbarEvents> {
     readonly metrics: ScrollbarMetrics = { orientation: Orientation.vertical, width: 16 }; // public readonly private writable
     // private readonly eventManager = new EventManager<ScrollbarEvents>();
     private valueEventArg = { value: 0 } as ScrollbarValueEvent;
-    public readonly events = this.eventManager.subscriber;
+    // public readonly events = this.eventManager.subscriber;
 
     /** Current value */
     private value = 0;
@@ -110,7 +110,7 @@ export class ScrollWidget extends Widget<ScrollbarEvents> {
 
     private proposeValue(proposedValue: number) {
         this.valueEventArg.value = proposedValue;
-        this.eventManager.raise('previewChange', this.valueEventArg);
+        this.raise('previewChange', this.valueEventArg);
         var newValue = this.valueEventArg.value;
 
         if (newValue != null && newValue !== this.value) {
@@ -126,7 +126,7 @@ export class ScrollWidget extends Widget<ScrollbarEvents> {
         if (value !== this.value) {
             this.value = value;
             this.positionThumb();
-            this.eventManager.raise('valueChanged', this.value);
+            this.raise('valueChanged', this.value);
         }
         // if (this.metrics.orientation === Orientation.vertical) {
         //     var range = this.element.offsetHeight - this.ui.up.offsetHeight - this.ui.down.offsetHeight - this.ui.scroll.offsetHeight;

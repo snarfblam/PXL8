@@ -96,7 +96,7 @@ class Pxl8 {
             offsetChanged: offset => this.statusBar.setOffsetValue(offset),
         });
 
-        palView.events.subscribe({
+        palView.on({
             primaryColorSelected: () => this.eventManager.raise('primaryColorSelected'),
             secondaryColorSelected: () => this.eventManager.raise('secondaryColorSelected'),
             paletteModified: () => this.eventManager.raise('paletteModified'),

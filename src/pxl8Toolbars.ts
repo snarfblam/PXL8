@@ -75,7 +75,7 @@ export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarEvents> {
     }
 
     private addClickHandler(btn: ToolbarButton, name: Pxl8ToolbarButton) {
-        btn.element.onclick = e => this.eventManager.raise('buttonClick', name);
+        btn.element.onclick = e => this.raise('buttonClick', name);
     }
 
     private initWidget() {
@@ -147,21 +147,17 @@ export class Pxl8StatusBar extends Toolbar<Pxl8StatusbarEvents> {
         this.palView.element.style.verticalAlign = 'middle';
         this.palView.element.style.marginLeft = '24px';
 
-        this.items.tileUp.events.subscribe({
-            click: () =>
-                this.eventManager.raise("scroll", ViewUnit.tile, Direction.up)
+        this.items.tileUp.on({
+            click: () => this.raise("scroll", ViewUnit.tile, Direction.up)
         });
-        this.items.byteUp.events.subscribe({
-            click: () =>
-                this.eventManager.raise("scroll", ViewUnit.byte, Direction.up)
+        this.items.byteUp.on({
+            click: () => this.raise("scroll", ViewUnit.byte, Direction.up)
         });
-        this.items.tileDown.events.subscribe({
-            click: () =>
-                this.eventManager.raise("scroll", ViewUnit.tile, Direction.down)
+        this.items.tileDown.on({
+            click: () => this.raise("scroll", ViewUnit.tile, Direction.down)
         });
-        this.items.byteDown.events.subscribe({
-            click: () =>
-                this.eventManager.raise("scroll", ViewUnit.byte, Direction.down)
+        this.items.byteDown.on({
+            click: () => this.raise("scroll", ViewUnit.byte, Direction.down)
         });
     }
 

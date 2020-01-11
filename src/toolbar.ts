@@ -62,7 +62,7 @@ export class ToolbarButton extends Widget<ToolbarButtonEvents> {
     iconName = "";
 
     // private eventManager = new EventManager<ToolbarButtonEvents>();
-    public events = this.eventManager.subscriber;
+    // public events = this.eventManager.subscriber;
 
     constructor() {
         super(true);
@@ -76,7 +76,7 @@ export class ToolbarButton extends Widget<ToolbarButtonEvents> {
         this.element.appendChild(this.iconElement);
         this.element.appendChild(this.captionElement);
 
-        this.element.addEventListener('click', () => this.eventManager.raise('click'));
+        this.element.addEventListener('click', () => this.raise('click'));
     }
 
     protected createElement() {
