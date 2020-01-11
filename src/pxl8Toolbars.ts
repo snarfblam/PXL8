@@ -49,7 +49,7 @@ export interface Pxl8StatusbarEvents {
     scroll?: (unit: ViewUnit, dir: Direction.up | Direction.down) => void;
 }
 
-export class Pxl8Toolbar extends Toolbar {
+export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarEvents> {
     private items = {
         import: newButton("Import", "import.png"),
         export: newButton("Export", "export.png"),
@@ -58,11 +58,11 @@ export class Pxl8Toolbar extends Toolbar {
         zoomIn: newButton("Zoom In", "zoomin.png"),
         zoomOut: newButton("Zoom Out", "zoomout.png"),
     };
-    private eventManager = new EventManager<Pxl8ToolbarEvents>();
+    // private eventManager = new EventManager<Pxl8ToolbarEvents>();
     public events = this.eventManager.subscriber;
 
     constructor() {
-        super();
+        super(true);
 
         this.initWidget();
 
@@ -103,7 +103,7 @@ export class Pxl8Toolbar extends Toolbar {
     }
 }
 
-export class Pxl8StatusBar extends Toolbar {
+export class Pxl8StatusBar extends Toolbar<Pxl8StatusbarEvents> {
     private readonly items = {
         tileUp: newButton("Tile", "small_up.png"),
         byteUp: newButton("Byte", "small_up.png"),
@@ -113,11 +113,11 @@ export class Pxl8StatusBar extends Toolbar {
     private readonly palView = new MiniPaletteView();
     private readonly offsetLabel = new ToolbarLabel();
 
-    private readonly eventManager = new EventManager<Pxl8StatusbarEvents>();
+    // private readonly eventManager = new EventManager<Pxl8StatusbarEvents>();
     public readonly events = this.eventManager.subscriber;
     
     constructor() {
-        super();
+        super(true);
 
         this.initWidget();
         this.palView.site({ site: this.element });

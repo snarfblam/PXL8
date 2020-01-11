@@ -1,17 +1,25 @@
 import { Site, siteChild } from "./site";
 import { $ } from "./dollar";
+import { EventManager, nullEventManager, Events } from "./eventManager";
 
 var elementWidgetSymbol = '#element.widget#';
 
 
-export abstract class Widget {
+export abstract class Widget
+    <TEvents extends Events<TEvents> = {}> {
+    
     element: HTMLElement;
     //@ts-ignore
     elementType: string;
+    protected eventManager: EventManager<TEvents> = nullEventManager as any;
 
-    constructor() {
+    constructor(hasevents?: boolean) {
         this.element = this.createElement();
         (this.element as any)[elementWidgetSymbol] = this;
+
+        if (hasevents) {
+            this.eventManager = new EventManager<TEvents>();
+        }
     }
 
     /** 

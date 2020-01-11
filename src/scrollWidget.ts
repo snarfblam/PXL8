@@ -44,9 +44,9 @@ function setBounds(element: HTMLElement, x: number, y: number, w: number, h: num
 }
 
 
-export class ScrollWidget extends Widget {
+export class ScrollWidget extends Widget<ScrollbarEvents> {
     readonly metrics: ScrollbarMetrics = { orientation: Orientation.vertical, width: 16 }; // public readonly private writable
-    private readonly eventManager = new EventManager<ScrollbarEvents>();
+    // private readonly eventManager = new EventManager<ScrollbarEvents>();
     private valueEventArg = { value: 0 } as ScrollbarValueEvent;
     public readonly events = this.eventManager.subscriber;
 
@@ -69,7 +69,7 @@ export class ScrollWidget extends Widget {
         down: $.create('button'),
     }
     constructor() {
-        super();
+        super(true);
 
         this.createChildElements();
         this.applyMetrics();

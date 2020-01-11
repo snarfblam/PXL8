@@ -38,6 +38,7 @@ import { SwatchGrid } from './swatchGrid';
 import { nesCodec } from './gfx/nesCodec';
 import { SwatchModal } from './pxl8ui/swatchModal';
 
+
 class Pxl8 {
     private readonly appContainer = $('.app-container') as HTMLElement;
     private readonly eventManager = new EventManager<DocumentEvents>();

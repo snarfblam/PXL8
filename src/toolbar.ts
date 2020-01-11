@@ -1,19 +1,19 @@
 import { Widget } from './widget';
 import { $, $$ } from './dollar';
 import { removeFrom } from './util';
-import { EventManager } from './eventManager';
+import { EventManager, Events } from './eventManager';
 
 
 
 export enum ToolbarSize { small, large }
 
-export class Toolbar extends Widget {
+export class Toolbar<TEvents extends Events<TEvents> = {}> extends Widget<TEvents> {
     private iconPath = '';
     private buttons = [] as ToolbarButton[];
     private toolbarSize = ToolbarSize.small;
 
-    constructor() {
-        super();
+    constructor(hasEvents?: boolean) {
+        super(hasEvents);
 
         this.setSize(ToolbarSize.small);
     }
@@ -56,16 +56,16 @@ export interface ToolbarButtonEvents{
     click: () => void;
 }
 
-export class ToolbarButton extends Widget {
+export class ToolbarButton extends Widget<ToolbarButtonEvents> {
     iconElement: HTMLImageElement;
     captionElement: HTMLSpanElement;
     iconName = "";
 
-    private eventManager = new EventManager<ToolbarButtonEvents>();
+    // private eventManager = new EventManager<ToolbarButtonEvents>();
     public events = this.eventManager.subscriber;
 
     constructor() {
-        super();
+        super(true);
 
         this.iconElement = $.create('img') as HTMLImageElement;
         this.iconElement.classList.add('toolbar-icon');
