@@ -47,6 +47,7 @@ export interface Pxl8ToolbarEvents {
 
 export interface Pxl8StatusbarEvents {
     scroll?: (unit: ViewUnit, dir: Direction.up | Direction.down) => void;
+
 }
 
 export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarEvents> {

@@ -7,14 +7,19 @@ const horizontalSwatchSpacing = 4; // pixels
 const swatchHeightStyle = '24px';
 const swatchMarginBottomStyle = '4px';
 
-export class SwatchGrid extends Widget {
+export interface SwatchGridEvents{
+    swatchSelected: (index: number, color: Readonly<RGBA>) => void;
+}
+
+export class SwatchGrid extends Widget<SwatchGridEvents> {
     private _swatches: Swatch[] = [];
     private _clears: HTMLElement[] = [];
 
     constructor() {
-        super();
+        super(true);
 
         this.element.classList.add('swatch-grid');
+        this.subscribeToEvent('mousedown');
     }
 
     loadSwatches(colors: RGBA[], gridWidth: number) {
@@ -53,6 +58,16 @@ export class SwatchGrid extends Widget {
             }
         }
     }
+
+    onMouseDown(e: MouseEvent) {
+        for (var i = 0; i < this._swatches.length; i++){
+            if (this._swatches[i].element === e.target) {
+                this.raise("swatchSelected", i, this._swatches[i].color);
+                return;
+            }
+        }
+    }
+
 
     private _destroySwatches() {
         this._swatches.forEach(swatch => this.element.removeChild(swatch.element));

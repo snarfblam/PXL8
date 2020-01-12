@@ -21,7 +21,7 @@
 import { TileView } from './TileView';
 import { GfxView } from './gfxView';
 import { $, $$ } from './dollar';
-import { tileCodecs, SwatchPaletteCue } from './gfx/tileCodec';
+import { tileCodecs, SwatchPaletteCue, TileCodec, PaletteCue } from './gfx/tileCodec';
 import { debugPalette } from './gfx/palette';
 import { RomView, ViewUnit } from './romView';
 import { ROM } from './rom';
@@ -37,6 +37,8 @@ import { Modal } from './modal';
 import { SwatchGrid } from './swatchGrid';
 import { nesCodec } from './gfx/nesCodec';
 import { SwatchModal } from './pxl8ui/swatchModal';
+import { ColorPicker } from './pxl8ui/colorPicker';
+import { Widget } from './widget';
 
 
 class Pxl8 {
@@ -47,10 +49,15 @@ class Pxl8 {
     private readonly romView = new RomView();
     private readonly docEditor: DocumentEditor;
 
+    /** The tile codec the currently loaded color picker is for, or null if no picker is loaded. */
+    private colorPickerCodec: TileCodec | null = null;
+    private colorPicker:( ColorPicker & Modal) | null = null;
+    private currentCodec: TileCodec | null = null;
+
     public readonly events = this.eventManager.subscriber;
 
     constructor() {
-        var palView = this.statusBar.getPaletteView();
+        var palView = this.getPaletteView();
 
         this.docEditor = {
             events: this.events,
@@ -100,6 +107,7 @@ class Pxl8 {
             primaryColorSelected: () => this.eventManager.raise('primaryColorSelected'),
             secondaryColorSelected: () => this.eventManager.raise('secondaryColorSelected'),
             paletteModified: () => this.eventManager.raise('paletteModified'),
+            colorEditRequest: (index) => this.editPalEntry(index),
         });
 
         this.statusBar.on({
@@ -114,21 +122,11 @@ class Pxl8 {
 
         window.addEventListener('resize', e => this.performLayout());
 
-        // var swatches = new SwatchGrid();
-        // swatches.loadSwatches(
-        //     SwatchPaletteCue.rrggbbToRGBA(((nesCodec.paletteCue as SwatchPaletteCue).rrggbb)),
-        //     14);
-        // var mahModal = new Modal();
-        var mahModal = new SwatchModal();
-        mahModal.loadSwatchesFor(nesCodec);
-        // swatches.site(mahModal);
-        // mahModal.setCaption('Select a Color');
-        // mahModal.setPreferredWidth('500px');
-        mahModal.showModal();
     }
 
     private loadRom(file: File) {
-        this.romView.loadRom(new ROM(file), tileCodecs.nesCodec, this.docEditor);
+        this.currentCodec = tileCodecs.nesCodec;
+        this.romView.loadRom(new ROM(file), this.currentCodec, this.docEditor);
         this.romView.setViewOffset(0);
         this.performLayout();
     }
@@ -139,6 +137,43 @@ class Pxl8 {
             this.toolbar.element.getBoundingClientRect().height -
             this.statusBar.element.getBoundingClientRect().height;
         this.romView.resize(availHeight);
+    }
+
+    private editPalEntry(index: number) {
+        if (!this.colorPicker || this.colorPickerCodec !== this.currentCodec) {
+            this.loadColorPicker();
+        }
+
+        var prevColor = this.getPaletteView().getColor(index);
+        var showEditorPromise = this.colorPicker!.editColor(prevColor);
+        showEditorPromise.then(color => {
+            if (color) {
+                var pal = this.getPaletteView().getPalette();
+                pal[index] = color;
+                this.getPaletteView().setPalette(pal);
+                this.eventManager.raise('paletteModified');
+            }
+        });
+    }
+
+    private loadColorPicker() {
+        if (this.colorPicker) {
+            this.colorPicker.dispose();
+        }
+
+        this.colorPickerCodec = this.currentCodec;
+        var cue = this.currentCodec!.paletteCue || PaletteCue.default;
+        if (cue.type === 'swatches') {
+            var picker = new SwatchModal();
+            picker.loadSwatchesFor(this.currentCodec!);
+            this.colorPicker = picker;
+        } else {
+            throw Error('Color picker not implemented for cue type: ' + cue.type);
+        }
+    }
+
+    private getPaletteView() {
+        return this.statusBar.getPaletteView();
     }
 }
 

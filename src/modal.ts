@@ -84,6 +84,7 @@ export class ModalHost extends Widget {
         }
     }
 
+    /** To be called by modal objects to show themselves. */
     private showModal(modal: Modal | null) {
         if (this.currentModal) {
             this.currentModal.element.style.display = 'none';
@@ -100,14 +101,19 @@ export class ModalHost extends Widget {
         }
     }
 
+    public hideModal() {
+        if (this.currentModal) this.currentModal.hideModal();
+    }
+
     private hideModalBecause(reason: ModalCloseReason) {
         if (this.currentModal) {
             this.currentModal['setCloseReason'](reason);
-            this.hideModal();
+            this.currentModal.hideModal();
         }
     }
 
-    public hideModal() {
+    /** To be called by modal objects to hide themselves. */
+    private hideCurrentModal() {
         this.showModal(null);
     }
 
@@ -125,7 +131,7 @@ export class Modal extends Widget {
     /** If true, the modal will be close if the user presses escape. */
     closeOnEscape = true;
     protected captionElement: HTMLElement | null = null;
-    private closingReason: ModalCloseReason = ModalCloseReason.code;
+    private closingReason: ModalCloseReason = ModalCloseReason.code;  // until the user does something to say otherwise
 
     constructor(host?: ModalHost) {
         super();
@@ -156,12 +162,13 @@ export class Modal extends Widget {
 
     showModal() {
         this.host['showModal'](this);
+        this.closingReason = ModalCloseReason.code; // until the user does something to say otherwise
     }
 
     hideModal() {
         if (this.isVisible()) {
             this.closingModal(this.closingReason);
-            this.host['hideModal']();
+            this.host['hideCurrentModal']();
         }
     }
 
@@ -173,7 +180,7 @@ export class Modal extends Widget {
     
 
     isVisible() {
-        return this.element.style.display === 'none';
+        return this.element.style.display !== 'none';
     }
     /**
      * Sets the caption text for the modal, or hides it if a value of null is specified.

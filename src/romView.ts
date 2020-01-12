@@ -107,7 +107,6 @@ export class RomView {
             // queryOffset: query => query.offset = this.viewOffset
             queryOffset: q => {
                 q.offset = this.viewOffset;
-                console.log('q');
             }
         });
     }   

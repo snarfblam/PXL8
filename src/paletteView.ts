@@ -361,6 +361,10 @@ export class MiniPaletteView extends Widget<PaletteViewEvents> {
         return this.palette.cloneColors();
     }
 
+    getColor(index: number) {
+        return this.palette.getColor(index);
+    }
+
     updatePrimarySwatch() {
         var colorStyle = this.palette.getStyle(this.primarySelection);
         this.ui.selectionBox.primary.element.style.backgroundColor = colorStyle;
@@ -372,6 +376,8 @@ export class MiniPaletteView extends Widget<PaletteViewEvents> {
     }
 
     onPalDblClick(e: MouseEvent) {
+        e.preventDefault();
+
         var palIndex = this.ui.palettePanes.children.indexOf(e.target as HTMLElement);
         if (palIndex < 0 || palIndex >= this.ui.palettePanes.children.length) return;
 
@@ -380,6 +386,8 @@ export class MiniPaletteView extends Widget<PaletteViewEvents> {
         }
     }
     onPalMouseDown(e: MouseEvent) {
+        e.preventDefault();
+
         var palIndex = this.ui.palettePanes.children.indexOf(e.target as HTMLElement);
         if (palIndex < 0 || palIndex >= this.ui.palettePanes.children.length) return;
 
