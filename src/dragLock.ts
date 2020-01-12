@@ -1,4 +1,4 @@
-import { Widget } from "./widget";
+import { Widget } from "./widgets/widget";
 import { Volatile } from "./util";
 import { Point } from "./math";
 import { EventManager } from "./eventManager";

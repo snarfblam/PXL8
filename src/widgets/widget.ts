@@ -1,6 +1,6 @@
-import { Site, siteChild } from "./site";
-import { $ } from "./dollar";
-import { EventManager, nullEventManager, Events } from "./eventManager";
+import { Site, siteChild } from "../site";
+import { $ } from "../dollar";
+import { EventManager, nullEventManager, Events } from "../eventManager";
 
 var elementWidgetSymbol = '#element.widget#';
 

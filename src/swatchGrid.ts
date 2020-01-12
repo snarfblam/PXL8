@@ -1,4 +1,4 @@
-import { Widget } from './widget';
+import { Widget } from './widgets/widget';
 import { RGBA } from './gfx/palette';
 import { $ } from './dollar';
 

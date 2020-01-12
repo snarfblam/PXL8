@@ -200,7 +200,6 @@ export class RomView {
     }
 
     private previewScrollChange(e: ScrollbarValueEvent) {
-        console.log('problem?');
         if (this.codec && this.rom) {
             var proposedValue = e.value || 0;
             var bytesPerRow = this.codec.bytesPerTile * this.gfxView.metrics.gridWidth;

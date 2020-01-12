@@ -1,5 +1,5 @@
 import { Widget } from "./widget";
-import { $ } from "./dollar";
+import { $ } from "../dollar";
 
 var _globalHost: ModalHost | null = null;
 function getGlobalHost() {

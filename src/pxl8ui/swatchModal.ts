@@ -1,4 +1,4 @@
-import { Modal, ModalHost, ModalCloseReason } from '../modal';
+import { Modal, ModalHost, ModalCloseReason } from '../widgets/modal';
 import { SwatchGrid } from '../swatchGrid';
 import { TileCodec, PaletteCue, SwatchPaletteCue } from '../gfx/tileCodec';
 import { ColorPicker } from './colorPicker';

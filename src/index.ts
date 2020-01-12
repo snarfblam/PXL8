@@ -27,18 +27,18 @@ import { RomView, ViewUnit } from './romView';
 import { ROM } from './rom';
 import { PaletteView } from './paletteView';
 import { Direction, Orientation } from './util';
-import { Toolbar, ToolbarButton, ToolbarSize } from './toolbar';
+import { Toolbar, ToolbarButton, ToolbarSize } from './widgets/toolbar';
 import { Pxl8Toolbar, Pxl8StatusBar } from './pxl8Toolbars';
 import { Site } from './site';
 import { showFileDialog } from './fileDialog';
 import { DocumentEvents, DocumentEditor } from './document';
 import { EventManager } from './eventManager';
-import { Modal } from './modal';
+import { Modal } from './widgets/modal';
 import { SwatchGrid } from './swatchGrid';
 import { nesCodec } from './gfx/nesCodec';
 import { SwatchModal } from './pxl8ui/swatchModal';
 import { ColorPicker } from './pxl8ui/colorPicker';
-import { Widget } from './widget';
+import { Widget } from './widgets/widget';
 
 
 class Pxl8 {

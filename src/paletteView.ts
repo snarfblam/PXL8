@@ -2,7 +2,7 @@ import { $, $$ } from './dollar';
 import { Palette, ManagedPalette, RGBA } from './gfx/palette';
 import { Site, siteChild, Siteable } from './site';
 import { EventManager } from './eventManager';
-import { Widget } from './widget';
+import { Widget } from './widgets/widget';
 
 function createElem(tag: string, x: number, y: number, w: number, h: number, color?: string) {
     var result = $.create(tag);

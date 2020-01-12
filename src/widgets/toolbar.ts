@@ -1,7 +1,7 @@
 import { Widget } from './widget';
-import { $, $$ } from './dollar';
-import { removeFrom } from './util';
-import { EventManager, Events } from './eventManager';
+import { $, $$ } from '../dollar';
+import { removeFrom } from '../util';
+import { EventManager, Events } from '../eventManager';
 
 
 

@@ -2,7 +2,7 @@ import { Orientation, eventToClientCoords } from './util';
 import { $, $$ } from './dollar';
 import { Site, siteChild } from './site';
 import { EventManager } from './eventManager';
-import { Widget } from './widget';
+import { Widget } from './widgets/widget';
 import { DragLock } from './dragLock';
 
 export interface ScrollbarMetrics {
