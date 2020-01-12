@@ -26,7 +26,7 @@ import { debugPalette } from './gfx/palette';
 import { RomView, ViewUnit } from './romView';
 import { ROM } from './rom';
 import { PaletteView } from './paletteView';
-import { Direction, Orientation } from './util';
+import { Direction, Orientation, Arrayish } from './util';
 import { Toolbar, ToolbarButton, ToolbarSize } from './widgets/toolbar';
 import { Pxl8Toolbar, Pxl8StatusBar } from './pxl8Toolbars';
 import { Site } from './site';
@@ -48,6 +48,9 @@ class Pxl8 {
     private readonly statusBar = new Pxl8StatusBar();
     private readonly romView = new RomView();
     private readonly docEditor: DocumentEditor;
+    private clipboardData: Uint8Array | null = null;
+
+    private rom: ROM | null = null;
 
     /** The tile codec the currently loaded color picker is for, or null if no picker is loaded. */
     private colorPickerCodec: TileCodec | null = null;
@@ -96,6 +99,12 @@ class Pxl8 {
                 if (buttonName === 'export') {
                     this.romView.saveRomAsDownload();
                 }
+                if (buttonName === 'copy') {
+                    this.performCopy();
+                }
+                if (buttonName === 'paste') {
+                    this.performPaste();
+                }
             }
         });
 
@@ -126,7 +135,8 @@ class Pxl8 {
 
     private loadRom(file: File) {
         this.currentCodec = tileCodecs.nesCodec;
-        this.romView.loadRom(new ROM(file), this.currentCodec, this.docEditor);
+        this.rom = new ROM(file);
+        this.romView.loadRom(this.rom, this.currentCodec, this.docEditor);
         this.romView.setViewOffset(0);
         this.performLayout();
     }
@@ -174,6 +184,68 @@ class Pxl8 {
 
     private getPaletteView() {
         return this.statusBar.getPaletteView();
+    }
+
+    performCopy() {
+        var selection = this.romView.gfxView.selection.getSelectionRange();
+        // Don't try to copy from beyond end of ROM
+        var selEnd = selection.firstTile + selection.byteCount;
+        if (this.rom) selEnd = Math.min(this.rom!.length, selEnd);
+        var selLen = selEnd - selection.firstTile;
+        // Don't try to copy partial tiles
+        if (this.currentCodec) {
+            var misalign = selLen % this.currentCodec.bytesPerTile;
+            selLen -= misalign;
+        }
+
+        if (this.rom && this.rom.rawData) {
+            var data = this.rom.rawData;
+            var buffer = data.buffer;
+            var selDataStart = data.byteOffset + selection.firstTile;
+            var selDataEnd = data.byteOffset + selEnd;
+            var clipboardBuffer = buffer.slice(selDataStart, selDataEnd);
+            this.clipboardData = new Uint8Array(clipboardBuffer);
+        } else {
+            this.warnUser("Could not copy the selection. ROM data is not ready.");
+        }
+    }
+
+    performPaste() {
+        var clipData = this.clipboardData;
+        var romData = this.rom && this.rom.rawData;
+        if (clipData) {
+            if (romData) {
+                var selection = this.romView.gfxView.selection.getSelectionRange();
+                // Don't try to copy from beyond end of ROM
+                var pasteEnd = selection.firstTile + clipData.byteLength;
+                pasteEnd = Math.min(romData.length, pasteEnd);
+                var pasteLen = pasteEnd - selection.firstTile;
+
+                var dest = selection.firstTile;
+                for (var i = 0; i < pasteLen; i++){
+                    romData[dest + i] = clipData[i];
+                }
+
+                this.refreshData();
+            } else {
+                this.warnUser("Could not paste. ROM data is not ready.");
+            }
+        } else {
+            this.warnUser("Could not paste. The clipboard is empty.");
+        }
+    }
+
+    /** 
+     * Redraws tiles. Call this method while tile data is modified programatically
+     * in a way that does not automatically update the rendered tiles.
+     */
+    refreshData() {
+        this.romView.refreshData();
+    }
+
+    warnUser(msg: string) {
+        console.warn(msg);
+        // Todo: pop-up warnings for user
     }
 }
 

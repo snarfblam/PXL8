@@ -95,8 +95,8 @@ export class RomView {
             valueChanged: val => this.onScrollValueChange(val),
         });
 
-        this.tileView.element.style.marginLeft = '4px';
-        this.tileView.element.style.marginTop = '4px';
+        // this.tileView.element.style.marginLeft = '4px';
+        // this.tileView.element.style.marginTop = '4px';
         this.element.style.height = '100%';
         this.element.style.position = 'relative';
 
@@ -271,6 +271,12 @@ export class RomView {
                 console.warn('RomView not ready to render.');
             }
         }
+    }
+
+    /** Forces all tiles to be re-renderd */
+    refreshData() {
+        this.gfxView.displayOffset(this.viewOffset);
+        this.tileView.redraw();
     }
 
     private fetchRomData(offset: number) {

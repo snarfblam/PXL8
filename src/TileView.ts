@@ -44,6 +44,7 @@ export class TileView {
 
     constructor() {
         this.element = $.create('canvas') as HTMLCanvasElement;
+        this.element.classList.add('pxl8-tile-view');
 
         // DOM does not support mouse capture? Stop drawing on any mouse-up ever.
         window.addEventListener('mouseup', () => this.endDrawOperation());

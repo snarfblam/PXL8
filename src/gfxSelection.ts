@@ -20,9 +20,35 @@ export interface GfxSelectionMetrics{
     viewPositionY: number,
 }
 
+/** Describes the range of a user's selection */
+export interface SelectionInfo {
+    /** Offset of the tile where the selection beings. */
+    start: number;
+    /** Offset of the tile where the selection ends. The end tile may be at a lesser offset than the begin tile. */
+    end: number;
+    /** Offset of the first selected tile. */
+    firstTile: number;
+    /** Offset of the last selected tile (inclusive). The selection extends through the indicated tile. */
+    lastTile: number;
+    /** The size in bytes of the data in the selected region. */
+    byteCount: number;
+    /** The number of tiles in the selected region. */
+    tileCount: number;
+}
+
 export interface GfxSelectionEvents {
     // queryMetrics: (metrics: GfxSelectionMetrics) => void;
     queryOffset: (evt: { offset: number }) => void
+}
+
+const hiddenSelectionStyle = {
+    background: 'rgba(0, 114, 255, 0.15)',
+    outline: '1px solid white',
+    outlineOffset: '-1px'
+}
+const normalSelectionStyle = {
+    background: 'rgba(0, 114, 255, 0.75)',
+    outline: 'none',
 }
 
 /** 
@@ -75,6 +101,19 @@ export class GfxSelection {
                 this.extendSelection(this.pointToOffset(x, y));
             },
         });
+    }
+
+    public getSelectionRange(): SelectionInfo {
+        this.queryMetrics();
+
+        var start = this.selectionStartOffset;
+        var end = this.selectionEndOffset;
+        var firstTile = Math.min(start, end);
+        var lastTile = Math.max(start, end);
+        var byteCount = lastTile - firstTile + this.metrics.bytesPerTile;
+        var tileCount = Math.floor(byteCount / this.metrics.bytesPerTile);
+        
+        return { start, end, firstTile, lastTile, byteCount, tileCount };
     }
 
     private pointToOffset(pxX: number, pxY: number) {
@@ -144,12 +183,6 @@ export class GfxSelection {
 
     /** Updates the UI selection elements. Call this.queryMetrics prior. */
     private updateSelectionElements() {
-        if (this.selectionHidden) {
-            this.hideSelectionRect(this.selTop);
-            this.hideSelectionRect(this.selMid);
-            this.hideSelectionRect(this.selBottom);
-            return;
-        }
         if (this.mode === GfxSelectionMode.linear) {
             var metrics = this.metrics;
 
@@ -216,6 +249,10 @@ export class GfxSelection {
         elem.style.top = top.toString() + 'px';
         elem.style.width = (tileW * this.metrics.tileWidth).toString() + 'px';
         elem.style.height = (tileH * this.metrics.tileHeight).toString() + 'px';
+        var style = this.selectionHidden ? hiddenSelectionStyle : normalSelectionStyle;
+        for (var key in style) {
+            (elem.style as any)[key] = (style as any)[key];
+        }
     }
     private hideSelectionRect(elem: HTMLElement) {
         elem.style.display = 'none';
@@ -227,6 +264,7 @@ function createSelectionElement() {
     var elem = $.create('div');
     elem.style.position = 'absolute';
     elem.style.display = 'none';
+    elem.style.pointerEvents = 'none'
         elem.style.background = 'rgba(0, 114, 255, 0.75)';
         return elem;
 }
