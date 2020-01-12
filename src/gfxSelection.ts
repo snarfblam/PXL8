@@ -34,6 +34,10 @@ export interface GfxSelectionEvents {
 export class GfxSelection {
     private selectionStartOffset = 0;
     private selectionEndOffset = 0;
+    /** Set to true to hide the current selection. This occurs when the user
+     *  initially mouse-downs, before he actually moves the mouse pointer.
+     */
+    private selectionHidden = true;
     private mode = GfxSelectionMode.linear;
     private dragLock: DragLock;
 
@@ -62,10 +66,12 @@ export class GfxSelection {
         this.dragLock.events.subscribe({
             dragStart: (x,y) => {
                 this.queryMetrics();
+                this.selectionHidden = true;
                 this.beginSelection(this.pointToOffset(x, y), GfxSelectionMode.linear);
             },
             dragTo: (x, y) => {
                 this.queryMetrics();
+                this.selectionHidden = false;
                 this.extendSelection(this.pointToOffset(x, y));
             },
         });
@@ -138,6 +144,12 @@ export class GfxSelection {
 
     /** Updates the UI selection elements. Call this.queryMetrics prior. */
     private updateSelectionElements() {
+        if (this.selectionHidden) {
+            this.hideSelectionRect(this.selTop);
+            this.hideSelectionRect(this.selMid);
+            this.hideSelectionRect(this.selBottom);
+            return;
+        }
         if (this.mode === GfxSelectionMode.linear) {
             var metrics = this.metrics;
 
