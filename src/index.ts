@@ -39,6 +39,9 @@ import { nesCodec } from './gfx/nesCodec';
 import { SwatchModal } from './pxl8ui/swatchModal';
 import { ColorPicker } from './pxl8ui/colorPicker';
 import { Widget } from './widgets/widget';
+import { ZRelativePosition, ZLayer } from './widgets/zlayer';
+import { layers } from './pxl8ui/pxlLayers';
+
 
 
 class Pxl8 {
@@ -131,6 +134,17 @@ class Pxl8 {
 
         window.addEventListener('resize', e => this.performLayout());
 
+        this.setupLayers();
+    }
+
+    private setupLayers() {
+        this.toolbar.setLayer(layers.chrome, true);
+        this.statusBar.setLayer(layers.chrome, true);
+        ZLayer.setLayer(this.romView.gfxView.element, layers.fixedViews, true);
+        ZLayer.setLayer(this.romView.tileView.element, layers.fixedViews, true);
+        this.romView.gfxView.selection.setSelectionStyle({
+            zIndex: ZLayer.getZIndex(layers.fixedViews)!.toString(),
+        });
     }
 
     private loadRom(file: File) {

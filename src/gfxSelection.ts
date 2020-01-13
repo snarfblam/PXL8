@@ -3,6 +3,7 @@ import { EventManager } from './eventManager';
 import { DragLock } from './dragLock';
 import { GfxView } from './gfxView';
 import { clamp } from './math';
+import { Widget } from './widgets/widget';
 
 export enum GfxSelectionMode {
     'linear' = 'linear',
@@ -101,6 +102,12 @@ export class GfxSelection {
                 this.extendSelection(this.pointToOffset(x, y));
             },
         });
+    }
+
+    public setSelectionStyle(style: { [name: string]: string }) {
+        Widget.setElementStyle(this.selTop, style);
+        Widget.setElementStyle(this.selMid, style);
+        Widget.setElementStyle(this.selBottom, style);
     }
 
     public getSelectionRange(): SelectionInfo {

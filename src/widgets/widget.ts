@@ -1,6 +1,7 @@
 import { Site, siteChild } from "../site";
 import { $ } from "../dollar";
 import { EventManager, nullEventManager, Events } from "../eventManager";
+import { ZLayer, ZRelativePosition } from './zlayer';
 
 var elementWidgetSymbol = '#element.widget#';
 
@@ -64,7 +65,28 @@ export abstract class Widget
     protected createElement(): HTMLElement{
         return $.create(this.elementType);
     }
-    
+
+    setStyle(values: { [name: string]: string }): void;
+    setStyle(name: string, value: string): void;
+    setStyle(style: string | { [name: string]: string }, value?: string): void {
+        // Does TS provide a mechanism to accommodate this sort of overload forwarding?
+        // as-is I'm just shoehorning the args through on the basis that currently the methods are known (to me) to have compatible overload sets
+        Widget.setElementStyle(this.element, style as string, value!);
+    }
+
+    static setElementStyle(element:HTMLElement | Widget, values: { [name: string]: string }): void;
+    static setElementStyle(element:HTMLElement | Widget, name: string, value: string): void;
+    static setElementStyle(element:HTMLElement | Widget, style: string | { [name: string]: string }, value?: string): void {
+        if (element instanceof Widget) element = element.element;
+
+        if (typeof style === 'string') {
+            (element.style as any)[style] = value;
+        } else {
+            for (const key in style) {
+                (element.style as any)[key] = style[key];
+            }
+        }
+    }
     /** Places this element into a parent element */
     public site(site: Site | HTMLElement | Widget) {
         if(this.element.parentElement) throw Error("can not site an already sited widget")
@@ -100,7 +122,21 @@ export abstract class Widget
     }
 
     /** Returns whether this element is sited. */
-    public isSited() { return !!this.element.parentElement; }
+    isSited() { return !!this.element.parentElement; }
+
+    /**
+     * Specifies the z-layer this widget appears on. The element must be 
+     * "layered" (having a CSS position other than 'static').
+     * @param zLayer The named layer this widget will appear on.
+     * @param makeLayered If true, the element's 'position' style will be set to 'relative' if it is currently 'static'
+     */
+    setLayer(zLayer: string, makeLayered?: boolean) {
+        ZLayer.setLayer(this as any, zLayer, makeLayered);
+    }
+
+    static defineLayer(name: string, position: ZRelativePosition) {
+        ZLayer.addLayer(name, position);
+    }
 
     on(handler: TEvents) {
         this.eventManager.subscriber.subscribe(handler);
