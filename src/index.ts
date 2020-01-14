@@ -18,23 +18,23 @@
 
 "use strict";
 
-import { TileView } from './TileView';
-import { GfxView } from './gfxView';
+import { TileView } from './pxl8ui/TileView';
+import { GfxView } from './pxl8ui/gfxView';
 import { $, $$ } from './dollar';
 import { tileCodecs, SwatchPaletteCue, TileCodec, PaletteCue } from './gfx/tileCodec';
 import { debugPalette } from './gfx/palette';
-import { RomView, ViewUnit } from './romView';
+import { RomView, ViewUnit } from './pxl8ui/romView';
 import { ROM } from './rom';
 import { PaletteView } from './paletteView';
 import { Direction, Orientation, Arrayish } from './util';
 import { Toolbar, ToolbarButton, ToolbarSize } from './widgets/toolbar';
-import { Pxl8Toolbar, Pxl8StatusBar } from './pxl8Toolbars';
+import { Pxl8Toolbar, Pxl8StatusBar } from './pxl8ui/pxl8Toolbars';
 import { Site } from './site';
 import { showFileDialog } from './fileDialog';
 import { DocumentEvents, DocumentEditor } from './document';
 import { EventManager } from './eventManager';
 import { Modal } from './widgets/modal';
-import { SwatchGrid } from './swatchGrid';
+import { SwatchGrid } from './pxl8ui/swatchGrid';
 import { nesCodec } from './gfx/nesCodec';
 import { SwatchModal } from './pxl8ui/swatchModal';
 import { ColorPicker } from './pxl8ui/colorPicker';

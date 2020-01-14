@@ -1,6 +1,6 @@
-import { Widget } from './widgets/widget';
-import { RGBA } from './gfx/palette';
-import { $ } from './dollar';
+import { Widget } from '../widgets/widget';
+import { RGBA } from '../gfx/palette';
+import { $ } from '../dollar';
 
 type Swatch = { color: RGBA, element: HTMLElement };
 const horizontalSwatchSpacing = 4; // pixels

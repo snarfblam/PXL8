@@ -1,10 +1,10 @@
-import { Toolbar, ToolbarButton, ToolbarSize, ToolbarLabel } from "./widgets/toolbar";
-import { $ } from "./dollar";
-import { Widget } from "./widgets/widget";
-import { EventManager } from "./eventManager";
-import { MiniPaletteView } from "./paletteView";
+import { Toolbar, ToolbarButton, ToolbarSize, ToolbarLabel } from "../widgets/toolbar";
+import { $ } from "../dollar";
+import { Widget } from "../widgets/widget";
+import { EventManager } from "../eventManager";
+import { MiniPaletteView } from "../paletteView";
 import { ViewUnit } from "./romView";
-import { Direction } from "./util";
+import { Direction } from "../util";
 
 function newButton(text: string, icon: string) {
     var btn = new ToolbarButton();

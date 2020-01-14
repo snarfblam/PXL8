@@ -1,9 +1,9 @@
-import { $, $$ } from './dollar';
-import { EventManager } from './eventManager';
-import { DragLock } from './dragLock';
+import { $, $$ } from '../dollar';
+import { EventManager } from '../eventManager';
+import { DragLock } from '../dragLock';
 import { GfxView } from './gfxView';
-import { clamp } from './math';
-import { Widget } from './widgets/widget';
+import { clamp } from '../math';
+import { Widget } from '../widgets/widget';
 
 export enum GfxSelectionMode {
     'linear' = 'linear',

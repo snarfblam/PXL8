@@ -1,12 +1,12 @@
 
-import { $, $$ } from './dollar';
-import { Site, siteChild } from './site';
-import { coords, Volatile, Arrayish, eventToClientCoords } from './util';
-import { GfxBuffer, GfxBufferMetrics } from './gfx/gfxBuffer';
-import { TileCodec } from './gfx/tileCodec';
-import { Palette, RGBA } from './gfx/palette';
-import { TileData } from './gfx/TileData';
-import { EventManager } from './eventManager';
+import { $, $$ } from '../dollar';
+import { Site, siteChild } from '../site';
+import { coords, Volatile, Arrayish, eventToClientCoords } from '../util';
+import { GfxBuffer, GfxBufferMetrics } from '../gfx/gfxBuffer';
+import { TileCodec } from '../gfx/tileCodec';
+import { Palette, RGBA } from '../gfx/palette';
+import { TileData } from '../gfx/TileData';
+import { EventManager } from '../eventManager';
 import { GfxSelection } from './gfxSelection';
 
 export interface GfxViewEvents {

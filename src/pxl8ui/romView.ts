@@ -1,16 +1,16 @@
-import { ROM } from "./rom";
+import { ROM } from "../rom";
 import { GfxView } from "./gfxView";
 import { TileView, TileViewMetrics } from './TileView';
-import { $ } from "./dollar";
-import { TileCodec } from "./gfx/tileCodec";
-import { Palette, debugPalette } from "./gfx/palette";
-import { Arrayish, Direction, saveBlob } from "./util";
-import { siteChild, Site } from "./site";
-import { EventManager, EventSubscription } from './eventManager';
-import { PaletteView, MiniPaletteView } from "./paletteView";
-import { ScrollWidget, ScrollbarValueEvent } from "./scrollWidget";
+import { $ } from "../dollar";
+import { TileCodec } from "../gfx/tileCodec";
+import { Palette, debugPalette } from "../gfx/palette";
+import { Arrayish, Direction, saveBlob } from "../util";
+import { siteChild, Site } from "../site";
+import { EventManager, EventSubscription } from '../eventManager';
+import { PaletteView, MiniPaletteView } from "../paletteView";
+import { ScrollWidget, ScrollbarValueEvent } from "../scrollWidget";
 import { Pxl8Toolbar } from "./pxl8Toolbars";
-import { DocumentEvents, DocumentEditor } from "./document";
+import { DocumentEvents, DocumentEditor } from "../document";
 
 const tileViewZoom = 32;
 const gfxViewZoom = 2;

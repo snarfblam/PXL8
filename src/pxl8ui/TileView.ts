@@ -1,10 +1,10 @@
-import { $, $$ } from './dollar';
-import { Volatile, coords } from './util';
-import { Site, siteChild } from './site';
-import { Palette, RGBA } from './gfx/palette';
-import { TileData } from './gfx/TileData';
-import { demoNesTile, tileCodecs, TileCodec } from './gfx/tileCodec';
-import { EventManager } from './eventManager';
+import { $, $$ } from '../dollar';
+import { Volatile, coords } from '../util';
+import { Site, siteChild } from '../site';
+import { Palette, RGBA } from '../gfx/palette';
+import { TileData } from '../gfx/TileData';
+import { demoNesTile, tileCodecs, TileCodec } from '../gfx/tileCodec';
+import { EventManager } from '../eventManager';
 
 export interface TileViewEvents {
     commitChanges?: () => void;
