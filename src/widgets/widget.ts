@@ -38,10 +38,16 @@ export abstract class Widget
     element: HTMLElement;
     /** 
      * Used by the default implementation of CreateElement. To customize your
-     * widget's element type, either override CreateElement or assign a 
-     * different value to elementType on your class's __prototype__. */
+     * widget's element type, either override CreateElement or call
+     * Widget.setElementType to change your class's default element type. */
     //@ts-ignore
     readonly elementType: string;
+    /** 
+     * Used by the default implementation of CreateElement. To customize your
+     * widget's css class list, either override CreateElement or call
+     * Widget.setElementType to change your class's css class list. */
+    //@ts-ignore
+    readonly cssClassList: string[];
     private eventManager: EventManager<TEvents> = nullEventManager as any;
     protected raise = this.eventManager.raise;
     private elementEventHandlers: ElementEventHandlers = {};
@@ -63,7 +69,11 @@ export abstract class Widget
      * should not reference 'this'!
      */
     protected createElement(): HTMLElement{
-        return $.create(this.elementType);
+        var elem = $.create(this.elementType);
+        if (this.cssClassList) {
+            this.cssClassList.forEach(cls => elem.classList.add(cls));
+        }
+        return elem;
     }
 
     setStyle(values: { [name: string]: string }): void;
@@ -88,14 +98,17 @@ export abstract class Widget
         }
     }
     /** Places this element into a parent element */
-    public site(site: Site | HTMLElement | Widget) {
+    public site<TEvents extends Events<TEvents>>(site: Site | HTMLElement | Widget<TEvents>) {
         if(this.element.parentElement) throw Error("can not site an already sited widget")
 
         if (site instanceof HTMLElement) site = { site };
         if (site instanceof Widget) site = { site: site.element };
 
         siteChild(this.element, site);
+        this.onSited();
     }
+
+    protected onSited() { }
     
     /** Removes this element from its parent */
     public unsite() {
@@ -202,7 +215,7 @@ export abstract class Widget
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
     protected onMouseLeave(e: MouseEvent) { }
 
-    static elementEventHandler(this: HTMLElement, e: Event) {
+    private static elementEventHandler(this: HTMLElement, e: Event) {
         var widget = (this as any)[elementWidgetSymbol] as Widget;
         if (widget) {
             // Subscriber may have requested to ignore events bubbled from children
@@ -215,5 +228,33 @@ export abstract class Widget
             if ((widget as any)[handlerName]) (widget as any)[handlerName](e);
         }
     }
+
+    /**
+     * Sets the element type and/or class list to use for a widget.
+     * @param widgetClass The Widget class to update.
+     * @param elementType The element type to use, e.g. 'div', or undefined to 
+     * leave unchanged
+     * @param cssClassList A class-list string (space-separated class names). 
+     * Start the string with a plus symbol to inherit any base classes, e.g.
+     * '+ my-widget drop-shadow' will inherit css classes from the widget's super class.
+     */
+    static setElementType(widgetClass: Function, elementType?: string, cssClassList?: string) {
+        if (elementType) {
+            widgetClass.prototype.elementType = elementType;
+        }
+        if (cssClassList) {
+            var currentClassList = (widgetClass.prototype.cssClass || []) as string[];
+            var newClassList = cssClassList.split(' ').filter(i => i);
+            
+            // '+' expands to base class's css class list
+            if (newClassList[0] === '+') {
+                newClassList.shift();
+                newClassList = currentClassList.concat();
+            }
+
+            widgetClass.prototype.cssClassList = newClassList;
+        }
+    }
 }
-(Widget.prototype as any).elementType = 'div';
+// (Widget.prototype as any).elementType = 'div';
+Widget.setElementType(Widget, 'div', 'widget');

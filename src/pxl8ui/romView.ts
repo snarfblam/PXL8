@@ -11,6 +11,7 @@ import { PaletteView, MiniPaletteView } from "../paletteView";
 import { ScrollWidget, ScrollbarValueEvent } from "../scrollWidget";
 import { Pxl8Toolbar } from "./pxl8Toolbars";
 import { DocumentEvents, DocumentEditor } from "../document";
+import { TileArranger } from "./tileArranger";
 
 const tileViewZoom = 32;
 const gfxViewZoom = 2;
@@ -29,6 +30,7 @@ export enum ViewUnit {
 export class RomView {
     gfxView = new GfxView();
     tileView = new TileView();
+    tileArranger = new TileArranger();
     // palView = new MiniPaletteView();
     element = $.create('div');
     scroll = new ScrollWidget();
@@ -78,13 +80,16 @@ export class RomView {
         //         this.tileView.selectedColor = this.palView.getPrimarySelection();
         //     }
         // });
-        this.tileView.events.subscribe({
+        this.tileView.on({
             commitChanges: () => {
                 this.commitTileEdit();
             },
         });
         this.gfxView.events.subscribe({
-            tilePicked: index => this.openTileForEdit(index)
+            tilePicked: index => {
+                this.popOutTile(index);
+                this.openTileForEdit(index);
+            }
         });
         this.scroll.on({
             // pageUp: () => this.scrollView(Direction.up, ViewUnit.page),
@@ -117,6 +122,7 @@ export class RomView {
             this.gfxView.palette = newPal; 
             this.gfxView.displayOffset(this.viewOffset);
             this.tileView.palette = newPal;
+            this.tileArranger.setPalette(newPal);
             this.tileView.redraw();
         },
         primaryColorSelected: () => {
@@ -133,6 +139,7 @@ export class RomView {
         this.gfxView.site(thisSite);
         this.scroll.site(thisSite);
         this.tileView.site(thisSite);
+        this.tileArranger.site(thisSite);
         // this.element.appendChild($.create('br'));
         // this.palView.site(thisSite);
         // this.element.appendChild(this.statusPane);
@@ -168,6 +175,9 @@ export class RomView {
             gridHeight: gridHeight,
         });
 
+        this.tileArranger.rom = rom;
+        this.tileArranger.codec = codec;
+
         this.viewableByteCount = this.gfxView.metrics.gridWidth * this.gfxView.metrics.gridHeight * this.codec.bytesPerTile;
         this.romBuffer = new Uint8Array(this.viewableByteCount);
 
@@ -197,6 +207,12 @@ export class RomView {
                 console.warn('Not ready for render in openTileForEdit');
             }    
         }
+    }
+    private popOutTile(tileIndex: number) {
+        var tileOffset = this.viewOffset + tileIndex * this.codec!.bytesPerTile;
+        
+        console.log('cheese');
+        this.tileArranger.addView(tileOffset);
     }
 
     private previewScrollChange(e: ScrollbarValueEvent) {
@@ -303,7 +319,7 @@ export class RomView {
 
         this.codec.encode({ data: tileData, offset: 0 }, { data: this.rom!.rawData!, offset: this.tileViewOffset });
         var index = Math.floor(offset / this.codec.bytesPerTile);
-        this.gfxView.refreshTile(this.viewOffset, index);
+        this.gfxView.refreshTile(this.viewOffset, this.tileViewOffset - this.viewOffset);
     }
 
     // private onSave(e: Event) {
@@ -336,6 +352,15 @@ export class RomView {
             // var rowCount = Math.floor((tileCount + tilesPerRow - 1) / tilesPerRow);
             this.scroll.setRange(this.rom.length, rowSize, pageSize);
         }
+
+        var scrollRect = this.scroll.element.getBoundingClientRect();
+        this.tileArranger.setStyle({
+            position: 'absolute',
+            left: scrollRect.right + 'px',
+            top: '0px', // scrollRect.top + 'px',
+            width: document.documentElement.clientWidth - scrollRect.right + 'px',
+            height: scrollRect.height + 'px',
+        });
     }
 }
 

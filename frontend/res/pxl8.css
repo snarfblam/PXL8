@@ -297,6 +297,11 @@ img.toolbar-icon {
     border-bottom-right-radius: 4px;
 }
 
+.pxl8-tile-view-draggable {
+    border: none;
+    border-radius: initial;
+}
+
 /*** Modals ****************************************************/
 
     body.modal {

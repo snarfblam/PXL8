@@ -18,30 +18,22 @@
 
 "use strict";
 
-import { TileView } from './pxl8ui/TileView';
-import { GfxView } from './pxl8ui/gfxView';
 import { $, $$ } from './dollar';
 import { tileCodecs, SwatchPaletteCue, TileCodec, PaletteCue } from './gfx/tileCodec';
 import { debugPalette } from './gfx/palette';
 import { RomView, ViewUnit } from './pxl8ui/romView';
 import { ROM } from './rom';
-import { PaletteView } from './paletteView';
-import { Direction, Orientation, Arrayish } from './util';
-import { Toolbar, ToolbarButton, ToolbarSize } from './widgets/toolbar';
 import { Pxl8Toolbar, Pxl8StatusBar } from './pxl8ui/pxl8Toolbars';
 import { Site } from './site';
 import { showFileDialog } from './fileDialog';
 import { DocumentEvents, DocumentEditor } from './document';
 import { EventManager } from './eventManager';
-import { Modal } from './widgets/modal';
-import { SwatchGrid } from './pxl8ui/swatchGrid';
-import { nesCodec } from './gfx/nesCodec';
+import { Modal, ModalHost } from './widgets/modal';
 import { SwatchModal } from './pxl8ui/swatchModal';
 import { ColorPicker } from './pxl8ui/colorPicker';
-import { Widget } from './widgets/widget';
-import { ZRelativePosition, ZLayer } from './widgets/zlayer';
 import { layers } from './pxl8ui/pxlLayers';
-
+import { ZLayer } from './widgets/zlayer';
+import { } from './pxl8ui/tileArranger';
 
 
 class Pxl8 {
@@ -57,7 +49,7 @@ class Pxl8 {
 
     /** The tile codec the currently loaded color picker is for, or null if no picker is loaded. */
     private colorPickerCodec: TileCodec | null = null;
-    private colorPicker:( ColorPicker & Modal) | null = null;
+    private colorPicker: (ColorPicker & Modal<{}>) | null = null;
     private currentCodec: TileCodec | null = null;
 
     public readonly events = this.eventManager.subscriber;
@@ -145,6 +137,7 @@ class Pxl8 {
         this.romView.gfxView.selection.setSelectionStyle({
             zIndex: ZLayer.getZIndex(layers.fixedViews)!.toString(),
         });
+        ModalHost.getGlobalHost().setLayer(layers.modalHost);
     }
 
     private loadRom(file: File) {

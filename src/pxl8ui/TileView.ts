@@ -5,6 +5,7 @@ import { Palette, RGBA } from '../gfx/palette';
 import { TileData } from '../gfx/TileData';
 import { demoNesTile, tileCodecs, TileCodec } from '../gfx/tileCodec';
 import { EventManager } from '../eventManager';
+import { Widget } from '../widgets/widget';
 
 export interface TileViewEvents {
     commitChanges?: () => void;
@@ -19,15 +20,15 @@ export interface TileViewEvents {
  * Call dispose() if the object is no longer needed and the application is
  * not closing.
  */
-export class TileView {
-    element: HTMLCanvasElement;
+export class TileView extends Widget<TileViewEvents>{
+    // element: HTMLCanvasElement;
     context: CanvasRenderingContext2D | null = null;
     metrics: Readonly<TileViewMetrics> = defaultMetrics;
-    owner: Site | null = null;
     pixels: TileData = defaultTileData;
     palette: Palette = defaultPalette;
     primaryColor = 0;
     secondaryColor = 1;
+    draggable = false;
 
     /** The color currently being drawn, or null if no draw operation is in progress. */
     private drawColor = null as number | null;
@@ -39,25 +40,25 @@ export class TileView {
     private cachedColor: number | null = null;
     private cachedColorStyle: string = 'black';
     
-    private eventManager = new EventManager<TileViewEvents>();
-    public events = this.eventManager.subscriber; 
+    // private eventManager = new EventManager<TileViewEvents>();
+    // public events = this.eventManager.subscriber; 
 
     constructor() {
-        this.element = $.create('canvas') as HTMLCanvasElement;
-        this.element.classList.add('pxl8-tile-view');
+        super(true);
 
         // DOM does not support mouse capture? Stop drawing on any mouse-up ever.
         window.addEventListener('mouseup', () => this.endDrawOperation());
     }
 
+
     /** Initializes this element for use. Can be called multiple times if the object is re-used. */
     initialize(metrics: TileViewMetrics) {
         var width = metrics.tileWidth * metrics.pixelWidth;
         var height = metrics.tileHeight * metrics.pixelHeight;
-        this.element.width = width;
-        this.element.height = height;
+        (this.element as HTMLCanvasElement).width = width;
+        (this.element as HTMLCanvasElement).height = height;
         this.element.style.background = 'white';
-        this.context = this.element.getContext('2d')!;
+        this.context = (this.element as HTMLCanvasElement).getContext('2d')!;
 
 
         this.metrics = { ...metrics };
@@ -65,21 +66,25 @@ export class TileView {
     }
 
     site(owner: Site) {
-        siteChild(this.element, owner);
-        this.owner = owner;
-
-        this.element.addEventListener('mousemove', e => this.onMouseMove(e));
-        this.element.addEventListener('mousedown', e => this.onMouseDown(e));
-        this.element.addEventListener('mouseup', e => this.onMouseUp(e));
+        // siteChild(this.element, owner);
+        super.site(owner);
+        // this.element.addEventListener('mousemove', e => this.onMouseMove(e));
+        // this.element.addEventListener('mousedown', e => this.onMouseDown(e));
+        // this.element.addEventListener('mouseup', e => this.onMouseUp(e));
+        this.subscribeToEvent('mousemove');
+        this.subscribeToEvent('mousedown');
+        this.subscribeToEvent('mouseup');
         //this.element.addEventListener('oncontextmenu', e => (e.preventDefault(), console.log('ctx'), false));
         this.element.oncontextmenu = () => false;
     }
 
-    unsite() {
-        if (!this.owner) throw Error('Can not unsite an unsited component.');
-        this.owner.site.removeChild(this.element);
-        this.owner = null;
+    makeDraggable() {
+        if (!this.draggable) {
+            this.draggable = true;
+            this.element.classList.add('pxl8-tile-view-draggable');
+        }
     }
+
 
     onMouseMove(e: MouseEvent) {
         if (this.drawColor !== null) {
@@ -158,7 +163,8 @@ export class TileView {
         this.context!.fillRect(left, top, this.metrics.pixelWidth, this.metrics.pixelHeight);
     
         this.pixels.setPixel(px, py, color);
-        this.eventManager.raise("commitChanges");
+        // this.eventManager.raise("commitChanges");
+        this.raise('commitChanges');
     }
 
     private getCachedColor(color: number) {
@@ -202,6 +208,7 @@ export class TileView {
     dispose() {
     }
 }
+Widget.setElementType(TileView, 'canvas', 'pxl8-tile-view');
 
 
 export interface TileViewMetrics {

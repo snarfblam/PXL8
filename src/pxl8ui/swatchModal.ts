@@ -4,7 +4,7 @@ import { TileCodec, PaletteCue, SwatchPaletteCue } from '../gfx/tileCodec';
 import { ColorPicker } from './colorPicker';
 import { RGBA, Palette } from '../gfx/palette';
 import { Promise } from 'es6-promise';
-
+import { Pxl8Modal } from './pxl8Modal';
 /*
  var swatches = new SwatchGrid();
         swatches.loadSwatches(
@@ -15,7 +15,7 @@ import { Promise } from 'es6-promise';
         mahModal.setCaption('Select a Color');
         mahModal.setPreferredWidth('500px');
 */
-export class SwatchModal extends Modal implements ColorPicker {
+export class SwatchModal extends Pxl8Modal implements ColorPicker {
     swatches = new SwatchGrid();
     selectedColor: RGBA | null = null;
     modalPromise = {
@@ -24,7 +24,7 @@ export class SwatchModal extends Modal implements ColorPicker {
     };
 
     constructor(host?: ModalHost) {
-        super(host);
+        super(false, host);
 
         this.setCaption("Select a color");
         this.setPreferredWidth('500px');

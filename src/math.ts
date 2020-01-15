@@ -1,3 +1,8 @@
+interface MathWithTruncMaybe extends Math{
+    trunc?: (i: number) => number;
+}
+declare var Math: MathWithTruncMaybe;
+
 export interface Point{
     x: number;
     y: number;
@@ -28,3 +33,19 @@ export function intToHex(value: number) {
 }
 /** A value an 8-bit value can be multiplied by to move it into the upper 32 bits of an integer. */
 export const bitMult24 = 2 ** 24;
+
+/** 
+ * Represents an integer. Integer constants can be cast to `int` (`var i 
+ * = 0 as int`). Other numbers, such as function returns and the result of
+ * expressions, should be converted to `int` like so: `var y = int(myInt / 2);`
+ */
+export type int = number & { __int__: void };
+
+/** Converts a number to an int via truncation. */
+export var int = Math.trunc ?
+    Math.trunc as (i: int | number) => int :
+    function (i: number |  int) {
+        return (i < 0 ? Math.ceil(i) : Math.floor(i)) as int;
+    };
+
+

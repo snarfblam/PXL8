@@ -1,5 +1,6 @@
 import { Widget } from "./widget";
 import { $ } from "../dollar";
+import { Events } from "../eventManager";
 
 var _globalHost: ModalHost | null = null;
 function getGlobalHost() {
@@ -32,7 +33,7 @@ export enum ModalCloseReason{
 
 export class ModalHost extends Widget {
     private visible = false;
-    private currentModal = null as Modal | null;
+    private currentModal = null as Modal<{}> | null;
     private keyDownHandler = (e: KeyboardEvent) => this.onKeyDown(e);
 
     constructor() {
@@ -85,7 +86,7 @@ export class ModalHost extends Widget {
     }
 
     /** To be called by modal objects to show themselves. */
-    private showModal(modal: Modal | null) {
+    private showModal(modal: Modal<{}> | null) {
         if (this.currentModal) {
             this.currentModal.element.style.display = 'none';
             document.removeEventListener('keydown', this.keyDownHandler);
@@ -117,6 +118,10 @@ export class ModalHost extends Widget {
         this.showModal(null);
     }
 
+    static getGlobalHost() {
+        return getGlobalHost();
+    }
+
 }
 
 /** 
@@ -124,7 +129,7 @@ export class ModalHost extends Widget {
  * 
  * Note: A Modal should not be explicitly sited.
  */
-export class Modal extends Widget {
+export class Modal<TEvents extends Events<TEvents>> extends Widget<TEvents> {
     readonly host: ModalHost;
     /** If true, the modal will be closed if the mouse clicks outside the modal */
     closeOnClickOutside = true;
@@ -133,8 +138,8 @@ export class Modal extends Widget {
     protected captionElement: HTMLElement | null = null;
     private closingReason: ModalCloseReason = ModalCloseReason.code;  // until the user does something to say otherwise
 
-    constructor(host?: ModalHost) {
-        super();
+    constructor(hasEvents?: boolean, host?: ModalHost) {
+        super(hasEvents);
 
         this.host = host || getGlobalHost();
         this.site(this.host);
@@ -161,7 +166,7 @@ export class Modal extends Widget {
     // }
 
     showModal() {
-        this.host['showModal'](this);
+        this.host['showModal'](this as unknown as Modal<{}>);
         this.closingReason = ModalCloseReason.code; // until the user does something to say otherwise
     }
 

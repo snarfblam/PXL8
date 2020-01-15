@@ -27,8 +27,17 @@ export interface TileCodec {
     paletteCue?: PaletteCue,
 }
 
+export const nullCodec = {
+    bytesPerTile: 1,
+    bitsPerPixel: 1,
+    tileWidth: 1,
+    tileHeight: 1,
+    decode: (source: BufferPointer, dest: TilePointer) => {},
+    encode: (source: TilePointer, dest: BufferPointer) => {},
+}
+
 export type PaletteCue = RgbPaletteCue | SwatchPaletteCue;
-export var PaletteCue = {
+export const PaletteCue = {
     default: {
         type: 'rgb',
         rMax: 255,
@@ -62,7 +71,7 @@ export interface SwatchPaletteCue {
     rrggbb: string[],
 };
 
-export var SwatchPaletteCue = {
+export const SwatchPaletteCue = {
     rrggbbToRGBA: function rrggbbToRGBA(rrggbb: string[]) {
         var result: RGBA[] = [];
         rrggbb.forEach(value => {

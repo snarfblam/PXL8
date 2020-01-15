@@ -1,3 +1,6 @@
+import { Widget } from "./widgets/widget";
+import { Events } from "./eventManager";
+
 export interface Siteable {
     sitable: HTMLElement;
     isSited: boolean;
@@ -8,7 +11,12 @@ export interface Siteable {
 export interface Site {
     prepend?: boolean;
     site: HTMLElement;
+    /** If specified, defines custom element placement logic. */
     placeElement?: (child: HTMLElement) => void;
+}
+export function Site<TEvents extends Events<TEvents>>(site: HTMLElement | Widget<TEvents>) {
+    if (site instanceof Widget) site = site.element;
+    return { site };
 }
 
 export function siteChild(child: HTMLElement, site: Site): HTMLElement {

@@ -114,9 +114,33 @@ export class GfxView {
         }
     }
 
-    refreshTile(offset: number, index: number) {
-        var { codec, gfxData, buffer, context, palette, metrics } = this;
+    /**
+     * Refreshes the specified tile. It will be assumed 
+     * that an entire tile's worth of bytes have been changed, which means two
+     * tiles will be updated if specified tile data crosses a tile boundary
+     * within the view.
+     * @param viewOffset The base offset of the view
+     * @param relativeOffset The offset of the changed data. 
+     */
+    refreshTile(viewOffset: number, relativeOffset: number) {
+        var { codec } = this;
 
+        if (codec == null) {
+            throw Error("GfxView object not initialized or required property not set (codec, gfxData, palette).");
+        }
+        
+        var byteSize = codec.bytesPerTile;
+        var index = Math.floor(relativeOffset / byteSize);
+        var index2 = Math.floor((relativeOffset + byteSize - 1) / byteSize);
+
+        this._refreshTile(viewOffset, index);
+        if (index !== index2)
+            this._refreshTile(viewOffset, index2);
+    }
+
+    private _refreshTile(viewOffset: number, index: number) {
+        var { codec, gfxData, buffer, context, palette, metrics } = this;
+        console.log(index);
         if (codec == null || gfxData == null || buffer == null || context == null || palette == null) {
             throw Error("GfxView object not initialized or required property not set (codec, gfxData, palette).");
         }
@@ -124,7 +148,7 @@ export class GfxView {
         buffer.palette = palette;
         buffer.codec = codec;
 
-        var tileOffset = offset + index * codec.bytesPerTile;
+        var tileOffset = viewOffset + index * codec.bytesPerTile;
         var offsetAfter = tileOffset + codec.bytesPerTile;
         var enoughData = index >= 0 && offsetAfter <= gfxData.length;
 

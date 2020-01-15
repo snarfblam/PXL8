@@ -95,10 +95,17 @@ export class ToolbarButton extends Widget<ToolbarButtonEvents> {
         this.updateIconUrl();
     }
 
-    site(site: Toolbar) {
-        super.site(site);
+    // site(site: Toolbar) {
+    //     super.site(site);
+    //     this.updateIconUrl();
+    //     site['registerButton'](this);
+    // }
+
+    protected onSited() {
+        var toolbar = this.findParentWidget();
+        if (!(toolbar instanceof Toolbar)) throw Error('ToolbarButton must be placed inside a Toolbar.');
         this.updateIconUrl();
-        site['registerButton'](this);
+        toolbar['registerButton'](this);
     }
 
     unsite() {

@@ -105,3 +105,5 @@ export class ROM {
         
     }
 }
+
+export const nullRom = new ROM(new Blob([]));

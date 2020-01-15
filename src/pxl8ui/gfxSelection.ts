@@ -98,7 +98,6 @@ export class GfxSelection {
             },
             dragTo: (x, y) => {
                 this.queryMetrics();
-                this.selectionHidden = false;
                 this.extendSelection(this.pointToOffset(x, y));
             },
         });
@@ -142,6 +141,9 @@ export class GfxSelection {
 
     private extendSelection(selectionEndOffset: number) {
         this.selectionEndOffset = selectionEndOffset;
+        if (this.selectionEndOffset != this.selectionStartOffset) {
+            this.selectionHidden = false;
+        }
         this.updateSelectionElements();
     }
 
