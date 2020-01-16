@@ -143,7 +143,7 @@ export class ToolbarButton extends Widget<ToolbarButtonEvents> {
     }
 }
 
-export class ToolbarLabel extends Widget {
+export class ToolbarLabel extends Widget<{}> {
     text = 'label';
 
     constructor() {

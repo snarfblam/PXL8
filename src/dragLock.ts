@@ -1,4 +1,4 @@
-import { Widget } from "./widgets/widget";
+import { Widget, WidgetLike } from "./widgets/widget";
 import { Volatile } from "./util";
 import { Point } from "./math";
 import { EventManager } from "./eventManager";
@@ -31,7 +31,7 @@ export class DragLock {
     element: HTMLElement;
     events = this.eventManager.subscriber;
 
-    constructor(target: HTMLElement | Widget) {
+    constructor(target: HTMLElement | WidgetLike) {
         this.element = (target instanceof Widget) ?
             target.element : target;
         

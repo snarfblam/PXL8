@@ -1,4 +1,4 @@
-import { Widget } from './widget';
+import { Widget, WidgetLike } from './widget';
 
 interface ZLayerEntry {
     zIndex: number;
@@ -33,7 +33,7 @@ function addLayer(name: string, position: ZRelativePosition) {
     entries[name] = { zIndex: index, zIndexStyle: index.toString() };
 }
 
-function setLayer(element: HTMLElement | Widget, layer: string, forceLayered?: boolean) {
+function setLayer(element: HTMLElement | WidgetLike, layer: string, forceLayered?: boolean) {
     if (element instanceof Widget) element = element.element;
     var layerObj = entries[layer];
     if (layerObj) {

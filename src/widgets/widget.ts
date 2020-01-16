@@ -33,7 +33,8 @@ const elementEventToWidgetEventMap = {
 export type ElementEvents = keyof ElementEventHandlers;
 
 export abstract class Widget
-    <TEvents extends Events<TEvents> = {}> {
+    <TEvents extends Events<TEvents>> {
+    // <TEvents extends Events<TEvents> = {}> {
     
     element: HTMLElement;
     /** 
@@ -84,9 +85,9 @@ export abstract class Widget
         Widget.setElementStyle(this.element, style as string, value!);
     }
 
-    static setElementStyle(element:HTMLElement | Widget, values: { [name: string]: string }): void;
-    static setElementStyle(element:HTMLElement | Widget, name: string, value: string): void;
-    static setElementStyle(element:HTMLElement | Widget, style: string | { [name: string]: string }, value?: string): void {
+    static setElementStyle(element:HTMLElement | WidgetLike, values: { [name: string]: string }): void;
+    static setElementStyle(element:HTMLElement | WidgetLike, name: string, value: string): void;
+    static setElementStyle(element:HTMLElement | WidgetLike, style: string | { [name: string]: string }, value?: string): void {
         if (element instanceof Widget) element = element.element;
 
         if (typeof style === 'string') {
@@ -126,7 +127,7 @@ export abstract class Widget
     public findParentWidget() {
         var elem = this.element.parentElement;
         while (elem) {
-            var widg = (elem as any)[elementWidgetSymbol] as Widget;
+            var widg = (elem as any)[elementWidgetSymbol] as WidgetLike;
             if (widg) return widg;
             elem = elem.parentElement;
         }
@@ -216,7 +217,7 @@ export abstract class Widget
     protected onMouseLeave(e: MouseEvent) { }
 
     private static elementEventHandler(this: HTMLElement, e: Event) {
-        var widget = (this as any)[elementWidgetSymbol] as Widget;
+        var widget = (this as any)[elementWidgetSymbol] as WidgetLike;
         if (widget) {
             // Subscriber may have requested to ignore events bubbled from children
             var options = widget.elementEventHandlers[e.type as ElementEvents];
@@ -258,3 +259,14 @@ export abstract class Widget
 }
 // (Widget.prototype as any).elementType = 'div';
 Widget.setElementType(Widget, 'div', 'widget');
+
+/** Enumerates properties of Widget that are dependant upon the generic type parameter. */
+type WidgetGenericDependants = 'on' | 'raise' | 'unhandle';
+/**
+ * A Widget supertype that encompasses all Widget classes, regardless of their 
+ * generic event type parameter.
+ * @summary Represents any widget
+ */
+// export type WidgetLike = Pick<Widget<{}>, Exclude<keyof Widget<{}>, WidgetGenericDependants>>;
+// var x: Widget<any> = (null as never as Widget<{ x: () => void }>);
+export type WidgetLike = Widget<any>;

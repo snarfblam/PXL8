@@ -31,7 +31,7 @@ export enum ModalCloseReason{
 }
 
 
-export class ModalHost extends Widget {
+export class ModalHost extends Widget<{}> {
     private visible = false;
     private currentModal = null as Modal<{}> | null;
     private keyDownHandler = (e: KeyboardEvent) => this.onKeyDown(e);
