@@ -8,7 +8,12 @@ function getRelativeCoords(e: MouseEvent, elem: HTMLElement): Volatile<Point> {
     return Volatile.point(e.x - rect.left, e.y - rect.top);
 }
 
+export interface DragLockStartingEvent {
+    cancel: boolean;
+}
+
 export interface DragLockEvents{
+    dragStarting?: (e: MouseEvent, etc: DragLockStartingEvent) => void;
     dragStart?: (x: number, y: number) => void;
     dragTo?: (x: number, y: number) => void;
     dragComplete?: (x: number, y: number) => void;
@@ -50,9 +55,13 @@ export class DragLock {
     }
 
     private onMouseDown(e: MouseEvent) { 
-        e.preventDefault();
-        var { x, y } = getRelativeCoords(e, this.element);
-        this.beginDragging(x, y);
+        var eventArgs = { cancel: false };
+        this.eventManager.raise('dragStarting', e, eventArgs);
+        if (!eventArgs.cancel) {
+            e.preventDefault();
+            var { x, y } = getRelativeCoords(e, this.element);
+            this.beginDragging(x, y);
+        }
     }
     private onMouseMove(e: MouseEvent) {
         var { x, y } = getRelativeCoords(e, this.element);
