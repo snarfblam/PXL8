@@ -1,0 +1,29 @@
+-address any and all in-code 'todo's
+
+-arranger views
+    -commit edits and refresh 
+
+-better scroll behavior
+    -scrollbar auto-repeat
+    -mouse wheel
+    -don't scroll past end of the document
+
+-repo readme
+
+
+
+
+==============================================================
+long term
+
+-snes codec
+-gb codec
+-arranger persistance
+    -json upload/download
+    -local storage
+-palette customizability
+    -persistence
+
+-configurable codecs
+    -1bpp custom size
+    -alternative tile arrangements
