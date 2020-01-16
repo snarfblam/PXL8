@@ -6,9 +6,17 @@ import { TileData } from '../gfx/TileData';
 import { demoNesTile, tileCodecs, TileCodec } from '../gfx/tileCodec';
 import { EventManager } from '../eventManager';
 import { Widget } from '../widgets/widget';
+import { DragLock, DragLockStartingEvent } from '../dragLock';
+import { int } from '../math';
 
 export interface TileViewEvents {
     commitChanges?: () => void;
+    /**
+     * Raised if the view is draggable and the use attempts to drag the view.
+     * @param dx The number of cells, horizontally, the view has been dragged.
+     * @param dy The number of cells, vertically, the view has been dragged.
+     */
+    viewDragged?: (dx: number, dy: number) => void;
 }
 /** 
  * Tile editing interface component.
@@ -29,6 +37,8 @@ export class TileView extends Widget<TileViewEvents>{
     primaryColor = 0;
     secondaryColor = 1;
     draggable = false;
+    viewDragging = false;
+    viewDragLock: DragLock | null = null;
 
     /** The color currently being drawn, or null if no draw operation is in progress. */
     private drawColor = null as number | null;
@@ -81,6 +91,13 @@ export class TileView extends Widget<TileViewEvents>{
     makeDraggable() {
         if (!this.draggable) {
             this.draggable = true;
+            this.viewDragLock = new DragLock(this);
+            this.viewDragLock.events.subscribe({
+                dragStarting: (e: MouseEvent, etc: DragLockStartingEvent) => this.beforeMouseDragStart(e, etc),
+                dragStart: (x, y) => this.onMouseDragStart(x, y),
+                dragTo: (x, y) => this.onMouseDragTo(x, y),
+                dragComplete: (x, y) => this.onMouseDragComplete(x, y),
+            });
             this.element.classList.add('pxl8-tile-view-draggable');
         }
     }
@@ -99,7 +116,7 @@ export class TileView extends Widget<TileViewEvents>{
         e.preventDefault();
 
         var { x, y } = coords.absToElement(Volatile.point(e.clientX, e.clientY), this.element);
-        var iColor = 0 as number | null;
+        var iColor = null as number | null;
 
         if (e.button === 0) {
             iColor = this.primaryColor;
@@ -112,14 +129,6 @@ export class TileView extends Widget<TileViewEvents>{
             var px = Math.floor(x / this.metrics.pixelWidth);
             var py = Math.floor(y / this.metrics.pixelHeight);
             this.beginDrawOperation(iColor, px, py);
-            // var top = py * this.metrics.pixelWidth;
-            // var left = px * this.metrics.pixelHeight;
-            // if (iColor >= this.palette.length) iColor = this.palette.length - 1;
-            // this.context!.fillStyle = this.getCachedColor(iColor);
-            // this.context!.fillRect(left, top, this.metrics.pixelWidth, this.metrics.pixelHeight);
-        
-            // this.pixels.setPixel(px, py, iColor);
-            // this.eventManager.raise("commitChanges");
         }
     }
 
@@ -128,6 +137,23 @@ export class TileView extends Widget<TileViewEvents>{
         e.preventDefault();
         var { x, y } = coords.absToElement(Volatile.point(e.clientX, e.clientY), this.element);
         // this.endDrawOperation();
+    }
+
+    beforeMouseDragStart(e: MouseEvent, etc: DragLockStartingEvent) {
+        if (e.button !== 1) etc.cancel = true;
+    }
+    onMouseDragStart(x: number,y: number) {
+        
+    }
+    onMouseDragTo(x: number,y: number) {
+        var dx = Math.floor(x / this.element.offsetWidth);
+        var dy = Math.floor(y / this.element.offsetHeight);
+        if (dx !== 0 || dy !== 0) {
+            this.raise("viewDragged", dx, dy);
+        }
+    }
+    onMouseDragComplete(x: number, y: number) {
+        
     }
 
     private beginDrawOperation(color: number, px: number, py: number) {

@@ -302,6 +302,11 @@ img.toolbar-icon {
     border-radius: initial;
 }
 
+.pxl8-tileview-decoration{
+    border: 4px solid #666;
+    border-radius: 4px;
+}
+
 /*** Modals ****************************************************/
 
     body.modal {

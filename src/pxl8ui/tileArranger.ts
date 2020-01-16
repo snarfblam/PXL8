@@ -5,6 +5,8 @@ import { ROM, nullRom } from '../rom';
 import { RGBA, Palette, debugPalette } from '../gfx/palette';
 import { $ } from '../dollar';
 import { Site } from '../site';
+import { layers } from './pxlLayers';
+import { ZLayer } from '../widgets/zlayer';
 
 export interface TileArrangerEvents{
     x: () => void;
@@ -19,11 +21,26 @@ interface ArrangerView {
 
 function createDecorationElement() {
     var decoration = $.create('div');
+    decoration.style.position = ('absolute');
+    decoration.style.boxSizing = 'content-box';
+    decoration.style.zIndex = ZLayer.getZIndex(layers.floatingViewDecorations) as any;
+    decoration.classList.add('pxl8-tileview-decoration');
     return decoration;
 }
 
-function positionViewDecoration(view: ArrangerView) {
-    
+function positionView(view: ArrangerView) {
+    view.view.setStyle({
+        left: view.location.x.toString() + 'px',
+        top: view.location.y.toString() + 'px'
+    });
+
+    var currentStyle = getComputedStyle(view.decoration);
+    var borderLeftWidth = parseInt(currentStyle.borderLeftWidth as any) || 0;
+    var borderTopWidth = parseInt(currentStyle.borderTopWidth as any) || 0;
+    view.decoration.style.left = (view.location.x - borderLeftWidth) + 'px';
+    view.decoration.style.top = (view.location.y - borderTopWidth) + 'px';
+    view.decoration.style.width = view.view.element.offsetWidth + 'px';
+    view.decoration.style.height = view.view.element.offsetHeight + 'px';
 }
 
 export class TileArranger extends Widget<TileArrangerEvents>{
@@ -32,6 +49,11 @@ export class TileArranger extends Widget<TileArrangerEvents>{
     views: ArrangerView[] = [];
     rom: ROM = nullRom;
     codec: TileCodec = nullCodec;
+    /** 
+     * The location within the view that is consizered the origin for the purposes
+     * of zooming and the tile grid.
+     */
+    viewOrigin = { x: 260, y: 260 }; // Todo: calculate instead of hardcoding (depends on codec, zoom, css, etc);
 
     constructor() {
         super(true);
@@ -48,18 +70,31 @@ export class TileArranger extends Widget<TileArrangerEvents>{
             tileHeight: this.codec.tileHeight,
         });
         view.palette = this.palette;
+        view.setLayer(layers.floatingViews);
         view.makeDraggable();
-        view.setStyle({ left: '256px', top: '256px', position: 'absolute', });
 
-
-        view.site(Site(this));
         var newView = {
             view, offset,
-            decoration: createDecorationElement()
+            decoration: createDecorationElement(),
+            location: { x: this.viewOrigin.x, y: this.viewOrigin.y },
         }
+        view.site(Site(this));
+        this.element.appendChild(newView.decoration);
+
         this.views.push(newView);
-        positionViewDecoration(newView);
+        view.setStyle({position: 'absolute', });
+        positionView(newView);
         this.renderView(newView);
+
+        view.on({ viewDragged: (dx, dy) => this.onViewDragged(newView, dx, dy) });
+        positionView(newView);
+
+    }
+
+    onViewDragged(view: ArrangerView, dx: number, dy: number) {
+        view.location.x += dx * view.view.element.offsetWidth;
+        view.location.y += dy * view.view.element.offsetHeight;
+        positionView(view);
     }
 
     setPalette(pal: Palette) {
