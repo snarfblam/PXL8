@@ -173,6 +173,10 @@ export abstract class Widget
             if (value) this.element.removeEventListener(key, Widget.elementEventHandler);
             delete this.elementEventHandlers[key as ElementEvents];
         }
+
+        if (this.eventManager as any !== nullEventManager) {
+            this.eventManager.listeners = [];
+        }
      }
 
     /**

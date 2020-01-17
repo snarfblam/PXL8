@@ -56,8 +56,13 @@ export class TileView extends Widget<TileViewEvents>{
     constructor() {
         super(true);
 
+        // Todo: solution that does not require every view to have a permanent hook into window->mouseup
+
         // DOM does not support mouse capture? Stop drawing on any mouse-up ever.
-        window.addEventListener('mouseup', () => this.endDrawOperation());
+        window.addEventListener('mouseup', () => {
+            if (this.isDrawing())
+                this.endDrawOperation();
+        });
     }
 
 
@@ -87,6 +92,8 @@ export class TileView extends Widget<TileViewEvents>{
         //this.element.addEventListener('oncontextmenu', e => (e.preventDefault(), console.log('ctx'), false));
         this.element.oncontextmenu = () => false;
     }
+
+    isDrawing() { return this.drawColor !== null; }
 
     makeDraggable() {
         if (!this.draggable) {
@@ -174,6 +181,7 @@ export class TileView extends Widget<TileViewEvents>{
 
     private endDrawOperation() {
         this.drawColor = null;
+        this.raise('commitChanges');
     }
 
     private applyDrawnPixel(px: number, py: number) {
@@ -190,7 +198,7 @@ export class TileView extends Widget<TileViewEvents>{
     
         this.pixels.setPixel(px, py, color);
         // this.eventManager.raise("commitChanges");
-        this.raise('commitChanges');
+        // this.raise('commitChanges');
     }
 
     private getCachedColor(color: number) {

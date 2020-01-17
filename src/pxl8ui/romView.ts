@@ -12,6 +12,8 @@ import { ScrollWidget, ScrollbarValueEvent } from "../scrollWidget";
 import { Pxl8Toolbar } from "./pxl8Toolbars";
 import { DocumentEvents, DocumentEditor } from "../document";
 import { TileArranger } from "./tileArranger";
+import { GfxBuffer } from "../gfx/gfxBuffer";
+import { TileData } from "../gfx/TileData";
 
 const tileViewZoom = 32;
 const gfxViewZoom = 2;
@@ -82,13 +84,18 @@ export class RomView {
         // });
         this.tileView.on({
             commitChanges: () => {
-                this.commitTileEdit();
+                this.commitFromMainTileView();
+            },
+        });
+        this.tileArranger.on({
+            commitChanges: (data, offset) => {
+                this.commitTileData(data, offset);
             },
         });
         this.gfxView.events.subscribe({
             tilePicked: index => {
                 this.popOutTile(index);
-                this.openTileForEdit(index);
+                this.openTileIndexForEdit(index);
             }
         });
         this.scroll.on({
@@ -185,14 +192,23 @@ export class RomView {
         this.performLayout();
     }
 
-    private openTileForEdit(tileIndex: number) {
+    private openTileIndexForEdit(tileIndex: number) {
         if (!this.rom) return;
 
         if (!this.romLoaded) {
-            this.rom.rawDataPromise.then(() => this.openTileForEdit(tileIndex));
+            this.rom.rawDataPromise.then(() => this.openTileIndexForEdit(tileIndex));
+        } else {
+            var tileOffset = this.viewOffset + tileIndex * this.codec!.bytesPerTile;
+            this.openTileOffsetForEdit(tileOffset);
+        } 
+    }
+    private openTileOffsetForEdit(tileOffset: number) {
+        if (!this.rom) return;
+
+        if (!this.romLoaded) {
+            this.rom.rawDataPromise.then(() => this.openTileOffsetForEdit(tileOffset));
         } else {
             if (this.isRenderReady()) {
-                var tileOffset = this.viewOffset + tileIndex * this.codec!.bytesPerTile;
                 var nextTileOffset = tileOffset + this.codec!.bytesPerTile;
                 var inBounds = tileOffset >= 0 && nextTileOffset <= this.rom.length;
 
@@ -208,10 +224,13 @@ export class RomView {
             }    
         }
     }
+    private refreshMainTileView() {
+        this.openTileOffsetForEdit(this.tileViewOffset);
+    }
+    
     private popOutTile(tileIndex: number) {
         var tileOffset = this.viewOffset + tileIndex * this.codec!.bytesPerTile;
-        
-        console.log('cheese');
+
         this.tileArranger.addView(tileOffset);
     }
 
@@ -312,14 +331,31 @@ export class RomView {
         return true;
     }
 
-    private commitTileEdit() {
-        if (!this.codec) return;
-        var offset = this.tileViewOffset - this.viewOffset;
-        var tileData = this.tileView.pixels;
+    private commitFromMainTileView() {
+        // if (!this.codec) return;
+        // var offset = this.tileViewOffset - this.viewOffset;
+        // var tileData = this.tileView.pixels;
 
-        this.codec.encode({ data: tileData, offset: 0 }, { data: this.rom!.rawData!, offset: this.tileViewOffset });
+        // this.codec.encode({ data: tileData, offset: 0 }, { data: this.rom!.rawData!, offset: this.tileViewOffset });
+        // var index = Math.floor(offset / this.codec.bytesPerTile);
+        // this.gfxView.refreshTile(this.viewOffset, this.tileViewOffset - this.viewOffset);
+        this.commitTileData(this.tileView.pixels, this.tileViewOffset);
+    }
+
+    private commitTileData(tileData: TileData, offset: number) {
+        if (!this.codec) return;
+        this.codec.encode({ data: tileData, offset: 0 }, { data: this.rom!.rawData!, offset: offset });
         var index = Math.floor(offset / this.codec.bytesPerTile);
-        this.gfxView.refreshTile(this.viewOffset, this.tileViewOffset - this.viewOffset);
+        this.gfxView.refreshTile(this.viewOffset, offset - this.viewOffset);
+
+        var dataEnd = offset + this.codec.bytesPerTile;
+        var viewEnd = this.tileViewOffset + this.codec.bytesPerTile;
+        if (dataEnd > this.tileViewOffset && offset < viewEnd) {
+            this.refreshMainTileView();
+            // this.tileView.redraw();
+        }
+
+        this.tileArranger.notifyDataChanged(offset, this.codec.bytesPerTile);
     }
 
     // private onSave(e: Event) {

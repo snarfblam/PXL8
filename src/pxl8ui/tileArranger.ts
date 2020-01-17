@@ -1,5 +1,5 @@
 import { Widget } from '../widgets/widget';
-import { TileView } from './TileView';
+import { TileView, TileViewEvents } from './TileView';
 import { TileCodec, nullCodec } from '../gfx/tileCodec';
 import { ROM, nullRom } from '../rom';
 import { RGBA, Palette, debugPalette } from '../gfx/palette';
@@ -7,9 +7,10 @@ import { $ } from '../dollar';
 import { Site } from '../site';
 import { layers } from './pxlLayers';
 import { ZLayer } from '../widgets/zlayer';
+import { TileData } from '../gfx/TileData';
 
 export interface TileArrangerEvents{
-    x: () => void;
+    commitChanges?: (data: TileData, offset: number) => void;
 }
 
 interface ArrangerView {
@@ -17,6 +18,7 @@ interface ArrangerView {
     offset: number;
     location: { x: number, y: number };
     decoration: HTMLElement;
+    eventHandler: TileViewEvents;
 }
 
 function createDecorationElement() {
@@ -73,10 +75,16 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         view.setLayer(layers.floatingViews);
         view.makeDraggable();
 
-        var newView = {
+        var newView: ArrangerView = {
             view, offset,
             decoration: createDecorationElement(),
             location: { x: this.viewOrigin.x, y: this.viewOrigin.y },
+            eventHandler: {
+                commitChanges: () => {
+                    this.raise('commitChanges', view.pixels, offset);
+                },
+                viewDragged: (dx, dy) => this.onViewDragged(newView, dx, dy) ,
+            }
         }
         view.site(Site(this));
         this.element.appendChild(newView.decoration);
@@ -86,7 +94,7 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         positionView(newView);
         this.renderView(newView);
 
-        view.on({ viewDragged: (dx, dy) => this.onViewDragged(newView, dx, dy) });
+        view.on(newView.eventHandler);
         positionView(newView);
 
     }
@@ -100,6 +108,17 @@ export class TileArranger extends Widget<TileArrangerEvents>{
     setPalette(pal: Palette) {
         this.palette = pal;
         this.views.forEach(entry => entry.view.palette = pal);
+    }
+
+    notifyDataChanged(offset: number, size: number) {
+        var dataEnd = offset + size;
+        var byteSize = this.codec.bytesPerTile;
+        this.views.forEach(view => {
+            var viewEnd = view.offset + byteSize;
+            if (dataEnd > view.offset && offset < viewEnd) {
+                this.renderView(view);
+            }
+        });
     }
 
     private renderView(view: ArrangerView) {
