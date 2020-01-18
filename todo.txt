@@ -1,7 +1,8 @@
 -address any and all in-code 'todo's
 
--arranger views
-    -commit edits and refresh 
+-arranger zooming
+-arranger middle-click sends tile to main view
+    
 
 -better scroll behavior
     -scrollbar auto-repeat
@@ -11,19 +12,19 @@
 -repo readme
 
 
-
-
 ==============================================================
-long term
+long term 
 
 -snes codec
 -gb codec
--arranger persistance
+-multi-palette management
+    -per-view palette assignment in arranger
+-arranger persistence
     -json upload/download
     -local storage
 -palette customizability
     -persistence
-
+-image import/export
 -configurable codecs
     -1bpp custom size
     -alternative tile arrangements
