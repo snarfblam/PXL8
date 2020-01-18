@@ -110,7 +110,7 @@ export abstract class Widget
         }
     }
     /** Places this element into a parent element */
-    public site<TEvents extends Events<TEvents>>(site: Site | HTMLElement | Widget<TEvents>) {
+    public site<TEvents extends Events<TEvents>>(site: Site | HTMLElement | WidgetLike) {
         if(this.element.parentElement) throw Error("can not site an already sited widget")
 
         if (site instanceof HTMLElement) site = { site };

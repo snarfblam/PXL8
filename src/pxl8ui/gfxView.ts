@@ -8,26 +8,36 @@ import { Palette, RGBA } from '../gfx/palette';
 import { TileData } from '../gfx/TileData';
 import { EventManager } from '../eventManager';
 import { GfxSelection } from './gfxSelection';
+import { Widget, WidgetLike } from '../widgets/widget';
+import { WidgetMouseEvent, MouseButton } from '../widgets/input';
 
 export interface GfxViewEvents {
+    /** Raised when the user selects a tile to edit. */
     tilePicked?: (index: number) => void;
+    /** Raised when the user selects a tile to add to the arranger. */
+    tilePopped?: (index: number) => void;
 }
-export class GfxView {
-    element: HTMLCanvasElement;
+export class GfxView extends Widget<GfxViewEvents> {
+    // element: HTMLElement;
     context: CanvasRenderingContext2D | null = null;
-    owner: Site | null = null;
+    // owner: Site | null = null;
     metrics: GfxViewMetrics = defaultMetrics;
     gfxData: Arrayish<number> | null = null;
     codec: TileCodec | null = null;
     buffer: GfxBuffer | null = null;
     palette: Palette | null = null;
-    private eventManager = new EventManager<GfxViewEvents>();
-    public events = this.eventManager.subscriber;
+    // private eventManager = new EventManager<GfxViewEvents>();
+    // public events = this.eventManager.subscriber;
     public readonly selection: GfxSelection;
 
     constructor() {
-        this.element = $.create('canvas') as HTMLCanvasElement;
+        super(true);
+        // this.element = $.create('canvas') as HTMLCanvasElement;
         this.selection = new GfxSelection(this);
+    }
+
+    createElement() {
+        return $.create('canvas');
     }
 
     /** Initializes this element for use. Can be called multiple times if the object is re-used. */
@@ -35,10 +45,10 @@ export class GfxView {
         var newMetrics = metrics || defaultMetrics;
         // this.element.setAttribute('width', width.toString());
         // this.element.setAttribute('height', height.toString());
-        this.element.width = newMetrics.pixelWidth * newMetrics.tileWidth * newMetrics.gridWidth;
-        this.element.height = newMetrics.pixelHeight * newMetrics.tileHeight * newMetrics.gridHeight;
-        this.element.style.background = 'white';
-        this.element.style.position = 'relative';
+        (this.element as HTMLCanvasElement).width = newMetrics.pixelWidth * newMetrics.tileWidth * newMetrics.gridWidth;
+        (this.element as HTMLCanvasElement).height = newMetrics.pixelHeight * newMetrics.tileHeight * newMetrics.gridHeight;
+        this.setStyle('background', 'white');
+        this.setStyle('position', 'relative');
 
         this.createContext();
 
@@ -51,10 +61,15 @@ export class GfxView {
             tileHeight: newMetrics.tileHeight
         };
         this.buffer = new GfxBuffer(bufferMetrics);
+
+        this.subscribeToEvent('mousemove');
+        this.subscribeToEvent('mousedown');
+        this.subscribeToEvent('mouseup');
+        
     }
 
     private createContext() {
-        this.context = this.element.getContext('2d')!;
+        this.context = (this.element as HTMLCanvasElement).getContext('2d')!;
         this.context.imageSmoothingEnabled = false;
     }
 
@@ -184,46 +199,39 @@ export class GfxView {
         const tileHeightPx = this.metrics.pixelHeight * this.metrics.tileHeight;
         var visibleRows = Math.floor((height + tileHeightPx - 1) / tileHeightPx);
         this.metrics.gridHeight = visibleRows;
-        this.element.height = height;
+        (this.element as HTMLCanvasElement).height = height;
         this.createContext();
     }
 
-    site(owner: Site) {
-        siteChild(this.element, owner);
-        this.owner = owner;
-
-        this.element.addEventListener('mousemove', e => this.onMouseMove(e));
-        this.element.addEventListener('mousedown', e => this.onMouseDown(e));
-        this.element.addEventListener('mouseup', e => this.onMouseUp(e));
-        //this.element.addEventListener('oncontextmenu', e => (e.preventDefault(), console.log('ctx'), false));
+    onSited() {
+        super.onSited();
         this.element.oncontextmenu = () => false;
     }
 
-    unsite() {
-        if (!this.owner) throw Error('Can not unsite an unsited component.');
-        this.owner.site.removeChild(this.element);
-        this.owner = null;
+    onMouseMove(e: WidgetMouseEvent) {
+        // var { x, y } = eventToClientCoords(this.element, e);
+        // var tileX = Math.floor(x / this.metrics.tileWidth);
+        // var tileY = Math.floor(y / this.metrics.tileHeight);
+        // var tileIndex = tileY * this.metrics.gridWidth + tileX;
     }
-
-    onMouseMove(e: MouseEvent) {
-        var { x, y } = eventToClientCoords(this.element, e);
-        var tileX = Math.floor(x / this.metrics.tileWidth);
-        var tileY = Math.floor(y / this.metrics.tileHeight);
-        var tileIndex = tileY * this.metrics.gridWidth + tileX;
-    }
-    onMouseDown(e: MouseEvent) {
+    onMouseDown(e: WidgetMouseEvent) {
         e.preventDefault();
 
         var { x, y } = eventToClientCoords(this.element, e);
         var tileX = Math.floor(x / (this.metrics.tileWidth * this.metrics.pixelWidth));
         var tileY = Math.floor(y / (this.metrics.tileHeight * this.metrics.pixelHeight));
         var tileIndex = tileX + tileY * this.metrics.gridWidth;
-        this.eventManager.raise("tilePicked", tileIndex);
+
+        if (e.button === MouseButton.left) {
+            this.raise("tilePicked", tileIndex);
+        } else if (e.button === MouseButton.right) {
+            this.raise("tilePopped", tileIndex);
+        }
     }
  
-    onMouseUp(e: MouseEvent) {
+    onMouseUp(e: WidgetMouseEvent) {
         e.preventDefault();
-        var { x, y } = eventToClientCoords(this.element, e);
+        // var { x, y } = eventToClientCoords(this.element, e);
     }
 
    

@@ -92,11 +92,13 @@ export class RomView {
                 this.commitTileData(data, offset);
             },
         });
-        this.gfxView.events.subscribe({
+        this.gfxView.on({
             tilePicked: index => {
-                this.popOutTile(index);
                 this.openTileIndexForEdit(index);
-            }
+            },
+            tilePopped: index => {
+                this.popOutTile(index);
+            },
         });
         this.scroll.on({
             // pageUp: () => this.scrollView(Direction.up, ViewUnit.page),
