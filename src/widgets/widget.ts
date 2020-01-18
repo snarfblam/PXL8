@@ -2,13 +2,22 @@ import { Site, siteChild } from "../site";
 import { $ } from "../dollar";
 import { EventManager, nullEventManager, Events } from "../eventManager";
 import { ZLayer, ZRelativePosition } from './zlayer';
+import { WidgetMouseEvent } from './input';
 
-var elementWidgetSymbol = '#element.widget#';
+/** 
+ * A (theoretically) unique string used as a property name on widgetized
+ * DOM elements to store the corresponding widget object.
+ */
+const elementWidgetSymbol = '#element.widget#';
 
 interface ElementEventHandlerOptions {
     bubbled: boolean;
 }
 
+/**
+ *  Identifies the set of functions a widget natively supports for its
+ * underlying element
+ */
 interface ElementEventHandlers{
     mousedown?: ElementEventHandlerOptions,
     mousemove?: ElementEventHandlerOptions,
@@ -19,6 +28,7 @@ interface ElementEventHandlers{
     mouseover?: ElementEventHandlerOptions,
     mouseleave?: ElementEventHandlerOptions,
 }
+/** Lookup value to map from DOM event names to Widget method names */
 const elementEventToWidgetEventMap = {
     mousedown: 'onMouseDown',
     mousemove: 'onMouseMove',
@@ -30,6 +40,7 @@ const elementEventToWidgetEventMap = {
     mouseleave: 'onMouseLeave',
 }
 
+/** The set of event names supported by a widget's built in event methods. */
 export type ElementEvents = keyof ElementEventHandlers;
 
 export abstract class Widget
@@ -204,21 +215,21 @@ export abstract class Widget
     }
 
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
-    protected onMouseDown(e: MouseEvent) { }
+    protected onMouseDown(e: WidgetMouseEvent) { }
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
-    protected onMouseMove(e: MouseEvent) { }
+    protected onMouseMove(e: WidgetMouseEvent) { }
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
-    protected onMouseUp(e: MouseEvent) { }
+    protected onMouseUp(e: WidgetMouseEvent) { }
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
-    protected onClick(e: MouseEvent) { }
+    protected onClick(e: WidgetMouseEvent) { }
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
-    protected onDblClick(e: MouseEvent) { }
+    protected onDblClick(e: WidgetMouseEvent) { }
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
-    protected onWheel(e: MouseEvent) { }
+    protected onWheel(e: WidgetMouseEvent) { }
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
-    protected onMouseOver(e: MouseEvent) { }
+    protected onMouseOver(e: WidgetMouseEvent) { }
     /** Override to handle this event. The event must be subscribed to via this.subscriveToEvent(). */
-    protected onMouseLeave(e: MouseEvent) { }
+    protected onMouseLeave(e: WidgetMouseEvent) { }
 
     private static elementEventHandler(this: HTMLElement, e: Event) {
         var widget = (this as any)[elementWidgetSymbol] as WidgetLike;
