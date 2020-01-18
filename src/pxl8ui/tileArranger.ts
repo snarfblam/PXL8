@@ -107,7 +107,10 @@ export class TileArranger extends Widget<TileArrangerEvents>{
 
     setPalette(pal: Palette) {
         this.palette = pal;
-        this.views.forEach(entry => entry.view.palette = pal);
+        this.views.forEach(entry => {
+            entry.view.palette = pal;
+            entry.view.redraw();
+        });
     }
 
     notifyDataChanged(offset: number, size: number) {
