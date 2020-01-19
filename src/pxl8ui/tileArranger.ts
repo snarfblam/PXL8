@@ -9,6 +9,7 @@ import { layers } from './pxlLayers';
 import { ZLayer } from '../widgets/zlayer';
 import { TileData } from '../gfx/TileData';
 import {  } from '../math';
+import { WidgetMouseEvent } from '../widgets/input';
 
 export interface TileArrangerEvents{
     commitChanges?: (data: TileData, offset: number) => void;
@@ -18,9 +19,11 @@ const validArrangerScales = [1, 2, 4, 8, 16];
 interface ArrangerView {
     view: TileView;
     offset: number;
+    outOfBounds: boolean;
     location: { tx: number, ty: number };
     decoration: HTMLElement;
-    eventHandler: TileViewEvents;
+    viewEventHandler: TileViewEvents;
+    decorationEventHandler: (e: WidgetMouseEvent) => void;
 }
 
 function createDecorationElement() {
@@ -61,27 +64,35 @@ export class TileArranger extends Widget<TileArrangerEvents>{
 
         var newView: ArrangerView = {
             view, offset,
+            outOfBounds: false,
             decoration: createDecorationElement(),
             location: { tx: 0, ty: 0 },
-            eventHandler: {
+            viewEventHandler: {
                 commitChanges: () => {
                     this.raise('commitChanges', view.pixels, offset);
                 },
                 viewDragged: (dx, dy) => this.onViewDragged(newView, dx, dy) ,
-            }
+            },
+            decorationEventHandler: e => {
+                if (newView.outOfBounds) {
+                    this.bringViewIntoBounds(newView);
+                }
+            },
         }
         view.site(Site(this));
         this.element.appendChild(newView.decoration);
+        newView.decoration.addEventListener('click', newView.decorationEventHandler);
 
         this.views.push(newView);
         view.setStyle({position: 'absolute', });
         this.positionView(newView);
         this.renderView(newView);
 
-        view.on(newView.eventHandler);
+        view.on(newView.viewEventHandler);
         this.positionView(newView);
 
     }
+
 
     onViewDragged(view: ArrangerView, dx: number, dy: number) {
         view.location.tx += dx; // * view.view.element.offsetWidth;
@@ -155,8 +166,52 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         }
     }
 
-    
-    private positionView(view: ArrangerView) {
+    private bringViewIntoBounds(view: ArrangerView) {
+        var viewBounds = this.getViewBounds(view);
+        var relativeTo = this.element.getBoundingClientRect();
+        var bounds = { // Relative to top-left corner of arranger
+            left: viewBounds.left - relativeTo.left,
+            top: viewBounds.top - relativeTo.top,
+            right: viewBounds.right - relativeTo.left,
+            bottom: viewBounds.bottom - relativeTo.top,
+        };
+        var viewWidth = this.element.offsetWidth;
+        var viewHeight = this.element.offsetHeight;
+        var viewRight = viewWidth - this.viewOrigin.x;
+        var viewBottom = viewHeight - this.viewOrigin.y;
+        var tileWidth = this.codec.tileWidth * this.currentScale;
+        var tileHeight = this.codec.tileHeight * this.currentScale;
+
+        if (bounds.left < 0) {
+            var minX = -Math.floor(this.viewOrigin.x / tileWidth);
+            view.location.tx = minX;
+        }
+        if (bounds.top < 0) {
+            var minY = -Math.floor(this.viewOrigin.y / tileHeight);
+            view.location.ty = minY;
+        }
+        if (bounds.right > viewWidth) {
+            var maxX = Math.floor(viewRight / tileWidth) - 1;
+            view.location.tx = maxX;
+        }
+        if (bounds.bottom > viewHeight) {
+            var maxY = Math.floor(viewBottom / tileHeight) - 1;
+            view.location.ty = maxY;            
+        }
+
+
+        this.positionView(view);
+    }
+
+    getViewBounds(v: ArrangerView) {
+        return v.view.element.getBoundingClientRect();
+    }
+    /**
+     * 
+     * @param view 
+     * @param oobOnly If true, the view will only be positioned if necessary, with repsect to OOB concerns
+     */
+    private positionView(view: ArrangerView, oobOnly?: boolean) {
         var viewWidth = this.element.offsetWidth;
         var viewHeight = this.element.offsetHeight;
 
@@ -170,6 +225,12 @@ export class TileArranger extends Widget<TileArrangerEvents>{
 
 
 
+
+        // We will use the 'decoration' element to cue the user if the view is
+        // outside the visible bounds or behind the main tile view
+        var viewOOB = vx > viewWidth || vr < 0 || vy > viewHeight || vb < 0;
+        var viewBehindTileView = vr < this.viewOrigin.x && vb < this.viewOrigin.y;
+        view.outOfBounds = viewOOB || viewBehindTileView;
 
         view.view.setStyle({
             left: vx.toString() + 'px',
@@ -187,10 +248,6 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         vx = Math.max(Math.min(maxVx, vx), minVx);
         vy = Math.max(Math.min(maxVy, vy), minVy);
 
-        // We will use the 'decoration' element to cue the user if the view is
-        // outside the visible bounds or behind the main tile view
-        var viewOOB = vx > viewWidth || vr < 0 || vy > viewHeight || vb < 0;
-        var viewBehindTileView = vr < this.viewOrigin.x && vb < this.viewOrigin.y;
 
         var currentStyle = getComputedStyle(view.decoration);
         var borderLeftWidth = parseInt(currentStyle.borderLeftWidth as any) || 0;

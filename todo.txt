@@ -1,7 +1,7 @@
 -address any and all in-code 'todo's
 
--currently, dragging arranger view OOB causes it to repeatedly move left as
- the actual element is not positioned 
+-ensure views concealed by main tile view still have a visible shadow
+-clicking on OOB view's shadow to bring it into view
 
 -arranger middle-click sends tile to main view
     
