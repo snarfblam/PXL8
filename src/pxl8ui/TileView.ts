@@ -8,6 +8,7 @@ import { EventManager } from '../eventManager';
 import { Widget } from '../widgets/widget';
 import { DragLock, DragLockStartingEvent } from '../dragLock';
 import { int } from '../math';
+import { WidgetMouseEvent, MouseButton } from '../widgets/input';
 
 export interface TileViewEvents {
     commitChanges?: () => void;
@@ -17,6 +18,7 @@ export interface TileViewEvents {
      * @param dy The number of cells, vertically, the view has been dragged.
      */
     viewDragged?: (dx: number, dy: number) => void;
+    viewDismissed?: () => void;
 }
 /** 
  * Tile editing interface component.
@@ -119,11 +121,22 @@ export class TileView extends Widget<TileViewEvents>{
         }
 
     }
-    onMouseDown(e: MouseEvent) {
+    onMouseDown(e: WidgetMouseEvent) {
         e.preventDefault();
 
         var { x, y } = coords.absToElement(Volatile.point(e.clientX, e.clientY), this.element);
         var iColor = null as number | null;
+
+        // ctrl-shift-left or shift-middle closes the view
+        var ctrlShiftLeft = e.ctrlKey && e.shiftKey && e.button === MouseButton.left;
+        var shiftMiddle = e.shiftKey && e.button === MouseButton.middle;
+        if (shiftMiddle || ctrlShiftLeft) {
+            this.raise('viewDismissed');
+            return;
+        }
+            
+        // ctrl is used to drag the view
+        if (e.ctrlKey) return;
 
         if (e.button === 0) {
             iColor = this.primaryColor;
@@ -146,8 +159,11 @@ export class TileView extends Widget<TileViewEvents>{
         // this.endDrawOperation();
     }
 
-    beforeMouseDragStart(e: MouseEvent, etc: DragLockStartingEvent) {
-        if (e.button !== 1) etc.cancel = true;
+    beforeMouseDragStart(e: WidgetMouseEvent, etc: DragLockStartingEvent) {
+        var middle = e.button === MouseButton.middle;
+        var ctrlLeft = (e.button === MouseButton.left && e.ctrlKey);
+        if (!(middle || ctrlLeft)) etc.cancel = true;
+
     }
     onMouseDragStart(x: number,y: number) {
         

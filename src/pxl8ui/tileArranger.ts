@@ -23,7 +23,7 @@ interface ArrangerView {
     location: { tx: number, ty: number };
     decoration: HTMLElement;
     viewEventHandler: TileViewEvents;
-    decorationEventHandler: (e: WidgetMouseEvent) => void;
+    decorationClickHandler: (e: WidgetMouseEvent) => void;
 }
 
 function createDecorationElement() {
@@ -71,9 +71,10 @@ export class TileArranger extends Widget<TileArrangerEvents>{
                 commitChanges: () => {
                     this.raise('commitChanges', view.pixels, offset);
                 },
-                viewDragged: (dx, dy) => this.onViewDragged(newView, dx, dy) ,
+                viewDragged: (dx, dy) => this.onViewDragged(newView, dx, dy),
+                viewDismissed: () => this.dismissView(newView),
             },
-            decorationEventHandler: e => {
+            decorationClickHandler: e => {
                 if (newView.outOfBounds) {
                     this.bringViewIntoBounds(newView);
                 }
@@ -81,7 +82,7 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         }
         view.site(Site(this));
         this.element.appendChild(newView.decoration);
-        newView.decoration.addEventListener('click', newView.decorationEventHandler);
+        newView.decoration.addEventListener('click', newView.decorationClickHandler);
 
         this.views.push(newView);
         view.setStyle({position: 'absolute', });
@@ -146,6 +147,16 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         });
             
         return usedScale;
+    }
+
+    dismissView(view: ArrangerView) {
+        view.view.unhandle(view.viewEventHandler);
+        view.decoration.removeEventListener('click', view.decorationClickHandler);
+        var viewIndex = this.views.indexOf(view);
+        this.views.splice(viewIndex, 1);
+        view.view.unsite();
+        this.element.removeChild(view.decoration);
+        view.view.dispose();
     }
 
     private setViewMetrics(view: TileView) {
