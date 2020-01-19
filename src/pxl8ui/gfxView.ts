@@ -194,8 +194,6 @@ export class GfxView extends Widget<GfxViewEvents> {
      * after resizing.)
      */
     resize(height: number) {
-        console.log(height);
-
         const tileHeightPx = this.metrics.pixelHeight * this.metrics.tileHeight;
         var visibleRows = Math.floor((height + tileHeightPx - 1) / tileHeightPx);
         this.metrics.gridHeight = visibleRows;

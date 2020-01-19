@@ -399,6 +399,7 @@ export class RomView {
             width: document.documentElement.clientWidth - scrollRect.right + 'px',
             height: scrollRect.height + 'px',
         });
+        this.tileArranger.performLayout();
     }
 }
 

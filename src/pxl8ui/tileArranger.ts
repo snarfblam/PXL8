@@ -177,8 +177,6 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         };
         var viewWidth = this.element.offsetWidth;
         var viewHeight = this.element.offsetHeight;
-        var viewRight = viewWidth - this.viewOrigin.x;
-        var viewBottom = viewHeight - this.viewOrigin.y;
         var tileWidth = this.codec.tileWidth * this.currentScale;
         var tileHeight = this.codec.tileHeight * this.currentScale;
 
@@ -191,12 +189,14 @@ export class TileArranger extends Widget<TileArrangerEvents>{
             view.location.ty = minY;
         }
         if (bounds.right > viewWidth) {
+            var viewRight = viewWidth - this.viewOrigin.x;
             var maxX = Math.floor(viewRight / tileWidth) - 1;
             view.location.tx = maxX;
         }
         if (bounds.bottom > viewHeight) {
+            var viewBottom = viewHeight - this.viewOrigin.y;
             var maxY = Math.floor(viewBottom / tileHeight) - 1;
-            view.location.ty = maxY;            
+            view.location.ty = maxY;
         }
 
 
@@ -230,6 +230,11 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         // outside the visible bounds or behind the main tile view
         var viewOOB = vx > viewWidth || vr < 0 || vy > viewHeight || vb < 0;
         var viewBehindTileView = vr < this.viewOrigin.x && vb < this.viewOrigin.y;
+        var oobChanged = (viewOOB || viewBehindTileView) != view.outOfBounds;
+        if (oobOnly) {
+            if (!oobChanged && !viewOOB && !viewBehindTileView) return;
+        }
+
         view.outOfBounds = viewOOB || viewBehindTileView;
 
         view.view.setStyle({
@@ -267,5 +272,10 @@ export class TileArranger extends Widget<TileArrangerEvents>{
             view.decoration.style.height = view.view.element.offsetHeight + 'px';
             ZLayer.setLayer(view.decoration, layers.floatingViewDecorations);
         // }
+    }
+
+    performLayout() {
+        console.log('layout');
+        this.views.forEach(view => this.positionView(view, true));
     }
 }
