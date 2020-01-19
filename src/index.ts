@@ -56,6 +56,7 @@ class Pxl8 {
 
     constructor() {
         var palView = this.getPaletteView();
+        var arranger = this.romView.tileArranger;
 
         this.docEditor = {
             events: this.events,
@@ -99,6 +100,12 @@ class Pxl8 {
                 }
                 if (buttonName === 'paste') {
                     this.performPaste();
+                }
+                if (buttonName === 'zoomin') {
+                    arranger.zoomIn();
+                }
+                if (buttonName === 'zoomout') {
+                    arranger.zoomOut();                    
                 }
             }
         });

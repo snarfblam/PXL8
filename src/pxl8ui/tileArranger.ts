@@ -8,15 +8,17 @@ import { Site } from '../site';
 import { layers } from './pxlLayers';
 import { ZLayer } from '../widgets/zlayer';
 import { TileData } from '../gfx/TileData';
+import {  } from '../math';
 
 export interface TileArrangerEvents{
     commitChanges?: (data: TileData, offset: number) => void;
 }
 
+const validArrangerScales = [1, 2, 4, 8, 16];
 interface ArrangerView {
     view: TileView;
     offset: number;
-    location: { x: number, y: number };
+    location: { tx: number, ty: number };
     decoration: HTMLElement;
     eventHandler: TileViewEvents;
 }
@@ -30,20 +32,6 @@ function createDecorationElement() {
     return decoration;
 }
 
-function positionView(view: ArrangerView) {
-    view.view.setStyle({
-        left: view.location.x.toString() + 'px',
-        top: view.location.y.toString() + 'px'
-    });
-
-    var currentStyle = getComputedStyle(view.decoration);
-    var borderLeftWidth = parseInt(currentStyle.borderLeftWidth as any) || 0;
-    var borderTopWidth = parseInt(currentStyle.borderTopWidth as any) || 0;
-    view.decoration.style.left = (view.location.x - borderLeftWidth) + 'px';
-    view.decoration.style.top = (view.location.y - borderTopWidth) + 'px';
-    view.decoration.style.width = view.view.element.offsetWidth + 'px';
-    view.decoration.style.height = view.view.element.offsetHeight + 'px';
-}
 
 export class TileArranger extends Widget<TileArrangerEvents>{
     currentScale = 4;
@@ -61,16 +49,12 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         super(true);
 
         this.setStyle('position', 'absolute');
+
     }
 
     addView(offset: number) {
         var view = new TileView();
-        view.initialize({
-            pixelWidth: this.currentScale,
-            pixelHeight: this.currentScale,
-            tileWidth: this.codec.tileWidth,
-            tileHeight: this.codec.tileHeight,
-        });
+        this.setViewMetrics(view);
         view.palette = this.palette;
         view.setLayer(layers.floatingViews);
         view.makeDraggable();
@@ -78,7 +62,7 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         var newView: ArrangerView = {
             view, offset,
             decoration: createDecorationElement(),
-            location: { x: this.viewOrigin.x, y: this.viewOrigin.y },
+            location: { tx: 0, ty: 0 },
             eventHandler: {
                 commitChanges: () => {
                     this.raise('commitChanges', view.pixels, offset);
@@ -91,18 +75,18 @@ export class TileArranger extends Widget<TileArrangerEvents>{
 
         this.views.push(newView);
         view.setStyle({position: 'absolute', });
-        positionView(newView);
+        this.positionView(newView);
         this.renderView(newView);
 
         view.on(newView.eventHandler);
-        positionView(newView);
+        this.positionView(newView);
 
     }
 
     onViewDragged(view: ArrangerView, dx: number, dy: number) {
-        view.location.x += dx * view.view.element.offsetWidth;
-        view.location.y += dy * view.view.element.offsetHeight;
-        positionView(view);
+        view.location.tx += dx; // * view.view.element.offsetWidth;
+        view.location.ty += dy; // * view.view.element.offsetHeight;
+        this.positionView(view);
     }
 
     setPalette(pal: Palette) {
@@ -124,6 +108,44 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         });
     }
 
+    zoomOut() {
+        this.setScale(this.currentScale / 2);
+    }
+
+    zoomIn() {
+        this.setScale(this.currentScale * 2);
+    }
+    /**
+     * Sets the scale (zoom) of the view.
+     * @param proposedScale The desired scale 
+     * @returns The new scale value
+     */
+    setScale(proposedScale: number) {
+        var usedScale = proposedScale | 0; // truncate
+        usedScale = Math.max(1, usedScale);
+        usedScale = Math.min(16, usedScale);
+        var valid = validArrangerScales.indexOf(usedScale) !== -1;
+        if (!valid) usedScale = this.currentScale;
+        
+        this.currentScale = usedScale;
+        this.views.forEach(view => {
+            this.setViewMetrics(view.view);
+            this.positionView(view);
+            this.renderView(view);
+        });
+            
+        return usedScale;
+    }
+
+    private setViewMetrics(view: TileView) {
+        view.initialize({
+            pixelWidth: this.currentScale,
+            pixelHeight: this.currentScale,
+            tileWidth: this.codec.tileWidth,
+            tileHeight: this.codec.tileHeight,
+        });
+    }
+
     private renderView(view: ArrangerView) {
         var pixelData = view.view.pixels;
         var romData = this.rom.rawData;
@@ -131,5 +153,26 @@ export class TileArranger extends Widget<TileArrangerEvents>{
             this.codec.decode({ data: romData, offset: view.offset }, { data: pixelData, offset: 0 });
             view.view.redraw();
         }
+    }
+
+    
+    private positionView(view: ArrangerView) {
+        var vx = view.location.tx * this.codec.tileWidth * this.currentScale +
+            this.viewOrigin.x;
+        var vy = view.location.ty * this.codec.tileHeight * this.currentScale +
+            this.viewOrigin.y;
+        
+        view.view.setStyle({
+            left: vx.toString() + 'px',
+            top: vy.toString() + 'px'
+        });
+
+        var currentStyle = getComputedStyle(view.decoration);
+        var borderLeftWidth = parseInt(currentStyle.borderLeftWidth as any) || 0;
+        var borderTopWidth = parseInt(currentStyle.borderTopWidth as any) || 0;
+        view.decoration.style.left = (vx - borderLeftWidth) + 'px';
+        view.decoration.style.top = (vy - borderTopWidth) + 'px';
+        view.decoration.style.width = view.view.element.offsetWidth + 'px';
+        view.decoration.style.height = view.view.element.offsetHeight + 'px';
     }
 }
