@@ -1,6 +1,8 @@
 -address any and all in-code 'todo's
 
--arranger zooming
+-currently, dragging arranger view OOB causes it to repeatedly move left as
+ the actual element is not positioned 
+
 -arranger middle-click sends tile to main view
     
 

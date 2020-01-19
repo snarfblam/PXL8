@@ -157,22 +157,58 @@ export class TileArranger extends Widget<TileArrangerEvents>{
 
     
     private positionView(view: ArrangerView) {
+        var viewWidth = this.element.offsetWidth;
+        var viewHeight = this.element.offsetHeight;
+
         var vx = view.location.tx * this.codec.tileWidth * this.currentScale +
             this.viewOrigin.x;
         var vy = view.location.ty * this.codec.tileHeight * this.currentScale +
             this.viewOrigin.y;
+        var vr = vx + view.view.element.offsetWidth - 1;
+        var vb = vy + view.view.element.offsetHeight - 1;
         
+
+
+
+
         view.view.setStyle({
             left: vx.toString() + 'px',
             top: vy.toString() + 'px'
         });
 
+        // For the sake of positioning the decoration, clamp the position to
+        // the viewport edges (borders remain visible as a cue to user that
+        // there is something OOB)
+        var minVx = -view.view.element.offsetWidth;
+        var minVy = -view.view.element.offsetHeight;
+        var maxVx = this.element.offsetWidth;
+        var maxVy = this.element.offsetHeight;
+
+        vx = Math.max(Math.min(maxVx, vx), minVx);
+        vy = Math.max(Math.min(maxVy, vy), minVy);
+
+        // We will use the 'decoration' element to cue the user if the view is
+        // outside the visible bounds or behind the main tile view
+        var viewOOB = vx > viewWidth || vr < 0 || vy > viewHeight || vb < 0;
+        var viewBehindTileView = vr < this.viewOrigin.x && vb < this.viewOrigin.y;
+
         var currentStyle = getComputedStyle(view.decoration);
         var borderLeftWidth = parseInt(currentStyle.borderLeftWidth as any) || 0;
         var borderTopWidth = parseInt(currentStyle.borderTopWidth as any) || 0;
-        view.decoration.style.left = (vx - borderLeftWidth) + 'px';
-        view.decoration.style.top = (vy - borderTopWidth) + 'px';
-        view.decoration.style.width = view.view.element.offsetWidth + 'px';
-        view.decoration.style.height = view.view.element.offsetHeight + 'px';
+
+        // if (viewBehindTileView) {
+        //     console.log('behind');
+        // } else if (viewOOB) {
+        //     var minX = 
+        // } else {
+            var currentStyle = getComputedStyle(view.decoration);
+            var borderLeftWidth = parseInt(currentStyle.borderLeftWidth as any) || 0;
+            var borderTopWidth = parseInt(currentStyle.borderTopWidth as any) || 0;
+            view.decoration.style.left = (vx - borderLeftWidth) + 'px';
+            view.decoration.style.top = (vy - borderTopWidth) + 'px';
+            view.decoration.style.width = view.view.element.offsetWidth + 'px';
+            view.decoration.style.height = view.view.element.offsetHeight + 'px';
+            ZLayer.setLayer(view.decoration, layers.floatingViewDecorations);
+        // }
     }
 }

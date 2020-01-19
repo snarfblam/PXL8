@@ -141,6 +141,7 @@ class Pxl8 {
         this.statusBar.setLayer(layers.chrome, true);
         ZLayer.setLayer(this.romView.gfxView.element, layers.fixedViews, true);
         ZLayer.setLayer(this.romView.tileView.element, layers.fixedViews, true);
+        this.romView.scroll.setLayer(layers.fixedViews);
         this.romView.gfxView.selection.setSelectionStyle({
             zIndex: ZLayer.getZIndex(layers.fixedViews)!.toString(),
         });
