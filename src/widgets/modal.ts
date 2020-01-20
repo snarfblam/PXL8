@@ -148,15 +148,15 @@ export class Modal<TEvents extends Events<TEvents>> extends Widget<TEvents> {
         ensureCssReady();
     }
 
-    /** 
-     * Creates the modal element. Do not override.
-     */
-    createElement() {
-        var element = $.create('div') as HTMLDivElement;
-        element.classList.add('modal');
-        // this.createContents(element);
-        return element;
-    }
+    // /** 
+    //  * Creates the modal element. Do not override.
+    //  */
+    // createElement() {
+    //     var element = $.create('div') as HTMLDivElement;
+    //     element.classList.add('modal');
+    //     // this.createContents(element);
+    //     return element;
+    // }
 
     // /**
     //  * Override this method to populate the modal element with children.
@@ -221,3 +221,4 @@ export class Modal<TEvents extends Events<TEvents>> extends Widget<TEvents> {
         this.element.style.width = style;
     }
 }
+Widget.setElementType(Modal, 'div', 'modal');

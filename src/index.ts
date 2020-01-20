@@ -137,9 +137,8 @@ class Pxl8 {
 
         (new InputModal()).showModal();
 
-        console.log('hiding');
-        this.romView.scroll.setStyle({ style: 'none' });
-        this.romView.tileView.setStyle({ style: 'none' });
+        this.romView.scroll.setStyle({ display: 'none' });
+        this.romView.tileView.setStyle({ display: 'none' });
     }
 
     private setupLayers() {
@@ -161,8 +160,8 @@ class Pxl8 {
         this.romView.setViewOffset(0);
         this.performLayout();
 
-        this.romView.scroll.setStyle({ style: 'block' });
-        this.romView.tileView.setStyle({ style: 'block' });
+        this.romView.scroll.setStyle({ display: 'block' });
+        this.romView.tileView.setStyle({ display: 'block' });
     }
 
     private performLayout() {

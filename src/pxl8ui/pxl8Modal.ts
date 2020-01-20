@@ -8,4 +8,4 @@ export class Pxl8Modal<TEvents extends Events<TEvents> = {}> extends Modal<TEven
         super(hasEvents, host);
     }
 }
-Widget.setElementType(Pxl8Modal, 'div', 'pxl8-modal');
+Widget.setElementType(Pxl8Modal, 'div', '+ pxl8-modal');

@@ -259,16 +259,21 @@ export abstract class Widget
             widgetClass.prototype.elementType = elementType;
         }
         if (cssClassList) {
-            var currentClassList = (widgetClass.prototype.cssClass || []) as string[];
+            console.log(cssClassList);
+            var currentClassList = (widgetClass.prototype.cssClassList || []) as string[];
             var newClassList = cssClassList.split(' ').filter(i => i);
+            console.log([...newClassList]);
             
             // '+' expands to base class's css class list
             if (newClassList[0] === '+') {
                 newClassList.shift();
-                newClassList = currentClassList.concat();
-            }
+                newClassList = currentClassList.concat(newClassList);
+                console.log([...newClassList]);
+        }
 
             widgetClass.prototype.cssClassList = newClassList;
+            console.log([...newClassList]);
+
         }
     }
 }

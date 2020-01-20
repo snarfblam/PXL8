@@ -2,7 +2,7 @@ import { Pxl8Modal } from './pxl8Modal';
 import { Widget } from '../widgets/widget';
 import { $ } from '../dollar';
 
-export class InputModal extends Pxl8Modal{
+export class InputModal extends Pxl8Modal {
     constructor() {
         super();
 
@@ -32,6 +32,7 @@ export class InputModal extends Pxl8Modal{
         (new InputGroupHeader(name)).site(this);
     }
 }
+Widget.setElementType(InputModal, 'div', '+ pxl8-info-modal');
 
 class InputGroupHeader extends Widget<{}>{
     constructor(text: string) {
@@ -79,7 +80,6 @@ class InputDisplay extends Widget<{}> {
     }
 
     private appendMouseItem(l: string, m: string, r: string) {
-        console.log(!!l, !!m, !!r);
         var lButton = (new MouseButtonLeft(l));
         if (l) lButton.setStyle({ background: '#e4e4e4' });
         lButton.site(this.inputGroup);
