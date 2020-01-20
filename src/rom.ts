@@ -98,7 +98,6 @@ export class ROM {
     }
 
     private doOneRead(offset: number, length: number, resolve: DataPromiseResolve, reject: DataPromiseReject) {
-        console.log('reading');
         this.promise.resolve = resolve;
         this.promise.reject = reject;
         this.reader.readAsArrayBuffer(this.data.slice(offset, offset + length));

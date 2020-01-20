@@ -33,7 +33,7 @@ import { SwatchModal } from './pxl8ui/swatchModal';
 import { ColorPicker } from './pxl8ui/colorPicker';
 import { layers } from './pxl8ui/pxlLayers';
 import { ZLayer } from './widgets/zlayer';
-import { } from './pxl8ui/tileArranger';
+import { InputModal } from './pxl8ui/inputModal';
 
 
 class Pxl8 {
@@ -134,6 +134,12 @@ class Pxl8 {
         window.addEventListener('resize', e => this.performLayout());
 
         this.setupLayers();
+
+        (new InputModal()).showModal();
+
+        console.log('hiding');
+        this.romView.scroll.setStyle({ style: 'none' });
+        this.romView.tileView.setStyle({ style: 'none' });
     }
 
     private setupLayers() {
@@ -154,6 +160,9 @@ class Pxl8 {
         this.romView.loadRom(this.rom, this.currentCodec, this.docEditor);
         this.romView.setViewOffset(0);
         this.performLayout();
+
+        this.romView.scroll.setStyle({ style: 'block' });
+        this.romView.tileView.setStyle({ style: 'block' });
     }
 
     private performLayout() {

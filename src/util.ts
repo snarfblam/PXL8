@@ -46,6 +46,15 @@ export function saveBlob(blob: Blob, filename: string) {
     }
 }
 
+export function prependChildElement(target: HTMLElement, element: HTMLElement) {
+    var firstChild = target.firstChild;
+    if (firstChild) {
+        target.insertBefore(element, firstChild);
+    } else {
+        target.appendChild(element);
+    }
+}
+
 export const coords = {
     absToElement: function absToElement(coord: Point, elem: HTMLElement) {
         var rect = elem.getBoundingClientRect();

@@ -307,6 +307,71 @@ img.toolbar-icon {
     border-radius: 4px;
 }
 
+.pxl8-input-display {
+    display: inline-block;
+    height: 1.5em;
+    border: 1px solid #aaa;
+    line-height: 1.3em;
+    text-align: center;
+    /* box-shadow: inset 0 -1px 0px #dddddd, inset 0 -2px 0px #c4c4c4; */
+    /* box-shadow: inset 0 -3px 2px #dddddd; */
+    box-shadow: inset 0 -3px 2px rgba(0,0,0,0.133);
+    color: #666666;
+    background: #F8F8F8;
+    font-family: consolas, arial, sans-serif;
+}
+
+.pxl8-keyboard-key {
+    border-radius: 2px;
+    padding-left: .2em;
+    padding-right: .2em;
+    min-width: 1.6em;
+    /* margin-left: .2em; */
+    margin-right: .2em;
+    box-shadow: inset 0 -2px 0px #dddddd, inset 0 -3px 0px #c4c4c4;
+}
+
+.pxl8-mouse-button-left {
+    padding-left: .3em;
+    padding-right: .15em;
+    border-top-left-radius: 12px;
+}
+.pxl8-mouse-button-middle {
+    padding-left: .15em;
+    padding-right: .15em;
+    border-top-right-radius: 0px;
+    margin-left: -1px;
+}
+.pxl8-mouse-button-right {
+    padding-left: .15em;
+    padding-right: .3em;
+    border-top-right-radius: 12px;
+    margin-left: -1px;
+}
+
+.pxl8-input-row {
+    text-align: left;
+    color: #4c4c4c;
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
+.pxl8-input-description {
+    text-align: left;
+    padding-left: 1em;
+}
+.pxl8-input-button-group {
+    min-width: 200px;
+    text-align: right;
+    display: inline-block;
+}
+
+.pxl8-input-group-header {
+    color: #888;
+    border: 1px solid blac;
+    padding-right: 60px;
+    margin-top: 1.5em;
+}
+
 /*** Modals ****************************************************/
 
     body.modal {

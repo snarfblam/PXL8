@@ -1,6 +1,7 @@
 import { Widget } from "./widget";
 import { $ } from "../dollar";
 import { Events } from "../eventManager";
+import { prependChildElement } from "../util";
 
 var _globalHost: ModalHost | null = null;
 function getGlobalHost() {
@@ -199,7 +200,8 @@ export class Modal<TEvents extends Events<TEvents>> extends Widget<TEvents> {
         } else {
             if (!this.captionElement) {
                 this.captionElement = $.create('h1');
-                this.element.prepend(this.captionElement);
+                // this.element.prepend(this.captionElement);
+                prependChildElement(this.element, this.captionElement);
             }
             this.captionElement.textContent = text;
             this.captionElement.style.display = 'block';
