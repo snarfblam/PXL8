@@ -6,6 +6,8 @@ export enum layers {
     'modalHost' = "modal",
     /** Toolbar, status bar, etc */
     'chrome' = "chrome",
+    /** Splash logo */
+    'splash' = "splash",
     /** Primary editing UI */
     'fixedViews' = "fixedViews",
     /** Content that appears over floating arranger views */
@@ -17,6 +19,7 @@ export enum layers {
 };
  
 Widget.defineLayer(layers.modalHost, ZRelativePosition.bottom);
+Widget.defineLayer(layers.splash, ZRelativePosition.bottom);
 Widget.defineLayer(layers.chrome, ZRelativePosition.bottom);
 Widget.defineLayer(layers.fixedViews, ZRelativePosition.bottom);
 Widget.defineLayer(layers.floatingViewOverlay, ZRelativePosition.bottom);

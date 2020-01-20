@@ -379,6 +379,12 @@ img.toolbar-icon {
     overflow-y: auto;
 }
 
+.pxl8-splash {
+    background: #aaaaaa url(pxl8splash.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 /*** Modals ****************************************************/
 
     body.modal {

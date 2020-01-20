@@ -34,6 +34,7 @@ import { ColorPicker } from './pxl8ui/colorPicker';
 import { layers } from './pxl8ui/pxlLayers';
 import { ZLayer } from './widgets/zlayer';
 import { InputModal } from './pxl8ui/inputModal';
+import { Pxl8Splash } from './pxl8ui/pxl8Splash';
 
 
 class Pxl8 {
@@ -44,6 +45,7 @@ class Pxl8 {
     private readonly romView = new RomView();
     private readonly docEditor: DocumentEditor;
     private readonly helpModal = new InputModal();
+    private readonly splash = new Pxl8Splash();
     private clipboardData: Uint8Array | null = null;
 
     private rom: ROM | null = null;
@@ -78,6 +80,7 @@ class Pxl8 {
         this.statusBar.site(appSitePrepend);
         this.toolbar.site(appSitePrepend);
         this.romView.site(appSite);
+        this.splash.site(appSite);
         console.log(appSite);
         (window as any).romView = this.romView;
 
@@ -138,6 +141,14 @@ class Pxl8 {
         window.addEventListener('resize', e => this.performLayout());
 
         this.setupLayers();
+
+        this.splash.setStyle({
+            position: 'absolute',
+            left: '0',
+            width: '100%',
+            top: this.toolbar.element.offsetHeight.toString() + "px",
+            height: "calc(100% - " + this.toolbar.element.offsetHeight.toString() + "px)",
+        });
     }
 
     private setupLayers() {
@@ -158,6 +169,8 @@ class Pxl8 {
         this.romView.loadRom(this.rom, this.currentCodec, this.docEditor);
         this.romView.setViewOffset(0);
         this.performLayout();
+
+        this.splash.setStyle({ display: 'none' });
     }
 
     private performLayout() {

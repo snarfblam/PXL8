@@ -88,7 +88,8 @@ export abstract class Widget
         return elem;
     }
 
-    setStyle(values: { [name: string]: string }): void;
+    setStyle(values: Partial<CSSStyleDeclaration>): void;
+    // setStyle(values: { [name: string]: string }): void;
     setStyle(name: string, value: string): void;
     setStyle(style: string | { [name: string]: string }, value?: string): void {
         // Does TS provide a mechanism to accommodate this sort of overload forwarding?
