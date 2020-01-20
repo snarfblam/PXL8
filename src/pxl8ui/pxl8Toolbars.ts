@@ -39,7 +39,7 @@ function newPxl8Logo() {
     return logo;
 }
 
-export type Pxl8ToolbarButton = 'import' | 'export' | 'copy' | 'paste' | 'zoomin' | 'zoomout';
+export type Pxl8ToolbarButton = 'import' | 'export' | 'copy' | 'paste' | 'zoomin' | 'zoomout' | 'help';
 
 export interface Pxl8ToolbarEvents {
     buttonClick?: (name: Pxl8ToolbarButton) => void;
@@ -58,6 +58,7 @@ export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarEvents> {
         paste: newButton("Paste", "paste.png"),
         zoomIn: newButton("Zoom In", "zoomin.png"),
         zoomOut: newButton("Zoom Out", "zoomout.png"),
+        help: newButton("Help", "help.png"),
     };
     // private eventManager = new EventManager<Pxl8ToolbarEvents>();
     // public events = this.eventManager.subscriber;
@@ -73,6 +74,7 @@ export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarEvents> {
         this.addClickHandler(this.items.paste, 'paste');
         this.addClickHandler(this.items.zoomIn, 'zoomin');
         this.addClickHandler(this.items.zoomOut, 'zoomout');
+        this.addClickHandler(this.items.help, 'help');
     }
 
     private addClickHandler(btn: ToolbarButton, name: Pxl8ToolbarButton) {
@@ -92,6 +94,8 @@ export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarEvents> {
             newSpacer(),
             this.items.zoomIn,
             this.items.zoomOut,
+            newSpacer(),
+            this.items.help,
         ];
 
         itemList.forEach(item => {

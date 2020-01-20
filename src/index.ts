@@ -43,6 +43,7 @@ class Pxl8 {
     private readonly statusBar = new Pxl8StatusBar();
     private readonly romView = new RomView();
     private readonly docEditor: DocumentEditor;
+    private readonly helpModal = new InputModal();
     private clipboardData: Uint8Array | null = null;
 
     private rom: ROM | null = null;
@@ -107,6 +108,9 @@ class Pxl8 {
                 if (buttonName === 'zoomout') {
                     arranger.zoomOut();                    
                 }
+                if (buttonName === 'help') {
+                    this.helpModal.showModal();
+                }
             }
         });
 
@@ -134,11 +138,6 @@ class Pxl8 {
         window.addEventListener('resize', e => this.performLayout());
 
         this.setupLayers();
-
-        (new InputModal()).showModal();
-
-        this.romView.scroll.setStyle({ display: 'none' });
-        this.romView.tileView.setStyle({ display: 'none' });
     }
 
     private setupLayers() {
@@ -159,9 +158,6 @@ class Pxl8 {
         this.romView.loadRom(this.rom, this.currentCodec, this.docEditor);
         this.romView.setViewOffset(0);
         this.performLayout();
-
-        this.romView.scroll.setStyle({ display: 'block' });
-        this.romView.tileView.setStyle({ display: 'block' });
     }
 
     private performLayout() {

@@ -309,9 +309,9 @@ img.toolbar-icon {
 
 .pxl8-input-display {
     display: inline-block;
-    height: 1.5em;
+    height: 1.45rem;
     border: 1px solid #aaa;
-    line-height: 1.3em;
+    /* line-height: 1.3em; */
     text-align: center;
     /* box-shadow: inset 0 -1px 0px #dddddd, inset 0 -2px 0px #c4c4c4; */
     /* box-shadow: inset 0 -3px 2px #dddddd; */
@@ -319,12 +319,14 @@ img.toolbar-icon {
     color: #666666;
     background: #F8F8F8;
     font-family: consolas, arial, sans-serif;
+    font-size: .75rem;
+    padding-top: .35rem;
 }
 
 .pxl8-keyboard-key {
     border-radius: 2px;
     padding-left: .2em;
-    padding-right: .2em;
+    padding-right: .6em;
     min-width: 1.6em;
     /* margin-left: .2em; */
     margin-right: .2em;
