@@ -255,11 +255,11 @@ export class RomView {
         this.setViewOffset(value);
     }
 
-    scrollView(dir: Direction, unit: ViewUnit) {
-        var amt = 1;
+    scrollView(dir: Direction, unit: ViewUnit, amt?: number) {
+        if(amt === undefined) amt = 1;
 
         if (dir === Direction.up) {
-            amt = -1;    
+            amt *= -1;    
         } else if (dir !== Direction.down) {
             console.error(Error('Invalid direction specified'));
         }

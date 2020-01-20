@@ -35,6 +35,7 @@ import { layers } from './pxl8ui/pxlLayers';
 import { ZLayer } from './widgets/zlayer';
 import { InputModal } from './pxl8ui/inputModal';
 import { Pxl8Splash } from './pxl8ui/pxl8Splash';
+import { Direction } from './util';
 
 
 class Pxl8 {
@@ -131,6 +132,15 @@ class Pxl8 {
         this.statusBar.on({
             scroll: (unit, dir) => {
                 this.romView.scrollView(dir, unit);
+            }
+        });
+
+        window.addEventListener('wheel', e => {
+            var delta = e.deltaY;
+
+            if (this.rom) {
+                if (delta < 0) this.romView.scrollView(Direction.up, ViewUnit.row, 8);
+                if (delta > 0) this.romView.scrollView(Direction.down, ViewUnit.row, 8);
             }
         });
 
