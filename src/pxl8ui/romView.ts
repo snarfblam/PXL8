@@ -136,9 +136,11 @@ export class RomView {
         },
         primaryColorSelected: () => {
             this.tileView.primaryColor = this.document!.getPrimaryColor();
+            this.tileArranger.setPrimaryColor(this.document!.getPrimaryColor());
         },
         secondaryColorSelected: () => {
             this.tileView.secondaryColor = this.document!.getSecondaryColor();
+            this.tileArranger.setSecondaryColor(this.document!.getSecondaryColor());
         },
 
     }
@@ -184,8 +186,10 @@ export class RomView {
             gridHeight: gridHeight,
         });
 
+        // Todo: wrap up these all up into TileArranger.initialize()
         this.tileArranger.rom = rom;
         this.tileArranger.codec = codec;
+        this.tileArranger.initialize(editor);
 
         this.viewableByteCount = this.gfxView.metrics.gridWidth * this.gfxView.metrics.gridHeight * this.codec.bytesPerTile;
         this.romBuffer = new Uint8Array(this.viewableByteCount);
@@ -193,6 +197,8 @@ export class RomView {
         this.rom.rawDataPromise.then(() => this.romLoaded = true);
         this.performLayout();
     }
+
+    public getDocument() { return this.document; }
 
     private openTileIndexForEdit(tileIndex: number) {
         if (!this.rom) return;

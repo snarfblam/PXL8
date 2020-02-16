@@ -19,7 +19,7 @@ function ensureCssReady() {
         _modalCss = document.createElement('style')
         _modalCss.innerHTML =
             ".modal-host:before { content:''; display: inline-block; height: 100%; vertical-align: middle; margin-right: -0.25em } " +
-            ".modal { display: inline-block; vertical-align: middle; width: 300px; }";
+            ".modal { display: none; vertical-align: middle; width: 300px; }";
         document.body.appendChild(_modalCss);
     }
 }

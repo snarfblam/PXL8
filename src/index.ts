@@ -123,7 +123,7 @@ class Pxl8 {
         });
 
         palView.on({
-            primaryColorSelected: () => this.eventManager.raise('primaryColorSelected'),
+            primaryColorSelected: () => void(console.log('color')) || this.eventManager.raise('primaryColorSelected'),
             secondaryColorSelected: () => this.eventManager.raise('secondaryColorSelected'),
             paletteModified: () => this.eventManager.raise('paletteModified'),
             colorEditRequest: (index) => this.editPalEntry(index),

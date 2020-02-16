@@ -10,6 +10,8 @@ import { ZLayer } from '../widgets/zlayer';
 import { TileData } from '../gfx/TileData';
 import {  } from '../math';
 import { WidgetMouseEvent } from '../widgets/input';
+import { RomView } from './romView';
+import { DocumentEditor, nullDocument } from '../document';
 
 export interface TileArrangerEvents{
     commitChanges?: (data: TileData, offset: number) => void;
@@ -41,6 +43,7 @@ export class TileArranger extends Widget<TileArrangerEvents>{
     private palette: Palette = debugPalette; // private because when set, we need to redraw all our arrangers
     views: ArrangerView[] = [];
     rom: ROM = nullRom;
+    document: DocumentEditor = nullDocument;
     codec: TileCodec = nullCodec;
     /** 
      * The location within the view that is consizered the origin for the purposes
@@ -55,12 +58,29 @@ export class TileArranger extends Widget<TileArrangerEvents>{
 
     }
 
+    getDocument() {
+        var romView = this.findParentWidget() as RomView | null;
+        console.log('view: ' , romView);
+        if (romView) return romView.getDocument();
+        return null;
+    }
+
+    initialize(document: DocumentEditor) {
+        this.document = document;
+    }
+
     addView(offset: number) {
         var view = new TileView();
         this.setViewMetrics(view);
         view.palette = this.palette;
         view.setLayer(layers.floatingViews);
         view.makeDraggable();
+        var doc = this.document;
+        if (doc) {
+            console.log('teh colors');
+            view.primaryColor = doc.getPrimaryColor();
+            view.secondaryColor = doc.getSecondaryColor();
+        }
 
         var newView: ArrangerView = {
             view, offset,
@@ -106,6 +126,18 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         this.views.forEach(entry => {
             entry.view.palette = pal;
             entry.view.redraw();
+        });
+    }
+
+    setPrimaryColor(color: number) {
+        this.views.forEach(entry => {
+            entry.view.primaryColor = color;
+        });
+    }
+
+    setSecondaryColor(color: number) {
+        this.views.forEach(entry => {
+            entry.view.secondaryColor = color;
         });
     }
 

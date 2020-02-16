@@ -403,6 +403,10 @@ img.toolbar-icon {
         max-width: 90%;
     }
     
+    .modal {
+        display:none;
+    }
+
     .modal h1 {
         font-size: 24px;
         margin-bottom: 16px;
