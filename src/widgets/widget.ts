@@ -272,6 +272,36 @@ export abstract class Widget
             widgetClass.prototype.cssClassList = newClassList;
         }
     }
+
+    /**
+     * Adds one or more CSS classes to the widget's element
+     * @param classList A space-separated list of classes
+     */
+    addClass(classList: string) {
+        var elemClasses = this.element.classList;
+
+        var list = classList.split(' ');
+        if (list.length > 1) list = list.filter(i => i); // remove empty entries
+
+        for (let i = 0; i < list.length; i++) {
+            elemClasses.add(list[i]);
+        }
+    }
+
+    /**
+     * Removes one or more CSS classes to the widget's element
+     * @param classList A space-separated list of classes
+     */
+    removeClass(classList: string) {
+        var elemClasses = this.element.classList;
+
+        var list = classList.split(' ');
+        if (list.length > 1) list = list.filter(i => i); // remove empty entries
+
+        for (let i = 0; i < list.length; i++) {
+            elemClasses.remove(list[i]);
+        }
+    }
 }
 // (Widget.prototype as any).elementType = 'div';
 Widget.setElementType(Widget, 'div', 'widget');
