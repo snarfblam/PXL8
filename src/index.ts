@@ -174,7 +174,8 @@ class Pxl8 {
     }
 
     private loadRom(file: File) {
-        this.currentCodec = tileCodecs.nesCodec;
+        // this.currentCodec = tileCodecs.nesCodec;
+        this.currentCodec = tileCodecs.gbCodec;
         this.rom = new ROM(file);
         this.romView.loadRom(this.rom, this.currentCodec, this.docEditor);
         this.romView.setViewOffset(0);

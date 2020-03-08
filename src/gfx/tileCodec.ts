@@ -3,6 +3,7 @@ import { TileData } from "./TileData";
 import { Arrayish } from '../util';
 
 import { nesCodec } from './nesCodec';
+import { gbCodec } from './gbCodec';
 
 export interface BufferPointer {
     data: ArrayLike<number>;
@@ -89,6 +90,7 @@ export const SwatchPaletteCue = {
 
 export const tileCodecs = {
     nesCodec,
+    gbCodec,
 };
 
 export const demoNesTile = [
