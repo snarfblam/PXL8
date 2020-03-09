@@ -30,6 +30,7 @@ import { DocumentEvents, DocumentEditor } from './document';
 import { EventManager } from './eventManager';
 import { Modal, ModalHost } from './widgets/modal';
 import { SwatchModal } from './pxl8ui/swatchModal';
+import { RgbModal } from './pxl8ui/rgbModal';
 import { ColorPicker } from './pxl8ui/colorPicker';
 import { layers } from './pxl8ui/pxlLayers';
 import { ZLayer } from './widgets/zlayer';
@@ -220,8 +221,12 @@ class Pxl8 {
             var picker = new SwatchModal();
             picker.loadSwatchesFor(this.currentCodec!);
             this.colorPicker = picker;
+        } else if (cue.type === 'rgb') {
+            var rgbPicker = new RgbModal();
+            rgbPicker.intitialize(cue.rMax, cue.gMax, cue.bMax);
+            this.colorPicker = rgbPicker;
         } else {
-            throw Error('Color picker not implemented for cue type: ' + cue.type);
+            throw Error('Color picker not implemented for cue type: ' + cue!.type);
         }
     }
 

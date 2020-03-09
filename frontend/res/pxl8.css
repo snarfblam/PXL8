@@ -385,6 +385,37 @@ img.toolbar-icon {
     background-repeat: no-repeat;
 }
 
+.pxl8-rgb-preview {
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+    height: 60px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #00000080;
+}
+
+.pxl8-rgb-grid {
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #00000080;
+    box-sizing: content-box;
+}
+
+button.pxl8-rgb-ok {
+    margin: 6px;
+    font-size: 1.2rem;
+}
+
+.pxl8-button {
+    border-radius: 4px;
+    background: #FFFFFF;
+    border: 1px solid #888888;
+    padding: 4px 8px;
+    box-shadow: 1px 1px #BBBBBB;
+}
+
 /*** Modals ****************************************************/
 
     body.modal {
