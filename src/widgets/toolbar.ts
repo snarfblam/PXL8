@@ -1,4 +1,4 @@
-import { Widget } from './widget';
+import { Widget, getWidget, findContainingWidget } from './widget';
 import { $, $$ } from '../dollar';
 import { removeFrom } from '../util';
 import { EventManager, Events } from '../eventManager';
@@ -7,7 +7,11 @@ import { EventManager, Events } from '../eventManager';
 
 export enum ToolbarSize { small, large }
 
-export class Toolbar<TEvents extends Events<TEvents> = {}> extends Widget<TEvents> {
+export interface ToolbarEvents<TButtons extends string>{
+    buttonClicked?: (button: TButtons) => void;
+}
+
+export class Toolbar<TButtons extends string = string, TEvents extends ToolbarEvents<TButtons> & Events<TEvents> = ToolbarEvents<TButtons>> extends Widget<TEvents> {
     private iconPath = '';
     private buttons = [] as ToolbarButton[];
     private toolbarSize = ToolbarSize.small;
@@ -16,6 +20,23 @@ export class Toolbar<TEvents extends Events<TEvents> = {}> extends Widget<TEvent
         super(hasEvents);
 
         this.setSize(ToolbarSize.small);
+        this.element.addEventListener('click', this.onElementClicked.bind(this));
+    }
+
+    private onElementClicked(e: MouseEvent) {
+        var owner = findContainingWidget(e.target as HTMLElement);
+        if (owner instanceof ToolbarButton) {
+            var name = owner.name;
+            if (name) {
+                //this.raise('buttonClicked', name as TButtons);
+                // touche, typescript
+                // > Argument of type '[TButtons]' is not assignable to parameter of type 'Parameters<TEvents["buttonClicked"]>'.ts(2345)
+                // Parameters<TEvents["buttonClicked"]> = TButtons
+                // TS is inferring argument as a tuple type ([TButtons] instead of TButtons).
+                // I give up
+                (this.raise as any)('buttonClicked', name as any);
+            }
+        }
     }
 
     protected createElement() {
@@ -50,6 +71,25 @@ export class Toolbar<TEvents extends Events<TEvents> = {}> extends Widget<TEvent
     
     private registerButton(b: ToolbarButton) { this.buttons.push(b); }
     private unregisterButton(b: ToolbarButton) { removeFrom(this.buttons, b); }
+
+    addButton(name: TButtons, text: string, icon: string) {
+        var btn = new ToolbarButton(name);
+        btn.setText(text);
+        btn.setIcon(icon);
+
+        //this.site(btn);
+        btn.site(this);
+        return btn;
+    }
+
+    addSpace() {
+        // Todo: this should be stylable
+        var spacer = $.create('div');
+        spacer.style.width = '8px';
+        spacer.style.height = '8px';
+        spacer.style.display = 'inline-block';
+        this.element.appendChild(spacer);
+    }
 }
 
 export interface ToolbarButtonEvents{
@@ -60,12 +100,15 @@ export class ToolbarButton extends Widget<ToolbarButtonEvents> {
     iconElement: HTMLImageElement;
     captionElement: HTMLSpanElement;
     iconName = "";
+    readonly name: string | null;
 
     // private eventManager = new EventManager<ToolbarButtonEvents>();
     // public events = this.eventManager.subscriber;
 
-    constructor() {
+    constructor(name?: string) {
         super(true);
+
+        this.name = name || null;
 
         this.iconElement = $.create('img') as HTMLImageElement;
         this.iconElement.classList.add('toolbar-icon');

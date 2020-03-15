@@ -88,7 +88,7 @@ class Pxl8 {
 
         // Event handlers
         this.toolbar.on({
-            buttonClick: buttonName => {
+            buttonClicked: buttonName => {
                 if (buttonName === 'import') {
                     showFileDialog()
                         .then(file => {

@@ -306,6 +306,29 @@ export abstract class Widget
 // (Widget.prototype as any).elementType = 'div';
 Widget.setElementType(Widget, 'div', 'widget');
 
+/**
+ * Finds the Widget object associated with the specified element
+ * or its nearest widgetized parent element
+ * @param elem The elenment for which to find the owning widget
+ */
+export function findContainingWidget(elem: HTMLElement) {
+    var e: HTMLElement | null = elem;
+    while (e) {
+        var widg = (e as any)[elementWidgetSymbol] as WidgetLike;
+        if (widg) return widg;
+        e = e.parentElement;
+    }
+
+    return null;
+}
+/**
+ * Gets the Widget object associated with an element, if one exists.
+ * @param elem The element for which to get the owning widget
+ */
+export function getWidget(elem: HTMLElement): WidgetLike | undefined {
+    return ((elem as any)[elementWidgetSymbol] as WidgetLike) || undefined;
+}
+
 /** Enumerates properties of Widget that are dependant upon the generic type parameter. */
 type WidgetGenericDependants = 'on' | 'raise' | 'unhandle';
 /**

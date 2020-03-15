@@ -1,4 +1,4 @@
-import { Toolbar, ToolbarButton, ToolbarSize, ToolbarLabel } from "../widgets/toolbar";
+import { Toolbar, ToolbarButton, ToolbarSize, ToolbarLabel, ToolbarEvents } from "../widgets/toolbar";
 import { $ } from "../dollar";
 import { Widget } from "../widgets/widget";
 import { EventManager } from "../eventManager";
@@ -6,12 +6,12 @@ import { MiniPaletteView } from "../paletteView";
 import { ViewUnit } from "./romView";
 import { Direction } from "../util";
 
-function newButton(text: string, icon: string) {
-    var btn = new ToolbarButton();
-    btn.setText(text);
-    btn.setIcon(icon);
-    return btn;
-}
+// function newButton(text: string, icon: string) {
+//     var btn = new ToolbarButton();
+//     btn.setText(text);
+//     btn.setIcon(icon);
+//     return btn;
+// }
 function newSpacer(size?: number) {
     size = size || 24;
     var span = $.create('span');
@@ -39,88 +39,48 @@ function newPxl8Logo() {
     return logo;
 }
 
-export type Pxl8ToolbarButton = 'import' | 'export' | 'copy' | 'paste' | 'zoomin' | 'zoomout' | 'help';
+export type Pxl8ToolbarButton = 'import' | 'export' | 'copy' | 'paste' | 'zoomin' | 'zoomout' | 'help' | 'menu';
 
-export interface Pxl8ToolbarEvents {
-    buttonClick?: (name: Pxl8ToolbarButton) => void;
-}
 
-export interface Pxl8StatusbarEvents {
-    scroll?: (unit: ViewUnit, dir: Direction.up | Direction.down) => void;
-
-}
-
-export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarEvents> {
-    private items = {
-        import: newButton("Import", "import.png"),
-        export: newButton("Export", "export.png"),
-        copy: newButton("Copy", "copy.png"),
-        paste: newButton("Paste", "paste.png"),
-        zoomIn: newButton("Zoom In", "zoomin.png"),
-        zoomOut: newButton("Zoom Out", "zoomout.png"),
-        help: newButton("Help", "help.png"),
-    };
-    // private eventManager = new EventManager<Pxl8ToolbarEvents>();
-    // public events = this.eventManager.subscriber;
-
+export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarButton> {
     constructor() {
         super(true);
 
         this.initWidget();
-
-        this.addClickHandler(this.items.import, 'import');
-        this.addClickHandler(this.items.export, 'export');
-        this.addClickHandler(this.items.copy, 'copy');
-        this.addClickHandler(this.items.paste, 'paste');
-        this.addClickHandler(this.items.zoomIn, 'zoomin');
-        this.addClickHandler(this.items.zoomOut, 'zoomout');
-        this.addClickHandler(this.items.help, 'help');
     }
 
     private addClickHandler(btn: ToolbarButton, name: Pxl8ToolbarButton) {
-        btn.element.onclick = e => this.raise('buttonClick', name);
+        btn.element.onclick = e => this.raise('buttonClicked', name);
     }
 
     private initWidget() {
         this.setSize(ToolbarSize.large);
 
-        var itemList = [
-            newPxl8Logo(),
-            this.items.import,
-            this.items.export,
-            newSpacer(),
-            this.items.copy,
-            this.items.paste,
-            newSpacer(),
-            this.items.zoomIn,
-            this.items.zoomOut,
-            newSpacer(),
-            this.items.help,
-        ];
-
-        itemList.forEach(item => {
-            if (item instanceof Widget) {
-                item.site(this);
-            } else {
-                this.element.appendChild(item);
-            }
-        });
+        this.element.append(newPxl8Logo());
+        this.addButton("import", "Import", "import.png");
+        this.addButton("export", "Export", "export.png");
+        this.addSpace();
+        this.addButton("copy", "Copy", "copy.png");
+        this.addButton("paste", "Paste", "paste.png");
+        this.addSpace();
+        this.addButton("zoomout", "Zoom In", "zoomin.png");
+        this.addButton("zoomin", "Zoom Out", "zoomout.png");
+        this.addSpace();
+        this.addButton("menu", "Menu", "tiles.png");
+        this.addButton("help", "Help", "help.png");
     }
 }
 
-export class Pxl8StatusBar extends Toolbar<Pxl8StatusbarEvents> {
-    private readonly items = {
-        tileUp: newButton("Tile", "small_up.png"),
-        byteUp: newButton("Byte", "small_up.png"),
-        tileDown: newButton("Tile", "small_down.png"),
-        byteDown: newButton("Byte", "small_down.png"),
-    };
+type StatusBarButtons = 'tileUp' | 'tileDown' | 'byteUp' | 'byteDown';
+interface ScrollNotificationEvents {
+    scroll?: (unit: ViewUnit, dir: Direction.up | Direction.down) => void;
+}
+export type Pxl8StatusbarEvents = ToolbarEvents<StatusBarButtons> & ScrollNotificationEvents;
+
+export class Pxl8StatusBar extends Toolbar<StatusBarButtons, Pxl8StatusbarEvents> {
     private readonly palView = new MiniPaletteView();
     private readonly offsetLabel = new ToolbarLabel();
 
-    // private readonly eventManager = new EventManager<Pxl8StatusbarEvents>();
-    // public readonly events = this.eventManager.subscriber;
-    
     constructor() {
         super(true);
 
@@ -129,41 +89,27 @@ export class Pxl8StatusBar extends Toolbar<Pxl8StatusbarEvents> {
         this.offsetLabel.site(this);
 
         this.setOffsetValue(-1);
+
+        this.on({ 'buttonClicked': e => this.onButtonClicked(e) });
     }
 
     private initWidget() {
-        var itemList = [
-            newSpacer(),
-            this.items.tileUp,
-            this.items.byteUp,
-            this.items.tileDown,
-            this.items.byteDown,
-        ];
+        this.addButton('tileUp', "Tile", "small_up.png");
+        this.addButton('byteUp', "Byte", "small_up.png");
+        this.addButton('tileDown', "Tile", "small_down.png");
+        this.addButton('byteDown', "Byte", "small_down.png");
+    }
 
-        itemList.forEach(item => {
-            if (item instanceof Widget) {
-                item.site(this);
-            } else {
-                this.element.appendChild(item);
-            }
-        });
-
-        this.palView.element.style.display = 'inline-block';
-        this.palView.element.style.verticalAlign = 'middle';
-        this.palView.element.style.marginLeft = '24px';
-
-        this.items.tileUp.on({
-            click: () => this.raise("scroll", ViewUnit.tile, Direction.up)
-        });
-        this.items.byteUp.on({
-            click: () => this.raise("scroll", ViewUnit.byte, Direction.up)
-        });
-        this.items.tileDown.on({
-            click: () => this.raise("scroll", ViewUnit.tile, Direction.down)
-        });
-        this.items.byteDown.on({
-            click: () => this.raise("scroll", ViewUnit.byte, Direction.down)
-        });
+    private onButtonClicked(btn: StatusBarButtons) {
+        if (btn === 'tileUp') {
+            this.raise("scroll", ViewUnit.tile, Direction.up);
+        }else if (btn === 'tileDown') {
+            this.raise("scroll", ViewUnit.tile, Direction.down);
+        }else if (btn === 'byteUp') {
+            this.raise("scroll", ViewUnit.byte, Direction.up);
+        }else if (btn === 'byteDown') {
+            this.raise("scroll", ViewUnit.byte, Direction.down);
+        }
     }
 
     public getPaletteView() { return this.palView; }
