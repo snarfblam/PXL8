@@ -40,7 +40,7 @@ export class Toolbar<TButtons extends string = string, TEvents extends ToolbarEv
     }
 
     protected createElement() {
-        var elem = $.create('div');
+        var elem = super.createElement();
         elem.classList.add('toolbar');
         return elem;
     }
@@ -85,12 +85,12 @@ export class Toolbar<TButtons extends string = string, TEvents extends ToolbarEv
     addSpace() {
         // Todo: this should be stylable
         var spacer = $.create('div');
-        spacer.style.width = '8px';
-        spacer.style.height = '8px';
-        spacer.style.display = 'inline-block';
+        spacer.classList.add('wdg');
+        spacer.classList.add('spacer');
         this.element.appendChild(spacer);
     }
 }
+Widget.setElementType(Toolbar, 'div', 'wdg-toolbar');
 
 export interface ToolbarButtonEvents{
     click: () => void;

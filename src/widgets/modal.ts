@@ -1,4 +1,4 @@
-import { Widget } from "./widget";
+import { Widget, Display } from "./widget";
 import { $ } from "../dollar";
 import { Events } from "../eventManager";
 import { prependChildElement } from "../util";
@@ -33,7 +33,7 @@ export enum ModalCloseReason{
 
 
 export class ModalHost extends Widget<{}> {
-    private visible = false;
+    // private visible = false;
     private currentModal = null as Modal<{}> | null;
     private keyDownHandler = (e: KeyboardEvent) => this.onKeyDown(e);
 
@@ -41,6 +41,8 @@ export class ModalHost extends Widget<{}> {
         super();
 
         this.subscribeToEvent('mousedown');
+        this.setDisplay(Display.block);
+        this.setVisible(false);
     }
 
     createElement() {
@@ -60,14 +62,14 @@ export class ModalHost extends Widget<{}> {
         return elem;
     }
 
-    setVisible(visible: boolean) {
-        this.visible = visible;
-        if (visible) {
-            this.element.style.display = 'block';
-        } else {
-            this.element.style.display = 'none';
-        }
-    }
+    // setVisible(visible: boolean) {
+    //     this.visible = visible;
+    //     if (visible) {
+    //         this.element.style.display = 'block';
+    //     } else {
+    //         this.element.style.display = 'none';
+    //     }
+    // }
 
     protected onMouseDown(e: MouseEvent) {
         if (e.target === this.element) {

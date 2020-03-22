@@ -1,0 +1,41 @@
+/* 
+// Todo: wdg- prefix on all classes (e.g. .wdg.wdg-toolbar)
+*/
+.wdg.option-set {
+
+}
+.wdg.option-set.list {
+
+}
+.wdg.option-set.icons {
+
+}
+
+.wdg.option-item {
+    border: 2px solid #aaaac4;
+    background: #ffffff;
+    padding: .3em .5em;
+    border-radius: 5px;
+    margin: 4px;
+}
+.wdg.option-set.list > .option-set.list {
+
+}
+.wdg.option-set.icons > .option-set.list {
+
+}
+.wdg.option-item.option-selected {
+    border: 2px solid #8e8ed0;
+    background: #d4d9f9;
+    font-weight: bold;
+}
+
+.wdg.spacer {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+}
+
+.wdg.wdg-toolbar {
+
+}

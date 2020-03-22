@@ -321,4 +321,8 @@ export class TileArranger extends Widget<TileArrangerEvents>{
         console.log('layout');
         this.views.forEach(view => this.positionView(view, true));
     }
+
+    redraw() {
+        this.views.forEach(view => this.renderView(view));
+    }
 }

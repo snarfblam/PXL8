@@ -336,9 +336,11 @@ export class MiniPaletteView extends Widget<PaletteViewEvents> {
         this.ui.element.oncontextmenu = e => e.preventDefault();
     }
 
-    createElement() {
-        return createElem('div', 0, 0, 300, 24);
-    }
+    // createElement() {
+    //     var elem = createElem('div', 0, 0, 300, 24);
+    //     elem.classList.add('pxl8-palview');
+    //     return elem;
+    // }
 
     private createComponents() {
         this.ui.element = this.element;
@@ -468,4 +470,5 @@ export class MiniPaletteView extends Widget<PaletteViewEvents> {
     }
 
 }
+Widget.setElementType(MiniPaletteView, 'div', '+ pxl8-palview');
 

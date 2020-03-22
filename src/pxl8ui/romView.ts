@@ -157,6 +157,12 @@ export class RomView {
         siteChild(this.element, site);
     }
 
+    setCodec(codec: TileCodec) {
+        if (this.rom) {
+            this.loadRom(this.rom, codec, this.document!);
+            this.tileArranger.redraw(); // somehow it knows what codec to use?
+        }
+    }
     loadRom(rom: ROM, codec: TileCodec, editor: DocumentEditor) {
         const gridHeight = 16;
 
@@ -196,6 +202,7 @@ export class RomView {
 
         this.rom.rawDataPromise.then(() => this.romLoaded = true);
         this.performLayout();
+        this.redraw();
     }
 
     public getDocument() { return this.document; }
@@ -289,6 +296,9 @@ export class RomView {
         this.setViewOffset(newOffset);
     }
 
+    redraw() {
+        this.setViewOffset(this.viewOffset);
+    }
     setViewOffset(offset: number) {
         if (!this.rom) return;
 

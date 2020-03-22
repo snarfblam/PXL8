@@ -34,6 +34,10 @@ export class GfxView extends Widget<GfxViewEvents> {
         super(true);
         // this.element = $.create('canvas') as HTMLCanvasElement;
         this.selection = new GfxSelection(this);
+
+        this.subscribeToEvent('mousemove');
+        this.subscribeToEvent('mousedown');
+        this.subscribeToEvent('mouseup');
     }
 
     createElement() {
@@ -62,9 +66,7 @@ export class GfxView extends Widget<GfxViewEvents> {
         };
         this.buffer = new GfxBuffer(bufferMetrics);
 
-        this.subscribeToEvent('mousemove');
-        this.subscribeToEvent('mousedown');
-        this.subscribeToEvent('mouseup');
+
         
     }
 

@@ -1,14 +1,18 @@
 import { Site, siteChild } from "../site";
-import { $ } from "../dollar";
+import { $ as _$, $$ as _$$ } from "../dollar";
 import { EventManager, nullEventManager, Events } from "../eventManager";
 import { ZLayer, ZRelativePosition } from './zlayer';
 import { WidgetMouseEvent } from './input';
 
+export const $ = _$;
+export const $$ = _$$;
 /** 
  * A (theoretically) unique string used as a property name on widgetized
  * DOM elements to store the corresponding widget object.
  */
 const elementWidgetSymbol = '#element.widget#';
+/** CSS class applied to all widgets */
+const globalWidgetClass = 'wdg';
 
 interface ElementEventHandlerOptions {
     bubbled: boolean;
@@ -40,13 +44,38 @@ const elementEventToWidgetEventMap = {
     mouseleave: 'onMouseLeave',
 }
 
+/** Enumerates element display modes directly supported by the Widget class. */
+export enum Display {
+    inline = 'inline',
+    block = 'block',
+    inlineBlock = 'inline-block',
+}
+
 /** The set of event names supported by a widget's built in event methods. */
 export type ElementEvents = keyof ElementEventHandlers;
 
+/**
+ * Wraps an element to help manage layout, state, styling, and UI composition
+ * and serves as a base class for more complex UI components.
+ * 
+ * @remarks
+ * "Managed display" is a small feature that allows a CSS display value to be
+ * specified that will persist when the widget is hidden and re-displayed via
+ * the setVisible() function. Calling either setVisible() or setDisplay() with
+ * non-null values enables managed display and calling either with a null value
+ * disables managed display.
+ * 
+ * Use managed display if you would like to be able to show and hide a widget 
+ * without manually setting the 'display' style each time. Don't use managed 
+ * display if you need to manually manage the 'display' style.
+ */
 export abstract class Widget
     <TEvents extends Events<TEvents>> {
     // <TEvents extends Events<TEvents> = {}> {
     
+    visible: boolean | null = null;
+    display: Display | null = null;
+
     element: HTMLElement;
     /** 
      * Used by the default implementation of CreateElement. To customize your
@@ -66,6 +95,7 @@ export abstract class Widget
 
     constructor(hasevents?: boolean) {
         this.element = this.createElement();
+        this.element.classList.add(globalWidgetClass);
         (this.element as any)[elementWidgetSymbol] = this;
 
         if (hasevents) {
@@ -158,6 +188,56 @@ export abstract class Widget
      */
     setLayer(zLayer: string, makeLayered?: boolean) {
         ZLayer.setLayer(this as any, zLayer, makeLayered);
+    }
+
+    /** Sets the visibility of the widget. See remarks about managed display. */
+    setVisible(visible: boolean | null) {
+        this.setDisplayMode(visible, this.display);
+    }
+
+    /** Sets the display of the widget. See remarks about managed display.  */
+    setDisplay(display: Display | null) {
+        this.setDisplayMode(this.visible, display);
+    }
+
+    /** Hides the widget (uses managed display) */
+    hide() {
+        this.setVisible(false);
+    }
+
+    /** Shows the widget (uses managed display) */
+    show() {
+        this.setVisible(true);
+    }
+
+    private setDisplayMode(visible: boolean | null, display: Display | null) {
+        var disableManagedDisplay = (visible == null && display == null);
+
+        if (disableManagedDisplay) {
+            // Disable managed display
+            this.visible = null;
+            this.display = null;
+        } else {
+            // Try to deduce omitted values
+            if (visible == null || display == null) {
+                var currentDisplay = getComputedStyle(this.element).display;
+
+                if (visible == null) visible = (currentDisplay === 'none');
+                if (display == null) {
+                    // Try to "unset" the
+                    // display style to find what is likely the correct value.
+                    if (currentDisplay === 'none') {
+                        var displaySet = this.element.style.display == null;
+                        this.element.style.display = displaySet ? null : 'initial';
+                        currentDisplay = getComputedStyle(this.element).display;
+                    }
+                    display = currentDisplay as Display;
+                }
+            }
+            this.visible = visible;
+            this.display = display;
+            this.element.style.display = visible ? this.display : 'none';
+        }
     }
 
     static defineLayer(name: string, position: ZRelativePosition) {

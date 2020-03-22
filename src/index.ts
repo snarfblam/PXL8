@@ -37,6 +37,9 @@ import { ZLayer } from './widgets/zlayer';
 import { InputModal } from './pxl8ui/inputModal';
 import { Pxl8Splash } from './pxl8ui/pxl8Splash';
 import { Direction } from './util';
+import { MenuModal } from './pxl8ui/menuModal';
+import { gbCodec } from './gfx/gbCodec';
+import { nesCodec } from './gfx/nesCodec';
 
 
 class Pxl8 {
@@ -48,6 +51,7 @@ class Pxl8 {
     private readonly docEditor: DocumentEditor;
     private readonly helpModal = new InputModal();
     private readonly splash = new Pxl8Splash();
+    private readonly menu = new MenuModal();
     private clipboardData: Uint8Array | null = null;
 
     private rom: ROM | null = null;
@@ -62,6 +66,8 @@ class Pxl8 {
     constructor() {
         var palView = this.getPaletteView();
         var arranger = this.romView.tileArranger;
+
+        this.menu.panes.format.setFormat('NES');
 
         this.docEditor = {
             events: this.events,
@@ -113,11 +119,15 @@ class Pxl8 {
                 if (buttonName === 'zoomout') {
                     arranger.zoomOut();                    
                 }
+                if (buttonName === 'menu') {
+                    this.menu.showModal();
+                }
                 if (buttonName === 'help') {
                     this.helpModal.showModal();
                 }
             }
         });
+        this.menu.panes.format.on({ formatSelected: () => console.log('format') as any + this.changeTileFormat() });
 
         this.romView.events.subscribe({
             offsetChanged: offset => this.statusBar.setOffsetValue(offset),
@@ -162,6 +172,18 @@ class Pxl8 {
         });
     }
 
+    /** Switches to the tile format specified by this.menu.panes.format.getFormat() */
+    private changeTileFormat() {
+        var format = this.menu.panes.format.getFormat()!;
+        var codec = ({
+            'GB': gbCodec,
+            'NES': nesCodec,
+        } as any)[format] as TileCodec;
+
+        this.currentCodec = codec;
+        this.romView.setCodec(codec);
+    }
+
     private setupLayers() {
         this.toolbar.setLayer(layers.chrome, true);
         this.statusBar.setLayer(layers.chrome, true);
@@ -175,8 +197,7 @@ class Pxl8 {
     }
 
     private loadRom(file: File) {
-        // this.currentCodec = tileCodecs.nesCodec;
-        this.currentCodec = tileCodecs.gbCodec;
+        this.currentCodec = tileCodecs.nesCodec;
         this.rom = new ROM(file);
         this.romView.loadRom(this.rom, this.currentCodec, this.docEditor);
         this.romView.setViewOffset(0);

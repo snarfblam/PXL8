@@ -12,14 +12,14 @@ import { Direction } from "../util";
 //     btn.setIcon(icon);
 //     return btn;
 // }
-function newSpacer(size?: number) {
-    size = size || 24;
-    var span = $.create('span');
-    span.style.display = 'inline-block';
-    span.style.height = '1px';
-    span.style.width = size.toString() + "px";
-    return span;
-}
+// function newSpacer(size?: number) {
+//     size = size || 24;
+//     var span = $.create('span');
+//     span.style.display = 'inline-block';
+//     span.style.height = '1px';
+//     span.style.width = size.toString() + "px";
+//     return span;
+// }
 function newPxl8Logo() {
     var logo = $.create('span');
     logo.textContent = "PXL";
@@ -66,7 +66,7 @@ export class Pxl8Toolbar extends Toolbar<Pxl8ToolbarButton> {
         this.addButton("zoomout", "Zoom In", "zoomin.png");
         this.addButton("zoomin", "Zoom Out", "zoomout.png");
         this.addSpace();
-        this.addButton("menu", "Menu", "tiles.png");
+        this.addButton("menu", "Format", "tiles.png");
         this.addButton("help", "Help", "help.png");
     }
 }
@@ -128,3 +128,4 @@ export class Pxl8StatusBar extends Toolbar<StatusBarButtons, Pxl8StatusbarEvents
         this.offsetLabel.setText(text);
     }
 }
+Widget.setElementType(Pxl8StatusBar, 'div', '+ pxl8-mini-toolbar');

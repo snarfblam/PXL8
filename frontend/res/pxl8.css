@@ -416,6 +416,18 @@ button.pxl8-rgb-ok {
     box-shadow: 1px 1px #BBBBBB;
 }
 
+.pxl8-palview {
+    display: inline-block;
+    width: 300px;
+    height: 24px;
+    vertical-align: middle;
+    margin-left: 64px;
+}
+
+.pxl8-mini-toolbar {
+    padding-left: 16px;
+}
+
 /*** Modals ****************************************************/
 
     body.modal {
