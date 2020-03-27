@@ -4,6 +4,7 @@ import { Arrayish } from '../util';
 
 import { nesCodec } from './nesCodec';
 import { gbCodec } from './gbCodec';
+import * as generalCodecs from './generalCodecs';
 
 export interface BufferPointer {
     data: ArrayLike<number>;
@@ -91,6 +92,7 @@ export const SwatchPaletteCue = {
 export const tileCodecs = {
     nesCodec,
     gbCodec,
+    codec1Bpp: generalCodecs.Codec1Bpp,
 };
 
 export const demoNesTile = [

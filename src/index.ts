@@ -38,9 +38,10 @@ import { InputModal } from './pxl8ui/inputModal';
 import { Pxl8Splash } from './pxl8ui/pxl8Splash';
 import { Direction } from './util';
 import { MenuModal } from './pxl8ui/menuModal';
-import { gbCodec } from './gfx/gbCodec';
-import { nesCodec } from './gfx/nesCodec';
+// import { gbCodec } from './gfx/gbCodec';
+// import { nesCodec } from './gfx/nesCodec';
 
+const { gbCodec, nesCodec, codec1Bpp } = tileCodecs;
 
 class Pxl8 {
     private readonly appContainer = $('.app-container') as HTMLElement;
@@ -178,6 +179,7 @@ class Pxl8 {
         var codec = ({
             'GB': gbCodec,
             'NES': nesCodec,
+            '1BPP': codec1Bpp,
         } as any)[format] as TileCodec;
 
         this.currentCodec = codec;

@@ -96,7 +96,7 @@ export class GfxView extends Widget<GfxViewEvents> {
             var tilesToRender = Math.min(this.metrics.gridWidth, availTiles);
             for (var iTile = 0; iTile < tilesToRender; iTile++) {
                 buffer.loadTile(src, iTile, 0);
-                src.offset += 0x10;
+                src.offset += codec.bytesPerTile;
             }
 
             var outY = tileY * metrics.tileHeight * metrics.pixelHeight;

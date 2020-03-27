@@ -140,6 +140,16 @@ export abstract class Widget
             }
         }
     }
+    public appendText(text: string) {
+        this.element.appendChild(document.createTextNode(text));
+    }
+    public addChild(child: WidgetLike | HTMLElement) {
+        if (child instanceof Widget) {
+            child.site(this);
+        } else {
+            this.element.appendChild(child);
+        }
+    }
     /** Places this element into a parent element */
     public site<TEvents extends Events<TEvents>>(site: Site | HTMLElement | WidgetLike) {
         if(this.element.parentElement) throw Error("can not site an already sited widget")
