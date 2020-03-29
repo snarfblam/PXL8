@@ -4,6 +4,7 @@ import { Arrayish } from '../util';
 
 import { nesCodec } from './nesCodec';
 import { gbCodec } from './gbCodec';
+import { snesCodec4Bpp } from './snesCodecs';
 import * as generalCodecs from './generalCodecs';
 
 export interface BufferPointer {
@@ -93,6 +94,7 @@ export const tileCodecs = {
     nesCodec,
     gbCodec,
     codec1Bpp: generalCodecs.Codec1Bpp,
+    snesCodec4Bpp,
 };
 
 export const demoNesTile = [

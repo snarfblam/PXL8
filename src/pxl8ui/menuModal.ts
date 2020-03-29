@@ -37,7 +37,7 @@ class MenuPane<TEvents extends Events<TEvents>> extends Widget<TEvents> {
 export interface TileFormatPaneEvents {
     formatSelected?: () => void;
 }
-export type CodecName = 'NES' | 'GB' | '1BPP';
+export type CodecName = 'NES' | 'GB' | '1BPP' | 'SNES4BPP';
 
 class TileFormatPane extends MenuPane<TileFormatPaneEvents> {
     formats = new OptionSet();
@@ -51,6 +51,7 @@ class TileFormatPane extends MenuPane<TileFormatPaneEvents> {
         this.formats.addItem('NES', 'NES');
         this.formats.addItem('GB', 'GB');
         this.formats.addItem('1BPP', '1-BPP');
+        this.formats.addItem('SNES4BPP', 'SNES (4-Bit)');
         // this.formats.addItem('SNES', 'SNES');
         this.addChild(this.formats);
 
